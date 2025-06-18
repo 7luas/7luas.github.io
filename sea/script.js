@@ -1084,8 +1084,8 @@ function updatePointerCanvasPos(theEvent){
 		}
 	}
 	
-	mouseX = theEvent.x*canvasRes;
-	mouseY = theEvent.y*canvasRes;
+	mouseX = theEvent.targetTouches[0].pageX.x*canvasRes;
+	mouseY = theEvent.targetTouches[0].pageY.y*canvasRes;
 }
 
 function readLocalVars(){													

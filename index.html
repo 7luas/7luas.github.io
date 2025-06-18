@@ -1,51 +1,789 @@
 <html>
-	<head>
-		<title>Title for this project (Template v0.2 2025/06/03)</title>
-		<meta name="viewport" content="user-scalable=no,initial-scale=1,maximum-scale=1,minimum-scale=1,width=device-width">
-		<meta name="robots" content="noindex">
-		<script language="javascript" type="text/javascript" src="script.js"></script>
-		<style>
-			body {
-				background-color:#000000; 
-				width: 100%; 
-				height: 100%; 
-				margin: 0;
-			}
-			#everything {
-				background-color:#FFFFFF; 
-				width: 100%; 
-				height: 100%;  
-				margin:0; 
-				position: relative;
-			
-			}
-			
-			#mainCanvas, #fakePixelsCanvas, #debugCanvas, #pointerCanvas {
-				width: 100%;
-				height: 100%;  
-				margin:0; 
-				touch-action: none; 
-				position: absolute;
-			}
-			
-			#fakePixelsCanvas {
-				image-rendering: -moz-crisp-edges;
-				image-rendering: -webkit-crisp-edges;
-				image-rendering: pixelated;			
-			}
-			
-		</style>
-	</head>
-	<body onload="onLoad();" onkeydown="onKeyDown(event)" onkeyup="onKeyUp(event);">
+<head>
+  <link rel="icon" type="image/x-icon" href="images/favicon.png">
+<meta name="viewport" content="user-scalable=no,initial-scale=1,maximum-scale=1,minimum-scale=1,width=device-width">
+<meta name="robots" content="noindex">
+<meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css?family=Roboto+Slab:300,400&display=swap" rel="stylesheet">
+<style>
+.master {
+	font-size: calc(0.8em + 1vw); 
+	margin:0px; 
+	font-family: 'Roboto Slab';  serif; background-color:#FFFFFF; 
+	text-align:center;
+}
+.main {
+	max-width:1200px;
+	text-align:center;
+	display: inline-block;
+}
+h1 { font-size: 1em; font-weight:300; line-height: 1.4em;  margin: 2em 20% 1.4em 20%; text-align:left;}
+h2 { font-size: 0.7em; font-weight:300; line-height: 1.1em;  margin: 2em 20% 1.4em 20%; text-align:left;}
+p { font-size: 0.45em; line-height: 0.7em; margin: 2em 20% 1.4em 20%;}
+a {color: grey;}
+.caption { font-size: 0.6em; margin: 1em 0px 3em 0px;}
+ 
+strong {font-weight:400;}
+
+.embed-container { position: relative; padding-bottom: 35.5%; height: 0; overflow: hidden; max-width: 50%; height: auto;} 
+.embed-container iframe, .embed-container object, .embed-container embed { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+
+ 
+.line {
+clear:both;
+display: block;
+  overflow: auto;
+}
 
 
-		<div id="everything">
-			<canvas id="fakePixelsCanvas"></canvas>
-			<canvas id="mainCanvas"></canvas>
-			<canvas id="debugCanvas"></canvas>
-			<canvas id="pointerCanvas"></canvas>
+.layout5cols {
+  width: 20%;
+    position: relative;
+  float:left;
+}
+ 
+.layout4cols {
+  overflow: auto;
+  width: 25%;
+    position: relative;
+  float:left;
+}
+
+.container{
+  overflow: auto;
+
+}
+
+.layout3cols {
+  width: 33.333%;
+    position: relative;
+  float:left;
+}
+
+.layout2cols {
+  width: 50%;
+    position: relative;
+  float:left;
+}
+
+
+.image {
+  opacity: 1;
+  display: block;
+  width: 100%;
+  height: auto;
+  transition: .5s ease;
+  backface-visibility: hidden;
+}
+
+.middle {
+  transition: .5s ease;
+  opacity: 0;
+  position: absolute;
+  top: 50%;
+  left: 20%;
+  transform: translate(-10%, -50%);
+  -ms-transform: translate(-10%, -50%);
+  text-align: center;
+  
+    background-color: #FFFFFF;
+}
+
+.container:hover .image {
+filter: brightness(80%);
+ 
+}
+
+.container:hover .middle {
+  opacity: 1;
+}
+
+.text {
+  color: black;
+  font-size: 16px;
+  line-height: 1.7em;
+  padding: 16px 10px;
+}
+
+.interText {
+	padding-top: 0.1em;
+	display:inline-block;
+}
+
+ 
+ 
+@media (max-width: 800px)
+{
+ 
+.layout5cols {
+  width: 50%;
+    position: relative;
+  float:left;
+}
+.layout4cols {
+  width: 50%;
+    position: relative;
+  float:left;
+}
+
+.layout3cols {
+  width: 100%;
+    position: relative;
+  float:left;
+}
+
+.layout2cols {
+  width: 100%;
+    position: relative;
+  float:left;
+}
+
+h1 { font-size: 1.1em; margin: 2em 10% 1.4em 10%;}
+h2 { font-size: 0.85em;}
+
+
+.embed-container {  padding-bottom: 75%;  max-width: 100%;  } 
+}
+
+
+ 
+ 
+</style>
+ 
+</head>
+<body class="master">
+
+<div class="main">
+
+<div class = "interText">
+	<h1>Hello, my name is <strong>Daniel Ferreira</strong>. I am a Digital Designer, Art Director and Learning Designer. Here are some of my works.</h1>
+</div>
+
+<div class = "line">
+	<div class="layout4cols">
+		<div class="container">
+		  <img src="images/kcs3.gif" alt="" class="image" style="width:100%">
+		  <div class="middle">
+			<div class="text"><b>Character design and animation</b> for a marketing video.</div>
+		  </div>
 		</div>
+	</div>
+	<div class="layout4cols">
+		<div class="container">
+				<video  muted autoplay loop  class="image" style="width:100%"><source src="images/2019_MTC1.mp4" type="video/mp4">Browser does not support video tag.</video>
+			  <div class="middle">
+			<div class="text"><b>3D design and animation</b> for a Mental Health learning resource.</div>
+		  </div>
+		</div>
+	</div>
+	<div class="layout4cols">
+		<div class="container">
+				<video  muted autoplay loop  class="image" style="width:100%"><source src="images/kcs1.mp4" type="video/mp4">Browser does not support video tag.</video>
+		  <div class="middle">
+			<div class="text"><b>Motion design</b> for a marketing video.</div>
+		  </div>
+		</div>
+	</div>
+	<div class="layout4cols">
+		<div class="container">
+			<video  muted autoplay loop  class="image" style="width:100%"><source src="images/kcs2.mp4" type="video/mp4">Browser does not support video tag.</video>
+		  <div class="middle">
+			<div class="text"><b>Character design and animation</b> for a marketing video.</div>
+		  </div>
+		</div>
+	</div>
+</div>
+ 
+ <div class = "line">
+	<div class="layout2cols">
+		<div class="container">
+		  <img src="images/RW1.gif" alt="" class="image" style="width:100%">
+		  <div class="middle">
+			<div class="text"><b>Interaction</b> for a Remote Working health and safety course.</div>
+		  </div>
+		</div>
+	</div>
+	<div class="layout2cols">
+		<div class="container">
+		  <img src="images/IconsClean.jpg" alt="" class="image" style="width:100%">
+		  <div class="middle">
+			<div class="text"><b>Illustrations</b> for a Mental Health course.</div>
+		  </div>
+		</div>
+	</div>
+</div>
 
 
-	</body>
+<div class = "line">
+	<div class="layout2cols">
+		<div class="container">
+		<video  muted autoplay loop  class="image" style="width:100%"><source src="images/sigurVid.mp4" type="video/mp4">Browser does not support video tag.</video>
+		  <div class="middle">
+			<div class="text"><b>Cubes</b> is an experimental <a href="https://www.youtube.com/watch?v=hRn_bL5JEHA" target="_blank">procedural animation</a>.</div>
+		  </div>
+		</div>
+	</div>
+	<div class="layout2cols">
+		<div class="container">
+			<video  muted autoplay loop  class="image" style="width:100%"><source src="images/VRvid.mp4" type="video/mp4">Browser does not support video tag.</video>
+		  <div class="middle">
+			<div class="text"><b>Explainer animation</b> for a Virtual Reality training module.</div>
+		  </div>
+		</div>
+	</div>
+</div>
+
+
+
+<div class = "interText">
+		<h1>I have extensive experience in the creative industry and in further education, working in a variety of media, styles and techniques.</h1>
+</div>
+
+
+
+<div class = "line">
+	<div class="layout2cols">
+		<div class="container">
+		  <img src="images/PixelFaces.jpg" alt="" class="image" style="width:100%">
+		  <div class="middle">
+			<div class="text"><b>Pixel art</b> for a GDPR learning resource.</div>
+		  </div>
+		</div>
+	</div>
+	<div class="layout2cols">
+		<div class="container">
+		<video  muted autoplay loop  class="image" style="width:100%"><source src="images/IcarusVidlo.mp4" type="video/mp4">Browser does not support video tag.</video>
+		  <div class="middle">
+			<div class="text"><b>Animated promo</b> for a fashion label.</div>
+		  </div>
+		</div>
+	</div>
+</div>
+
+
+<div class = "line">
+	<div class="layout4cols">
+		<div class="container">
+		<video  muted autoplay loop  class="image" style="width:100%"><source src="images/banner1.mp4" type="video/mp4">Browser does not support video tag.</video>
+		  <div class="middle">
+			<div class="text"><b>Online campaigns</b> for Fox Films Latin America.</div>
+		  </div>
+		</div>
+	</div>	
+	<div class="layout4cols">
+		<div class="container">
+		<video  muted autoplay loop  class="image" style="width:100%"><source src="images/banner2.mp4" type="video/mp4">Browser does not support video tag.</video>
+		  <div class="middle">
+			<div class="text"><b>Online campaigns</b> for Fox Films Latin America.</div>
+		  </div>
+		</div>
+	</div>
+	<div class="layout4cols">
+		<div class="container">
+		<video  muted autoplay loop  class="image" style="width:100%"><source src="images/banner3.mp4" type="video/mp4">Browser does not support video tag.</video>
+		  <div class="middle">
+			<div class="text"><b>Online campaigns</b> for Fox Films Latin America.</div>
+		  </div>
+		</div>
+	</div>
+	<div class="layout4cols">
+		<div class="container">
+		<video  muted autoplay loop  class="image" style="width:100%"><source src="images/banner4.mp4" type="video/mp4">Browser does not support video tag.</video>
+		  <div class="middle">
+			<div class="text"><b>Online campaigns</b> for Fox Films Latin America.</div>
+		  </div>
+		</div>
+	</div>
+
+</div>
+
+
+<div class = "line">
+	<div class="layout2cols">
+		<div class="container">
+		  <img src="images/font1.jpg" alt="" class="image" style="width:100%">
+		  <div class="middle">
+			<div class="text"><b>Type design and logo</b> for a mechanical engineering conference.</div>
+		  </div>
+		</div>
+	</div>
+	<div class="layout2cols">
+		<div class="container">
+		  <img src="images/font2.jpg" alt="" class="image" style="width:100%">
+		  <div class="middle">
+			<div class="text"><b>Kuadriculado</b> is (arguably) the smallest pixel font possible - try it out <a href="https://www.dafont.com/kuadriculado.font" target="_blank">here</a></div>
+		  </div>
+		</div>
+	</div>
+</div>
+
+
+<div class = "line">
+	<div class="layout3cols">
+		<div class="container">
+		  <img src="images/tall1.jpg" alt="" class="image" style="width:100%">
+		  <div class="middle">
+			<div class="text"><b>Code-assisted drawing toy</b> developed in p5.js</div>
+		  </div>
+		</div>
+	</div>
+	<div class="layout3cols">
+		<div class="container">
+		  <img src="images/tall2.jpg" alt="" class="image" style="width:100%">
+		  <div class="middle">
+			<div class="text"><b>Illustration and cover design</b> for the book Sensual Tales of a Restless Mind (Kate Blair).</div>
+		  </div>
+		</div>
+	</div>
+	<div class="layout3cols">
+		<div class="container">
+		  <img src="images/tall3.jpg" alt="" class="image" style="width:100%">
+		  <div class="middle">
+			<div class="text"><b>Illustration</b> from the series Dibujos en Espana</div>
+		  </div>
+		</div>
+	</div>
+</div>
+
+<div class = "interText">
+	<h1>I am passionate about communication, and the different ways that a message or idea can be conveyed to an audience in an effective, engaging and original manner.</h1>
+</div>
+
+<div class = "line">
+	<div class="layout4cols">
+		<div class="container">
+				<video  muted autoplay loop  class="image" style="width:100%"><source src="images/2017_GDPR_world.mp4" type="video/mp4">Browser does not support video tag.</video>
+		  <div class="middle">
+			<div class="text"><b>Pixel art</b> for a GDPR learning resource.</div>
+		  </div>
+		</div>
+	</div>
+	<div class="layout4cols">
+		<div class="container">
+				<video  muted autoplay loop  class="image" style="width:100%"><source src="images/2019_MTC2.mp4" type="video/mp4">Browser does not support video tag.</video>
+		  <div class="middle">
+			<div class="text"><b>3D motion design</b> for a Mental Health course.</div>
+		  </div>
+		</div>
+	</div>
+	<div class="layout4cols">
+		<div class="container">
+				<video  muted autoplay loop  class="image" style="width:100%"><source src="images/stress.mp4" type="video/mp4">Browser does not support video tag.</video>
+		  <div class="middle">
+			<div class="text"><b>Motion design</b> for a Stress Awareness learning resource.</div>
+		  </div>
+		</div>
+	</div>
+	<div class="layout4cols">
+		<div class="container">
+				<video  muted autoplay loop  class="image" style="width:100%"><source src="images/2019_MTC3.mp4" type="video/mp4">Browser does not support video tag.</video>
+		  <div class="middle">
+			<div class="text"><b>3D animation</b> for a Mental Health course.</div>
+		  </div>
+		</div>
+	</div>
+</div>
+
+
+<div class = "line">
+	<div class="layout3cols">
+		<div class="container">
+		  <img src="images/infographic1.gif"   alt="" class="image" style="width:100%">
+		  <div class="middle">
+			<div class="text"><b>Infographics</b> for a Mental Health course.</div>
+		  </div>
+		</div>
+	</div>
+	<div class="layout3cols">
+		<div class="container">
+		  <img src="images/infographic2.gif"   alt="" class="image" style="width:100%">
+		  <div class="middle">
+			<div class="text"><b>Infographics</b> for a Mental Health course.</div>
+		  </div>
+		</div>
+	</div>
+	<div class="layout3cols">
+		<div class="container">
+		  <img src="images/VRAR.jpg" alt="" class="image" style="width:100%">
+		  <div class="middle">
+		  	<div class="text"><b>Visual identity and iconography</b> for a suite of Virtual Reality and Augmented Reality learning resources.</div>
+		  </div>
+		</div>
+	</div>	
+</div>
+ 
+<div class = "line">
+	<div class="layout4cols">
+		<div class="container">
+		  <img src="images/IconsConduct.jpg" alt="" class="image" style="width:100%">
+		  <div class="middle">
+			<div class="text"><b>Iconography</b> for a training module.</div>
+		  </div>
+		</div>
+	</div>
+	<div class="layout4cols">
+		<div class="container">
+		  <img src="images/film2.jpg" alt="" class="image" style="width:100%">
+		  <div class="middle">
+			<div class="text"><b>Scriptwriting, direction and video editing</b> for a Mental Health course.</div>
+		  </div>
+		</div>
+	</div>
+	<div class="layout4cols">
+		<div class="container">
+		  <img src="images/film3.jpg" alt="" class="image" style="width:100%">
+		  <div class="middle">
+			<div class="text"><b>Scriptwriting, direction and video editing</b> for a Mental Health course.</div>
+		  </div>
+		</div>
+	</div>
+	<div class="layout4cols">
+		<div class="container">
+		  <img src="images/film4.jpg" alt="" class="image" style="width:100%">
+		  <div class="middle">
+			<div class="text"><b>Interactive learning resources</b> for a Mental Health course.</div>
+		  </div>
+		</div>
+	</div>
+</div>
+
+<div class = "line" style="background:#bbd7e6">
+	<div class="layout4cols">
+		<div class="container">
+				<video  muted autoplay loop  class="image" style="width:100%"><source src="images/DSE.mp4" type="video/mp4">Browser does not support video tag.</video>
+		  <div class="middle">
+			<div class="text"><b>Interaction</b> for a learning resource about ergonomics.</div>
+		  </div>
+		</div>
+	</div>
+	<div class="layout4cols">
+		<div class="container">
+				<video  muted autoplay loop  class="image" style="width:100%"><source src="images/Habits_hi.mp4" type="video/mp4">Browser does not support video tag.</video>
+		  <div class="middle">
+			<div class="text"><b>Interaction</b> for a learning resource about habits and well-being.</div>
+		  </div>
+		</div>
+	</div>
+	<div class="layout4cols">
+		<div class="container">
+		  <video  muted autoplay loop  class="image" style="width:100%"><source src="images/Exe.mov" type="video/mp4">Browser does not support video tag.</video>
+		  <div class="middle">
+			<div class="text"><b>Interaction</b> for a course about Stress.</div>
+		  </div>
+		</div>
+	</div>	
+	<div class="layout4cols">
+		<div class="container">
+		  <video  muted autoplay loop  class="image" style="width:100%"><source src="images/LZ.mov" type="video/mp4">Browser does not support video tag.</video>
+		  <div class="middle">
+			<div class="text"><b>Motion design</b> for an explainer video.</div>
+		  </div>
+		</div>
+	</div>
+
+</div>	
+	
+	
+<div class = "interText">
+	<h1>I'm a creative coder, comfortable developing interactions, games and prototypes. I enjoy experimenting with new languages, platforms and technology.</h1>
+</div>
+
+<div class = "line">
+	<div class="layout2cols">
+		<div class="container">
+			<video  muted autoplay loop  class="image" style="width:100%"><source src="images/BoatVid.mp4" type="video/mp4">Browser does not support video tag.</video>
+		  <div class="middle">
+			<div class="text"><b>Game prototype</b> using the threejs library.</div>
+		  </div>
+		</div>
+	</div>
+	<div class="layout2cols">
+		<div class="container">
+		  <img src="images/MartinGame.jpg" alt="" class="image" style="width:100%">
+		  <div class="middle">
+			<div class="text"><b>Platform game</b> for a course about Working at Heights.</div>
+		  </div>
+		</div>
+	</div>
+</div>
+
+
+<div class = "line">
+	<div class="layout4cols">
+		<div class="container">
+		  <img src="images/app2.jpg" alt="" class="image" style="width:100%">
+		  <div class="middle">
+			<div class="text"><b>UI/UX design</b> for a digital learning companion app.</div>
+		  </div>
+		</div>
+	</div>
+	<div class="layout4cols">
+		<div class="container">
+		  <img src="images/app3.jpg" alt="" class="image" style="width:100%">
+		  <div class="middle">
+			<div class="text"><b>UI/UX design</b> for a digital learning companion app.</div>
+		  </div>
+		</div>
+	</div>
+	<div class="layout4cols">
+		<div class="container">
+		  <img src="images/app4.jpg" alt="" class="image" style="width:100%">
+		  <div class="middle">
+			<div class="text"><b>UI/UX design</b> for a digital learning companion app.</div>
+		  </div>
+		</div>
+	</div>
+	<div class="layout4cols">
+		<div class="container">
+		  <img src="images/app1.jpg" alt="" class="image" style="width:100%">
+		  <div class="middle">
+			<div class="text"><b>UI/UX design</b> for a digital learning companion app.</div>
+		  </div>
+		</div>
+	</div>
+
+</div>
+
+<div class = "line">
+	<div class="layout2cols">
+		<div class="container">
+		  <img src="images/PWA.jpg" alt="" class="image" style="width:100%">
+		  <div class="middle">
+			<div class="text"><b>Progressive Web App</b> framework for offline access of digital tools and learning resources.</div>
+		  </div>
+		</div>
+	</div>
+	<div class="layout2cols">
+		<div class="container">
+		  <video  muted autoplay loop  class="image" style="width:100%"><source src="images/Stop.mov" type="video/mp4">Browser does not support video tag.</video>
+		  <div class="middle">
+			<div class="text"><b>Game</b> and social media campaign for a Driver Safety course.</div>
+		  </div>
+		</div>
+	</div>
+</div>
+
+
+	
+
+<div class = "interText">
+	<h1>In my PhD research I studied how designers, artists and indie game devs use code as an expressive language, to convey ideas an emotions.</h1>
+</div>
+
+<div class = "line">
+	<div class="layout2cols">
+		<div class="container">
+		  <img src="images/diss1.jpg" alt="" class="image" style="width:100%">
+		  <div class="middle">
+			<div class="text">Research developed between São Paulo University (USP, Brasil) and University College London.</div>
+		  </div>
+		</div>
+	</div>
+	<div class="layout2cols">
+		<div class="container">
+		  <img src="images/researchBR1.jpg" alt="" class="image" style="width:100%">
+		  <div class="middle">
+			<div class="text"><b>Rumos Arte Cibernética</b> award for academic research.</div>
+		  </div>
+		</div>
+	</div>
+</div>
+
+<div class = "line">
+	<div class="layout2cols">
+		<div class="container">
+		  <img src="images/scribbles.gif"   alt="" class="image" style="width:100%">
+		  <div class="middle">
+			<div class="text"><b>Scribbles</b> is a Processing remake of a ZX BASIC program by Adrian Ward.</div>
+		  </div>
+		</div>
+	</div>
+	<div class="layout2cols">
+		<div class="container">
+		  <video  muted autoplay loop  class="image" style="width:100%"><source src="images/brancoBlack.mp4" type="video/mp4">Browser does not support video tag.</video>		
+		  <div class="middle">
+			<div class="text"><b>Generative animation</b>, part of PROCJAM.</div>
+		  </div>
+		</div>
+	</div>
+</div>
+
+
+<div class = "interText">
+	<h1>Part of that research was done within the project Playing Beowulf (University College London), which aimed to reimagine the medieval text as a procedural narrative.</h1>
+</div>
+
+<div class = "line">
+	<div class="layout2cols">
+		<div class="container">
+		  <img src="images/workshop1.jpg" alt="" class="image" style="width:100%">
+		  <div class="middle">
+			<div class="text">Workshop part of the <a href="https://darecollaborative.net/2015/03/11/playing-beowulf-gaming-the-library/" target="_blank">Playing Beowulf</a> project, at the London Knowledge Lab, UCL.</div>
+		  </div>
+		</div>
+	</div>
+	<div class="layout2cols">
+		<div class="container">
+		  <img src="images/mm2.jpg" alt="" class="image" style="width:100%">
+		  <div class="middle">
+			<div class="text">Early interface of MissionMaker, a game authoring tool part of the <a href="https://darecollaborative.net/2015/03/11/playing-beowulf-gaming-the-library/" target="_blank">Playing Beowulf</a> project.</div>
+		  </div>
+		</div>
+	</div>
+</div>
+
+<div class = "line">
+	<div class="layout2cols">
+		<div class="container">
+		  <img src="images/workshop2.jpg" alt="" class="image" style="width:100%">
+		  <div class="middle">
+			<div class="text">Workshop part of the <a href="https://darecollaborative.net/2015/03/11/playing-beowulf-gaming-the-library/" target="_blank">Playing Beowulf</a> project, at the London Knowledge Lab, UCL.</div>
+		  </div>
+		</div>
+	</div>
+	<div class="layout2cols">
+		<div class="container">
+		  <img src="images/beo.jpg" alt="" class="image" style="width:100%">
+		  <div class="middle">
+			<div class="text">One of the games created with MissionMaker (<a href="https://darecollaborative.net/2015/03/11/playing-beowulf-gaming-the-library/" target="_blank">Playing Beowulf</a>)</div>
+		  </div>
+		</div>
+	</div>
+</div>
+ 
+
+<div class = "interText">
+	<h1>I have participated in several art exhibits, individually and as part of a collective, in various digital, traditional and mixed media.</h1>
+</div>
+ 
+ <div class = "line">
+	<div class="layout2cols">
+		<div class="container">
+		  <img src="images/exhibit1.jpg" alt="" class="image" style="width:100%">
+		  <div class="middle">
+			<div class="text"><b>Desluz</b> is a mixed media art installation.</div>
+		  </div>
+		</div>
+	</div>
+	<div class="layout2cols">
+		<div class="container">
+		  <img src="images/art1.jpg" alt="" class="image" style="width:100%">
+		  <div class="middle">
+			<div class="text"><b>Amoreiras</b> is a mixed media art installation.</div>
+		  </div>
+		</div>
+	</div>
+</div>
+
+<div class = "line">
+	<div class="layout2cols">
+		<div class="container">
+		  <img src="images/exhibit2.jpg" alt="" class="image" style="width:100%">
+		  <div class="middle">
+			<div class="text"><b>Nibballs</b> is a game, part of the FILE Festival (São Paulo, Brasil).</div>
+		  </div>
+		</div>
+	</div>
+	<div class="layout2cols">
+		<div class="container">
+		  <img src="images/exhibit3.jpg" alt="" class="image" style="width:100%">
+		  <div class="middle">
+			<div class="text"><b>Windmill</b> is a mixed media art installation.</div>
+		  </div>
+		</div>
+	</div>
+</div>
+
+<div class = "line">
+	<div class="layout2cols">
+		<div class="container">
+		  <img src="images/researchBR2.jpg" alt="" class="image" style="width:100%">
+		  <div class="middle">
+			<div class="text"><b>pedralumen</b> is a mixed media art installation.</div>
+		  </div>
+		</div>
+	</div>
+	<div class="layout2cols">
+		<div class="container">
+		<video  muted autoplay loop  class="image" style="width:100%"><source src="images/redblues.mp4" type="video/mp4">Browser does not support video tag.</video>
+		<div class="middle">
+			<div class="text"><b>Animated music video</b> for the band Del-O-Max.</div>
+		</div>
+		</div>
+	</div>
+</div>
+ 
+<div class = "interText">
+	<h1>I also do comics. My general approach to visual language is strongly influenced by sequential art.</h1>
+</div>
+
+
+<div class = "line">
+	<div class="layout2cols">
+		<div class="container">
+		  <img src="images/comic1.jpg" alt="" class="image" style="width:100%">
+		  <div class="middle">
+		  </div>
+		</div>
+	</div>
+	<div class="layout2cols">
+		<div class="container">
+		  <img src="images/comic2.jpg" alt="" class="image" style="width:100%">
+		  <div class="middle">
+		  </div>
+		</div>
+	</div>
+</div>
+
+<div class = "line">
+	<div class="layout2cols">
+		<div class="container">
+		  <img src="images/comic5.jpg" alt="" class="image" style="width:100%">
+		  <div class="middle">
+		  </div>
+		</div>
+	</div>
+	<div class="layout2cols">
+		<div class="container">
+		  <img src="images/Asbestos.jpg" alt="" class="image" style="width:100%">
+		  <div class="middle">
+		  </div>
+		</div>
+	</div>
+</div>
+
+<div class = "line">
+	<div class="layout2cols">
+		<div class="container">
+		  <img src="images/room.jpg" alt="" class="image" style="width:100%">
+		  <div class="middle">
+		  </div>
+		</div>
+	</div>
+	<div class="layout2cols">
+		<div class="container">
+		  <img src="images/comic6.jpg" alt="" class="image" style="width:100%">
+		  <div class="middle">
+		  </div>
+		</div>
+	</div>
+</div>
+
+  
+<div class = "line">
+</br>
+	<h1>Let's <a href="mailto:danielpeixotoferreira@gmail.com">work together.</a></h1>
+	 
+	<h2>&copy; <script>document.write(new Date().getFullYear())</script> Daniel Ferreira</h2>
+
+		  
+	<h2><a href="#top">Back to top ⬆</a></h2>
+ </div>
+
+ 
+</br>
+
+</div>
+</body>
+
 </html>

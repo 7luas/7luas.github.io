@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_2" data-name="Layer 2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 106.3 106.3">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: none;
+        stroke: #fff;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        stroke-width: 5.52px;
+      }
+
+      .cls-2 {
+        fill: #d32218;
+      }
+    </style>
+  </defs>
+  <g id="UI_Top" data-name="UI Top">
+    <g>
+      <circle class="cls-2" cx="53.15" cy="53.15" r="53.15"/>
+      <g id="SVGRepo_iconCarrier" data-name="SVGRepo iconCarrier">
+        <path class="cls-1" d="M78.19,64.16c-1.33,3.02-3.23,5.85-5.7,8.33-10.68,10.68-28,10.68-38.68,0l-8.29-8.29M25.52,64.2h11.05M25.52,64.2v11.05M28.1,42.14c1.33-3.02,3.23-5.85,5.7-8.33,10.68-10.68,28-10.68,38.68,0l8.29,8.29M80.78,42.1v-11.05M80.78,42.1h-11.05"/>
+      </g>
+    </g>
+  </g>
+</svg>

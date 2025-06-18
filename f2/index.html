@@ -1,191 +1,534 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portfolio v1.05</title>
-    <style>
-        /* Embedded CSS (can be moved to external file) */
-        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap');
-        body {
-            font-family: 'Roboto', sans-serif;
-            margin: 0;
-            padding: 0;
-            text-align: center;
-            background: #fff;
-        }
-        h1 {
-            font-size: 1.5em;
-            margin: 20px 0;
-        }
-        .filters {
-            display: flex;
-            justify-content: center;
-            gap: 5px;
-            margin-bottom: 10px;
-        }
-        .filters button {
-            font-size: 0.8em;
-            text-transform: uppercase;
-            padding: 5px 10px;
-            border: none;
-            background: #ddd;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-        .filters button:hover {
-            background: #bbb;
-        }
-        .project-count {
-            font-size: 0.8em;
-            margin-bottom: 10px;
-        }
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(800px, 1fr));
-            gap: 0;
-            justify-content: center;
-        }
-        .tile {
-            position: relative;
-            overflow: hidden;
-            aspect-ratio: 16/9;
-        }
-        .tile img, .tile video {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        .tile.featured {
-            outline: 3px solid red;
-        }
-        .overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.15);
-            color: white;
-            padding: 10px;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-end;
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-        .tile:hover .overlay {
-            opacity: 1;
-        }
-        .tags span {
-            background: rgba(255, 255, 255, 0.7);
-            color: black;
-            padding: 2px 5px;
-            margin: 2px;
-            font-size: 0.7em;
-            border-radius: 5px;
-        }
-        footer {
-            font-size: 0.8em;
-            color: gray;
-            margin-top: 20px;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>Portfolio</title>
+  <!-- Load Roboto light font from Google Fonts -->
+  <link href="https://fonts.googleapis.com/css?family=Roboto:300&display=swap" rel="stylesheet">
+  <style>
+    /* Global Styles */
+    body {
+      margin: 0;
+      font-family: 'Roboto', sans-serif;
+      background: #fff;
+      color: #333;
+    }
+    h1, h2, h3, p {
+      margin: 0;
+      padding: 0;
+    }
+    /* Header */
+    header {
+      text-align: center;
+      font-size: 1.5em;
+      padding: 20px 10px;
+    }
+    /* Filter Buttons */
+    #filter-buttons {
+      text-align: center;
+      padding: 10px 0;
+    }
+    .filter-btn {
+      display: inline-block;
+      font-size: 0.8em;
+      text-transform: uppercase;
+      padding: 5px 10px;
+      margin: 0 5px;
+      border: none;
+      cursor: pointer;
+      transition: filter 0.2s ease;
+      border-radius: 3px;
+    }
+    /* Active: blue background, Inactive: grey background */
+    .active {
+      background-color: #007BFF;
+      color: #fff;
+    }
+    .inactive {
+      background-color: #888;
+      color: #fff;
+    }
+    /* Hover: 10% darker */
+    .filter-btn:hover {
+      filter: brightness(90%);
+    }
+    /* Click flash: 10% lighter (applied via JS) */
+    .flash {
+      filter: brightness(110%);
+    }
+    /* Project Count */
+    #project-count {
+      text-align: center;
+      font-size: 0.7em;
+      padding-bottom: 10px;
+    }
+    /* Project Grid */
+    #project-grid {
+      display: grid;
+      grid-gap: 0;
+      margin: 0 auto;
+      /* Default: 1 column; media queries below will adjust */
+      grid-template-columns: repeat(1, 1fr);
+    }
+    /* Project Tile */
+    .project-tile {
+      position: relative;
+      width: 100%;
+      max-width: 800px;
+      height: 0;
+      padding-bottom: 56.25%; /* 16:9 aspect ratio fallback */
+      overflow: hidden;
+      transition: transform 0.3s ease-in;
+    }
+    /* Ensure all direct children fill the tile */
+    .project-tile > * {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+    /* Main Media styling */
+    .project-tile img,
+    .project-tile video {
+      object-fit: cover;
+      transition: filter 0.3s ease-in;
+      display: block;
+    }
+    /* Overlay (hidden by default) */
+    .tile-overlay {
+      background: rgba(0, 0, 0, 0.3);
+      color: #fff;
+      opacity: 0;
+      transition: opacity 0.3s ease-in;
+      padding: 10px;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      font-size: 0.8em;
+    }
+    /* When hovered, show overlay */
+    .project-tile.hovered .tile-overlay {
+      opacity: 1;
+    }
+    /* Featured indicator (small orange circle at top-right) */
+    .featured-indicator {
+      top: 5px;
+      right: 5px;
+      width: 12px;
+      height: 12px;
+      background: orange;
+      border-radius: 50%;
+      z-index: 2;
+    }
+    /* Tags in overlay (styled as pills) */
+    .overlay-tags {
+      margin-top: 5px;
+    }
+    .overlay-tags span {
+      background: rgba(255,255,255,0.3);
+      padding: 2px 6px;
+      border-radius: 10px;
+      margin-right: 4px;
+      font-size: 0.7em;
+    }
+    /* Responsive grid columns */
+    @media (min-width: 600px) {
+      #project-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    @media (min-width: 900px) {
+      #project-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+    @media (min-width: 1400px) {
+      #project-grid {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
+  </style>
 </head>
 <body>
-    <h1>Lorem ipsum lorem ipsum ipsum lorem ipsum ipsum lorem ipsum. v1.05</h1>
-    <div class="filters">
-        <button id="all">All</button>
-        <button id="featured">Featured</button>
-        <div id="tag-buttons"></div>
-    </div>
-    <div class="project-count">Showing <span id="count">0</span> projects</div>
-    <div class="grid" id="project-grid"></div>
-    <footer>&copy; 2025 Portfolio</footer>
-    <script>
-        // Embedded JavaScript (can be moved to external file)
-        document.addEventListener("DOMContentLoaded", () => {
-            fetch("data.json")
-                .then(response => response.json())
-                .then(data => initializePortfolio(data.projects));
-        });
-
-        function initializePortfolio(projects) {
-            const grid = document.getElementById("project-grid");
-            const count = document.getElementById("count");
-            const allButton = document.getElementById("all");
-            const featuredButton = document.getElementById("featured");
-            const tagButtonsContainer = document.getElementById("tag-buttons");
-            
-            let activeFilters = new Set();
-            let filteredProjects = projects;
-            
-            function renderProjects() {
-                grid.innerHTML = "";
-                let sortedProjects = filteredProjects.sort((a, b) => b.featured - a.featured);
-                sortedProjects.forEach(project => {
-                    let mediaElement = project.mainMedia.endsWith(".mp4")
-                        ? `<video src='media/${project.mainMedia}' autoplay loop muted></video>`
-                        : `<img src='media/${project.mainMedia}' alt='${project.name}'>`;
-                    
-                    let tile = document.createElement("div");
-                    tile.classList.add("tile");
-                    if (project.featured) tile.classList.add("featured");
-                    
-                    let overlay = document.createElement("div");
-                    overlay.classList.add("overlay");
-                    overlay.innerHTML = `
-                        <strong>${project.name} (${project.projectContent.length})</strong>
-                        <p>${project.description}</p>
-                        <div class='tags'>${project.tags.map(tag => `<span>${tag}</span>`).join(" ")}</div>
-                    `;
-                    
-                    tile.innerHTML = mediaElement;
-                    tile.appendChild(overlay);
-                    grid.appendChild(tile);
-                });
-                count.textContent = filteredProjects.length;
-            }
-            
-            function filterProjects() {
-                if (activeFilters.has("featured")) {
-                    filteredProjects = projects.filter(p => p.featured);
-                } else if (activeFilters.size > 0) {
-                    filteredProjects = projects.filter(p => p.tags.some(tag => activeFilters.has(tag)));
-                } else {
-                    filteredProjects = projects;
-                }
-                renderProjects();
-            }
-            
-            allButton.addEventListener("click", () => {
-                activeFilters.clear();
-                filterProjects();
-            });
-            
-            featuredButton.addEventListener("click", () => {
-                activeFilters.clear();
-                activeFilters.add("featured");
-                filterProjects();
-            });
-            
-            let allTags = new Set(projects.flatMap(p => p.tags));
-            allTags.forEach(tag => {
-                let btn = document.createElement("button");
-                btn.textContent = tag;
-                btn.addEventListener("click", () => {
-                    if (activeFilters.has(tag)) {
-                        activeFilters.delete(tag);
-                    } else {
-                        activeFilters.add(tag);
-                    }
-                    filterProjects();
-                });
-                tagButtonsContainer.appendChild(btn);
-            });
-            
-            renderProjects();
+  <!-- Header -->
+  <header>
+    Lorem ipsum lorem ipsum ipsum lorem ipsum ipsum lorem ipsum.
+  </header>
+  <!-- Filter Buttons -->
+  <div id="filter-buttons">
+    <button id="btn-all" class="filter-btn active">ALL</button>
+    <button id="btn-featured" class="filter-btn inactive">FEATURED</button>
+    <!-- Tag buttons will be generated dynamically -->
+    <span id="tag-buttons"></span>
+  </div>
+  <!-- Project Count -->
+  <div id="project-count">Showing 0 projects</div>
+  <!-- Project Grid -->
+  <div id="project-grid"></div>
+  <!-- Footer -->
+  <footer style="text-align:center; font-size:0.7em; color: grey; padding: 20px 0;">
+    © 2025 Portfolio
+  </footer>
+  
+  <script>
+    /*************** Data Model ***************/
+    // Dummy data for exactly 10 projects with required properties.
+    const projectsData = [
+      {
+        name: "Project One",
+        shortDescription: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum euismod, nisi in vestibulum congue, lectus nulla tincidunt augue, ac varius justo nisi ac leo. Mauris non justo in purus tempor facilisis. Sed hendrerit, ligula ac ultricies gravida, dolor nibh facilisis sapien, et vehicula sem justo vitae lorem.",
+        mainMedia: "https://www.7luas.com.br/images/exhibit1.jpg",
+        content: [
+          "Lorem ipsum dolor sit amet.",
+          "https://www.7luas.com.br/images/IcarusVidlo.mp4",
+          "Consectetur adipiscing elit."
+        ],
+        tags: ["tag1"],
+        featured: false
+      },
+      {
+        name: "Project Two",
+        shortDescription: "Phasellus non orci sed eros gravida tincidunt. Aliquam erat volutpat. Fusce dictum lorem id dui placerat, quis feugiat ipsum fermentum. Praesent at augue ac nibh porta sollicitudin. Quisque volutpat libero in sem pretium, in bibendum quam hendrerit.",
+        mainMedia: "https://www.7luas.com.br/images/IcarusVidlo.mp4",
+        content: [
+          "Integer vitae libero ac nulla ultricies.",
+          "https://www.7luas.com.br/images/exhibit1.jpg"
+        ],
+        tags: ["tag2", "tag3"],
+        featured: true
+      },
+      {
+        name: "Project Three",
+        shortDescription: "Sed quis magna at nunc faucibus condimentum. Curabitur ut augue at massa vestibulum ultrices. Morbi dictum, justo sit amet dapibus ultrices, felis mi malesuada arcu, non viverra orci arcu sed nunc.",
+        mainMedia: "https://www.7luas.com.br/images/exhibit1.jpg",
+        content: [
+          "Lorem ipsum dolor sit.",
+          "https://www.7luas.com.br/images/exhibit1.jpg",
+          "Aliquam tincidunt sem vitae."
+        ],
+        tags: ["tag1"],
+        featured: false
+      },
+      {
+        name: "Project Four",
+        shortDescription: "Duis cursus velit nec velit fermentum, ut efficitur sem scelerisque. Nulla facilisi. Etiam quis nibh vel lacus consequat cursus. Praesent fermentum, sapien eget dictum lacinia, sem metus dignissim dolor, ac luctus enim nulla nec nisl.",
+        mainMedia: "https://www.7luas.com.br/images/IcarusVidlo.mp4",
+        content: [
+          "Vestibulum ante ipsum primis in faucibus.",
+          "Fusce vitae neque ac nulla sollicitudin.",
+          "https://www.7luas.com.br/images/IcarusVidlo.mp4",
+          "Pellentesque habitant morbi tristique."
+        ],
+        tags: ["tag2", "tag4", "tag3"],
+        featured: false
+      },
+      {
+        name: "Project Five",
+        shortDescription: "Maecenas a ante sed libero blandit dictum. Proin imperdiet, ex eget aliquet facilisis, est mi scelerisque nulla, at convallis dolor augue eget ligula. Suspendisse potenti. Donec a libero non quam tincidunt tristique non id erat.",
+        mainMedia: "https://www.7luas.com.br/images/exhibit1.jpg",
+        content: [
+          "Curabitur eleifend justo ut urna.",
+          "https://www.7luas.com.br/images/exhibit1.jpg"
+        ],
+        tags: ["tag3"],
+        featured: true
+      },
+      {
+        name: "Project Six",
+        shortDescription: "Nullam id magna nec odio fermentum tincidunt. Proin commodo urna ut nisi semper, at convallis arcu molestie. Nulla facilisi. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.",
+        mainMedia: "https://www.7luas.com.br/images/IcarusVidlo.mp4",
+        content: [
+          "Suspendisse varius turpis vitae.",
+          "Aliquam laoreet sem id metus.",
+          "https://www.7luas.com.br/images/exhibit1.jpg",
+          "Curabitur ac orci et sapien."
+        ],
+        tags: ["tag4", "tag1"],
+        featured: false
+      },
+      {
+        name: "Project Seven",
+        shortDescription: "Integer lacinia metus at neque ultrices, at ultricies sem fermentum. Sed at dictum magna. In hac habitasse platea dictumst. Praesent id nibh et magna tincidunt lobortis sed at elit.",
+        mainMedia: "https://www.7luas.com.br/images/exhibit1.jpg",
+        content: [
+          "Vivamus sed ipsum nec.",
+          "https://www.7luas.com.br/images/IcarusVidlo.mp4"
+        ],
+        tags: ["tag2"],
+        featured: false
+      },
+      {
+        name: "Project Eight",
+        shortDescription: "Fusce rutrum est et sem viverra, ac tincidunt mauris sagittis. Praesent non orci vel nunc cursus mollis. Donec porta magna id felis porttitor, non vestibulum dolor feugiat.",
+        mainMedia: "https://www.7luas.com.br/images/IcarusVidlo.mp4",
+        content: [
+          "Nam euismod neque eu.",
+          "Lorem ipsum dolor sit amet."
+        ],
+        tags: ["tag4"],
+        featured: false
+      },
+      {
+        name: "Project Nine",
+        shortDescription: "Curabitur suscipit libero id arcu lacinia, non sollicitudin purus facilisis. Donec ullamcorper, turpis in aliquet sagittis, tortor sem volutpat sapien, in molestie risus lorem sed urna.",
+        mainMedia: "https://www.7luas.com.br/images/exhibit1.jpg",
+        content: [
+          "Praesent scelerisque velit nec.",
+          "https://www.7luas.com.br/images/exhibit1.jpg",
+          "Nullam at urna in.",
+          "Sed viverra elit id."
+        ],
+        tags: ["tag1", "tag3", "tag2"],
+        featured: false
+      },
+      {
+        name: "Project Ten",
+        shortDescription: "Etiam bibendum orci in justo dignissim, a ultrices mi interdum. Pellentesque vitae mauris ut erat malesuada pretium. Morbi vestibulum massa non tellus blandit, quis consectetur dui vestibulum.",
+        mainMedia: "https://www.7luas.com.br/images/IcarusVidlo.mp4",
+        content: [
+          "In hac habitasse platea dictumst.",
+          "https://www.7luas.com.br/images/IcarusVidlo.mp4",
+          "Vestibulum consequat ante vitae."
+        ],
+        tags: ["tag2", "tag4"],
+        featured: false
+      }
+    ];
+    
+    /*************** Filter State ***************/
+    // State variables to track active filters.
+    let activeFeatured = false;
+    let activeTags = []; // array of tag strings
+    // "ALL" is considered active when neither activeFeatured nor activeTags are set.
+    
+    /*************** DOM Elements ***************/
+    const btnAll = document.getElementById("btn-all");
+    const btnFeatured = document.getElementById("btn-featured");
+    const tagButtonsContainer = document.getElementById("tag-buttons");
+    const projectCountEl = document.getElementById("project-count");
+    const projectGrid = document.getElementById("project-grid");
+    
+    /*************** Utility Functions ***************/
+    // Count media items in the project's content array.
+    function countMedia(contentArray) {
+      // Consider an entry to be media if it exactly matches one of the two URLs.
+      const mediaURLs = [
+        "https://www.7luas.com.br/images/IcarusVidlo.mp4",
+        "https://www.7luas.com.br/images/exhibit1.jpg"
+      ];
+      return contentArray.filter(item => mediaURLs.includes(item)).length;
+    }
+    
+    // Generate unique tag list from projectsData.
+    function getUniqueTags() {
+      const tagSet = new Set();
+      projectsData.forEach(proj => {
+        proj.tags.forEach(tag => tagSet.add(tag));
+      });
+      return Array.from(tagSet);
+    }
+    
+    // Update the display of the filter buttons based on active states.
+    function updateFilterButtonsUI() {
+      // ALL button: active if no other filter is active.
+      if (!activeFeatured && activeTags.length === 0) {
+        btnAll.classList.add("active");
+        btnAll.classList.remove("inactive");
+      } else {
+        btnAll.classList.remove("active");
+        btnAll.classList.add("inactive");
+      }
+      // FEATURED button:
+      if (activeFeatured) {
+        btnFeatured.classList.add("active");
+        btnFeatured.classList.remove("inactive");
+      } else {
+        btnFeatured.classList.remove("active");
+        btnFeatured.classList.add("inactive");
+      }
+      // Tag buttons:
+      const allTagButtons = document.querySelectorAll(".tag-btn");
+      allTagButtons.forEach(btn => {
+        const tag = btn.getAttribute("data-tag");
+        if (activeTags.includes(tag)) {
+          btn.classList.add("active");
+          btn.classList.remove("inactive");
+        } else {
+          btn.classList.remove("active");
+          btn.classList.add("inactive");
         }
-    </script>
+      });
+    }
+    
+    // Update the project grid based on current filters.
+    function renderProjects() {
+      // Clear the grid.
+      projectGrid.innerHTML = "";
+      
+      // Determine filtered projects.
+      let filteredProjects = [];
+      if (activeFeatured) {
+        filteredProjects = projectsData.filter(proj => proj.featured);
+      } else if (activeTags.length > 0) {
+        filteredProjects = projectsData.filter(proj => {
+          return proj.tags.some(tag => activeTags.includes(tag));
+        });
+      } else {
+        filteredProjects = projectsData.slice(); // all projects
+      }
+      
+      // Sort: featured projects on top.
+      filteredProjects.sort((a, b) => (b.featured === a.featured) ? 0 : (b.featured ? 1 : -1));
+      
+      // Update project count text.
+      projectCountEl.textContent = `Showing ${filteredProjects.length} project${filteredProjects.length === 1 ? "" : "s"}`;
+      
+      // Create and append each project tile.
+      filteredProjects.forEach(proj => {
+        const tile = document.createElement("div");
+        tile.className = "project-tile";
+        
+        // Add featured indicator if needed.
+        if (proj.featured) {
+          const featIndicator = document.createElement("div");
+          featIndicator.className = "featured-indicator";
+          tile.appendChild(featIndicator);
+        }
+        
+        // Create main media element.
+        let mediaEl;
+        if (proj.mainMedia.endsWith(".mp4")) {
+          mediaEl = document.createElement("video");
+          mediaEl.src = proj.mainMedia;
+          mediaEl.autoplay = true;
+          mediaEl.loop = true;
+          mediaEl.muted = true;
+          mediaEl.playsInline = true;
+        } else {
+          mediaEl = document.createElement("img");
+          mediaEl.src = proj.mainMedia;
+          mediaEl.alt = proj.name;
+        }
+        tile.appendChild(mediaEl);
+        
+        // Create overlay element (hidden by default)
+        const overlay = document.createElement("div");
+        overlay.className = "tile-overlay";
+        // Project title with media count in brackets
+        const titleEl = document.createElement("div");
+        titleEl.innerHTML = `<strong>${proj.name}</strong> <small>[${countMedia(proj.content)}]</small>`;
+        overlay.appendChild(titleEl);
+        // Short description
+        const descEl = document.createElement("div");
+        descEl.textContent = proj.shortDescription;
+        overlay.appendChild(descEl);
+        // Tags as pills
+        const tagsEl = document.createElement("div");
+        tagsEl.className = "overlay-tags";
+        proj.tags.forEach(tag => {
+          const tagSpan = document.createElement("span");
+          tagSpan.textContent = tag;
+          tagsEl.appendChild(tagSpan);
+        });
+        overlay.appendChild(tagsEl);
+        tile.appendChild(overlay);
+        
+        // Hover behavior: scale tile and adjust overlay.
+        tile.addEventListener("mouseenter", () => {
+          // Determine transform-origin based on tile's position relative to container edges.
+          const tileRect = tile.getBoundingClientRect();
+          const gridRect = projectGrid.getBoundingClientRect();
+          let origin = "center center";
+          if (Math.abs(tileRect.left - gridRect.left) < 5) {
+            origin = "left center";
+          } else if (Math.abs(tileRect.right - gridRect.right) < 5) {
+            origin = "right center";
+          }
+          tile.style.transformOrigin = origin;
+          tile.classList.add("hovered");
+          tile.style.transform = "scale(1.2)";
+          mediaEl.style.filter = "brightness(90%)";
+        });
+        tile.addEventListener("mouseleave", () => {
+          tile.classList.remove("hovered");
+          tile.style.transform = "scale(1)";
+          mediaEl.style.filter = "brightness(100%)";
+        });
+        
+        projectGrid.appendChild(tile);
+      });
+    }
+    
+    // Apply a temporary flash effect on a button (10% lighter) on click.
+    function flashButton(btn) {
+      btn.classList.add("flash");
+      setTimeout(() => {
+        btn.classList.remove("flash");
+      }, 150);
+    }
+    
+    /*************** Event Listeners for Filter Buttons ***************/
+    // ALL button
+    btnAll.addEventListener("click", () => {
+      flashButton(btnAll);
+      if (activeFeatured || activeTags.length > 0) {
+        activeFeatured = false;
+        activeTags = [];
+      }
+      updateFilterButtonsUI();
+      renderProjects();
+    });
+    
+    // FEATURED button
+    btnFeatured.addEventListener("click", () => {
+      flashButton(btnFeatured);
+      if (!activeFeatured) {
+        activeFeatured = true;
+        activeTags = [];
+      } else {
+        activeFeatured = false;
+      }
+      updateFilterButtonsUI();
+      renderProjects();
+    });
+    
+    // Generate tag buttons dynamically.
+    function generateTagButtons() {
+      const uniqueTags = getUniqueTags();
+      uniqueTags.forEach(tag => {
+        const btn = document.createElement("button");
+        btn.className = "filter-btn tag-btn inactive";
+        btn.textContent = tag;
+        btn.setAttribute("data-tag", tag);
+        btn.addEventListener("click", () => {
+          flashButton(btn);
+          activeFeatured = false;
+          const uniqueTagsAll = getUniqueTags();
+          if (activeTags.includes(tag)) {
+            activeTags = activeTags.filter(t => t !== tag);
+          } else {
+            let activeCount = activeTags.length;
+            if (uniqueTagsAll.length - activeCount === 1) {
+              activeTags = [];
+            } else {
+              activeTags.push(tag);
+            }
+          }
+          updateFilterButtonsUI();
+          renderProjects();
+        });
+        tagButtonsContainer.appendChild(btn);
+      });
+    }
+    
+    /*************** Initialization ***************/
+    document.addEventListener("DOMContentLoaded", () => {
+      generateTagButtons();
+      updateFilterButtonsUI();
+      renderProjects();
+    });
+  </script>
 </body>
 </html>

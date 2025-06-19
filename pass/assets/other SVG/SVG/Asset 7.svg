@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_2" data-name="Layer 2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 102.4 97.04">
+  <defs>
+    <style>
+      .cls-1 {
+        stroke-width: 3.28px;
+      }
+
+      .cls-1, .cls-2, .cls-3, .cls-4 {
+        stroke: #000;
+        stroke-miterlimit: 10;
+      }
+
+      .cls-1, .cls-3 {
+        fill: #fdeb6b;
+      }
+
+      .cls-2 {
+        fill: #fff1b6;
+        stroke-width: 4.11px;
+      }
+
+      .cls-3 {
+        stroke-width: 3.39px;
+      }
+
+      .cls-5 {
+        fill: #231f20;
+      }
+
+      .cls-4 {
+        fill: none;
+        stroke-linecap: round;
+        stroke-width: 3.29px;
+      }
+    </style>
+  </defs>
+  <g id="Passengers">
+    <g id="Solution">
+      <g>
+        <g>
+          <path class="cls-1" d="M1.77,80.63l7.98-52.08,22.21-8.01,19.24,69.88c-19.96,2.32-38.15-1.73-49.43-9.79Z"/>
+          <path class="cls-1" d="M100.63,80.63l-7.98-52.08-22.21-8.01-19.24,69.88c19.96,2.32,38.15-1.73,49.43-9.79Z"/>
+        </g>
+        <g>
+          <circle class="cls-2" cx="51.2" cy="55.74" r="39.25"/>
+          <g>
+            <circle class="cls-5" cx="35.55" cy="50.24" r="5.28"/>
+            <circle class="cls-5" cx="66.85" cy="50.24" r="5.28"/>
+          </g>
+          <path class="cls-4" d="M35.55,67.97s15.1,7.73,31.3,0"/>
+        </g>
+        <path class="cls-3" d="M94.88,41.73C94.88,19.62,75.32,1.69,51.2,1.69S7.53,19.62,7.53,41.73c0,6.66,1.79,12.94,4.93,18.46-.32-2.03-.5-4.11-.5-6.23,0-3.6.49-7.08,1.4-10.4,4.56-11.22,19.77-19.47,37.85-19.47s33.29,8.25,37.85,19.47c.91,3.31,1.4,6.8,1.4,10.4,0,2.12-.17,4.2-.5,6.23,3.14-5.53,4.93-11.8,4.93-18.46Z"/>
+      </g>
+    </g>
+  </g>
+</svg>

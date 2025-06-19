@@ -26,47 +26,59 @@ if (1) {
 	
 	
 	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+		
+		
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 		
 		
 		
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 		
-		
-	
-	
-					
-	
-	
-	
-	
-	
-	
+
  }
 if (1) { 																	
 
+
+
+var limitNumberOfPassengers=0; 
 
 
 var timeCounter = 0;	
@@ -381,11 +393,17 @@ function initializeProjectSpecificStuff(){
 	
 	
 	
+	window.prefWindow = "Prefers window seat.";
+	window.prefIsle = "Prefers isle seat.";
+	window.prefTogether = "Prefers seating together.";
+	window.elderlyFrail = "Frail elderly person.";
+	window.elderyAble = "Able-bodied elderly person."
+	
 	window.passengerPreseat = {
 		passport: 0,
 		name: "Pre-Seated",
 		age: 35,
-		pref: "Already booked a seat."
+		pref: ["Already booked a seat."]
 	}
 	
 	var tempPassenger;
@@ -393,49 +411,50 @@ function initializeProjectSpecificStuff(){
 	
 	tempPassenger = {
 		passport: uniqueRandomNumber(),
-		name: "Robert Bob",
-		age: 36
+		name: "Bob Dangerfield",
+		age: 35
 	}
 	arrayOfPassengers.push(tempPassenger);
 	
 	tempPassenger = {
 		passport: uniqueRandomNumber(),
-		name: "Mary Merry",
-		age: 25,
+		name: "Lorraine McFly",
+		age: 23,
 		code: "PREG"
 	}
 	arrayOfPassengers.push(tempPassenger);
 	
 	tempPassenger = {
 		passport: uniqueRandomNumber(),
-		name: "Carlos Domingos",
-		age: 30,
+		name: "Jorge L. Borges",
+		age: 25,
 		code: "PWD"
 	}
 	arrayOfPassengers.push(tempPassenger);
 	
 	tempPassenger = {
 		passport: uniqueRandomNumber(),
-		name: "Ingrid Illy",
-		age: 29,
+		name: "Jess Law",
+		age: 30,
+		pref: ["Baby on lap"],
 		code: "INF"
 	}
 	arrayOfPassengers.push(tempPassenger);
 	
 	tempPassenger = {
 		passport: uniqueRandomNumber(),
-		name: "Billy McCoy",
-		age: 6,
+		name: "Frank Abagnale",
+		age: 10,
 		code: "UMNR"
 	}
 	arrayOfPassengers.push(tempPassenger);
 	
 	tempPassenger = {
 		passport: uniqueRandomNumber(),
-		name: "Carla Torres",
-		age: 32,
-		pref: ["Couple seating together"],
-		group: "CarlaAndCharles",
+		name: "Carina Nuvem",
+		age: 37,
+		pref: [prefTogether],
+		group: "CarinaAndScott",
 		groupType: "couple",
 		groupLeader: "true"
 	}
@@ -443,50 +462,64 @@ function initializeProjectSpecificStuff(){
 	
 	tempPassenger = {
 		passport: uniqueRandomNumber(),
-		name: "Charles Towers",
+		name: "Scott Cloud",
 		age: 29,
-		pref: "Couple seating together",
-		group: "CarlaAndCharles",
-		groupType: "couple",
+		pref: [prefTogether],
+		group: "CarinaAndScott",
+		groupType: "couple"
 	}
 	arrayOfPassengers.push(tempPassenger);	
 	
 	tempPassenger = {
 		passport: uniqueRandomNumber(),
-		name: "Jorge Estaquio",
-		age: 44,
-		pref: "Prefers aisle seat"
+		name: "Heath Longlegs",
+		age: 20,
+		pref: [prefIsle]
 	}
 	arrayOfPassengers.push(tempPassenger);
 	
 	tempPassenger = {
 		passport: uniqueRandomNumber(),
-		name: "Amanda Pepper",
-		age: 22,
-		pref: "Prefers window seat",
+		name: "Carla Horn",
+		age: 42,
+		group: "CarlaAndCharlie",
+		groupType: "couple",
+		pref: [prefIsle],
 		code: "NERV"
 	}
+	arrayOfPassengers.push(tempPassenger);	
+	
+	tempPassenger = {
+		passport: uniqueRandomNumber(),
+		name: "Charles Hunt",
+		age: 29,
+		group: "CarlaAndCharlie",
+		groupType: "couple",
+		groupLeader: "true"		
+	}
 	arrayOfPassengers.push(tempPassenger);
 	
 	tempPassenger = {
 		passport: uniqueRandomNumber(),
-		name: "Hilds Hilst",
-		age: 82
+		name: "Hilda Hilst",
+		age: 88,
+		pref: [elderlyFrail]
 	}
 	arrayOfPassengers.push(tempPassenger);
 	
 	tempPassenger = {
 		passport: uniqueRandomNumber(),
 		name: "Howard Happy",
-		age: 78
+		age: 78,
+		pref: [prefWindow,elderyAble]
 	}
 	arrayOfPassengers.push(tempPassenger);
 	
 	tempPassenger = {
 		passport: uniqueRandomNumber(),
-		name: "Mr. Smith",
-		age: 29,
-		pref: "Family seating together",
+		name: "Jon Smith",
+		age: 38,
+		pref: [prefTogether],
 		group: "smiths",
 		groupType: "family",
 		groupLeader: "true"
@@ -495,9 +528,9 @@ function initializeProjectSpecificStuff(){
 	
 	tempPassenger = {
 		passport: uniqueRandomNumber(),
-		name: "Mrs. Smith",
+		name: "Jane Smith",
 		age: 30,
-		pref: "Family seating together",
+		pref: [prefTogether],
 		group: "smiths",
 		groupType: "family"
 	}
@@ -505,8 +538,10 @@ function initializeProjectSpecificStuff(){
 	
 	tempPassenger = {
 		passport: uniqueRandomNumber(),
-		name: "Chad Smith",
-		age: 7,
+		name: "Billy Smith",
+		age: 4,
+		pref: [prefTogether],		
+		code: "CHD",
 		group: "smiths",
 		groupType: "family",		
 	}
@@ -514,16 +549,20 @@ function initializeProjectSpecificStuff(){
 	
 	tempPassenger = {
 		passport: uniqueRandomNumber(),
-		name: "Peggy Smith",
-		age: 10,
+		name: "Lilly Smith",
+		age: 9,
+		pref: [prefTogether],
+		code: "CHD",
 		group: "smiths",
 		groupType: "family",		
 	}
 	arrayOfPassengers.push(tempPassenger);
 
 	
+	if(limitNumberOfPassengers>0){
+		arrayOfPassengers.splice(limitNumberOfPassengers,arrayOfPassengers.length-limitNumberOfPassengers);
+	}
 	
-
 	totalPassengersOriginallyInCue=arrayOfPassengers.length;
 	
 
@@ -536,8 +575,8 @@ function initializeProjectSpecificStuff(){
 	window.rowCount=5;
 	window.columnCount=6;
 	window.emergencyRows=[3]; 
-	window.corridorToRightOfColumn=[3]; 
-	window.columnCountWithcorridor = columnCount+corridorToRightOfColumn.length; 
+	window.aisleToRightOfColumn=[3]; 
+	window.columnCountWithAisle = columnCount+aisleToRightOfColumn.length; 
 	
 	
 	window.arrayOfSeatedPassengers=[]; 
@@ -551,15 +590,33 @@ function initializeProjectSpecificStuff(){
 		tempColumn=[];
 	}
 	
-	var  copyOfarrayOfPassengers = arrayOfPassengers.slice();
-	for(var i=0;i<columnCount;i++){		
-		for(var j=0;j<rowCount;j++){
-			if(Math.random()>0.7){
-				
-				arrayOfSeatedPassengers[i][j]= passengerPreseat;
+	
+	if(0){
+		var  copyOfarrayOfPassengers = arrayOfPassengers.slice();
+		for(var i=0;i<columnCount;i++){		
+			for(var j=0;j<rowCount;j++){
+				if(Math.random()>0.7){
+					
+					arrayOfSeatedPassengers[i][j]= passengerPreseat;
+				}
 			}
 		}
 	}
+	
+	arrayOfSeatedPassengers[0][0]=passengerPreseat;
+	arrayOfSeatedPassengers[0][2]=passengerPreseat;
+	arrayOfSeatedPassengers[0][3]=passengerPreseat;
+	arrayOfSeatedPassengers[0][4]=passengerPreseat;
+	arrayOfSeatedPassengers[1][0]=passengerPreseat;
+	arrayOfSeatedPassengers[3][2]=passengerPreseat;
+	arrayOfSeatedPassengers[3][4]=passengerPreseat;
+	arrayOfSeatedPassengers[5][0]=passengerPreseat; 
+	arrayOfSeatedPassengers[4][2]=passengerPreseat;
+	arrayOfSeatedPassengers[4][3]=passengerPreseat;
+	arrayOfSeatedPassengers[4][4]=passengerPreseat;
+	arrayOfSeatedPassengers[5][2]=passengerPreseat;
+	arrayOfSeatedPassengers[5][3]=passengerPreseat;
+	arrayOfSeatedPassengers[5][4]=passengerPreseat;
 
 	
 	var seatsVar = new seats();
@@ -649,25 +706,25 @@ function seats(){
  	window.layoutSeats = new component("layoutSeats",0.5,0.5);
  	parentComponents(layoutSeats,layoutSeatmap);
  	layoutSeats.widthRel=0.75;	
-	layoutSeats.heightPropWidth=rowCount/columnCountWithcorridor;
+	layoutSeats.heightPropWidth=rowCount/columnCountWithAisle;
 	layoutSeats.color="white";
 	
 	
 	var tempSeat;
-	for(var i=0;i<columnCountWithcorridor;i++){
+	for(var i=0;i<columnCountWithAisle;i++){
 		for(var j=0;j<rowCount;j++){
-			tempSeat = new component("",(1/(columnCountWithcorridor))*i,(1/(rowCount))*j);
+			tempSeat = new component("",(1/(columnCountWithAisle))*i,(1/(rowCount))*j);
 			tempSeat.anchorLeft=true;
 			tempSeat.anchorTop=true;
-			tempSeat.widthRel=1/columnCountWithcorridor;
+			tempSeat.widthRel=1/columnCountWithAisle;
 			tempSeat.componentType="seat";
 			tempSeat.heightRel=1/rowCount;
 			
 			tempSeat.color="rgb(228,208,200)";
 			tempSeat.strokeWidthRel = 4;
 			tempSeat.strokeColor="white";
-			for(var r=0;r<corridorToRightOfColumn.length;r++){
-				if(i==corridorToRightOfColumn[r]){
+			for(var r=0;r<aisleToRightOfColumn.length;r++){
+				if(i==aisleToRightOfColumn[r]){
 					tempSeat.color="lightgrey";
 				}
 			}
@@ -676,11 +733,11 @@ function seats(){
 	}
 	
 	for(var r=0;r<emergencyRows.length;r++){
-		for(var i=0;i<columnCountWithcorridor;i++){
-			tempSeat = new component("",(1/(columnCountWithcorridor))*i,(1/(rowCount))*(emergencyRows[r]-1));
+		for(var i=0;i<columnCountWithAisle;i++){
+			tempSeat = new component("",(1/(columnCountWithAisle))*i,(1/(rowCount))*(emergencyRows[r]-1));
 			tempSeat.anchorLeft=true;
 			tempSeat.anchorTop=true;
-			tempSeat.widthRel=1/columnCountWithcorridor;
+			tempSeat.widthRel=1/columnCountWithAisle;
 			
 			tempSeat.color="none";			
 			tempSeat.heightRel=1/rowCount;
@@ -688,8 +745,8 @@ function seats(){
 			tempSeat.strokeColor="salmon";
 			parentComponents(tempSeat,layoutSeats);
 	
-			for(var e=0;e<corridorToRightOfColumn.length;e++){
-				if(i==corridorToRightOfColumn[e]){
+			for(var e=0;e<aisleToRightOfColumn.length;e++){
+				if(i==aisleToRightOfColumn[e]){
 					tempSeat.color="salmon";
 				}
 			}
@@ -700,10 +757,10 @@ function seats(){
 	
 	
 	var letterCount=0;
-	for(var i=0;i<columnCountWithcorridor;i++){		
-		for(var e=0;e<corridorToRightOfColumn.length;e++){
-			if(i!=corridorToRightOfColumn[e]){
-				tempSeat = new component(String.fromCharCode(65+letterCount),1/(columnCountWithcorridor*2)+(1/(columnCountWithcorridor))*i,-1/(2*columnCountWithcorridor));
+	for(var i=0;i<columnCountWithAisle;i++){		
+		for(var e=0;e<aisleToRightOfColumn.length;e++){
+			if(i!=aisleToRightOfColumn[e]){
+				tempSeat = new component(String.fromCharCode(65+letterCount),1/(columnCountWithAisle*2)+(1/(columnCountWithAisle))*i,-1/(2*columnCountWithAisle));
 				tempSeat.color="none";
 				tempSeat.fontColor	= "black";	
 				tempSeat.fontType	= "UI";	
@@ -715,7 +772,7 @@ function seats(){
 	
 	
 	for(var i=0;i<rowCount;i++){		
-		tempSeat = new component(i+1,1/(columnCountWithcorridor*2)+(1/(columnCountWithcorridor))*3,1/(rowCount*2)+(1/(rowCount))*i);	
+		tempSeat = new component(i+1,1/(columnCountWithAisle*2)+(1/(columnCountWithAisle))*3,1/(rowCount*2)+(1/(rowCount))*i);	
 		tempSeat.color="none";
 		tempSeat.fontColor	= "black";	
 		tempSeat.fontType	= "UI";	
@@ -737,18 +794,18 @@ function seats(){
 		for(var j=0;j<rowCount;j++){
 			if(arrayOfSeatedPassengers[i][j]!=null){				
 				
-				tempPerson = new component("",(1/(columnCountWithcorridor))*fakeColumnCounter,(1/(rowCount))*j);
+				tempPerson = new component("",(1/(columnCountWithAisle))*fakeColumnCounter,(1/(rowCount))*j);
 				tempPerson.passenger = arrayOfSeatedPassengers[i][j];
 				if(tempPerson.passenger.passport==0){tempPerson.disabled=true;}
 				tempPerson.anchorLeft=true;
 				tempPerson.anchorTop=true;
-				tempPerson.widthRel=1/columnCountWithcorridor;
+				tempPerson.widthRel=1/columnCountWithAisle;
 				tempPerson.heightRel=1/rowCount;
 				tempPerson.actionOnDrag="drag";
 				parentComponents(tempPerson,layoutSeats);	
 				
 				if(0){
-					tempSeat = new component(arrayOfSeatedPassengers[i][j].name,(1/(columnCountWithcorridor))*fakeColumnCounter,(1/(rowCount))*j);
+					tempSeat = new component(arrayOfSeatedPassengers[i][j].name,(1/(columnCountWithAisle))*fakeColumnCounter,(1/(rowCount))*j);
 					tempSeat.anchorLeft=true;
 					tempSeat.anchorTop=true;
 					tempSeat.color="none";
@@ -899,6 +956,15 @@ function checkPlacing(){
 		return "reject";
 	}
 }
+function moveToTop(id){
+	for(i=0;i<arrayOfComponents.length;i++){
+		if(arrayOfComponents[i].id==id){
+			arrayOfComponents.push(arrayOfComponents[i]);
+			arrayOfComponents.splice(i,1);
+			break;
+		}						
+	}
+}
 
 function defineInputFunctions() { 											
  
@@ -909,7 +975,7 @@ function defineInputFunctions() {
 		pointerDown = true;
 		
 		pointerDownGlobalOneOffWarning=true; 
-		
+				
 		updatePointerCanvasPos(event);
 	}
 
@@ -931,6 +997,10 @@ function defineInputFunctions() {
 	canvasp.addEventListener("touchmove", mouseMove, false);	
 	function mouseMove(event){
 		updatePointerCanvasPos(event);
+		
+		if(pointerDown){
+			pointerDragging=true;
+		}
 	}
 
 	
@@ -1083,17 +1153,17 @@ function updatePointerCanvasPos(theEvent){
 	}
 	
 	
-	// First, get x,y position of mouse or touch
-	if(theEvent.targetTouches="null"){ // IF MOUSE (ie., no touch events)
+	
+	if(theEvent.targetTouches="null"){ 
 			mouseX = theEvent.x;
 			mouseY = theEvent.y;
 	}
-	if(theEvent.targetTouches!="null"&&theEvent.targetTouches.length>0){  
+	if(theEvent.targetTouches!="null"&&theEvent.targetTouches.length>0){   
 		mouseX = theEvent.targetTouches[0].pageX;
 		mouseY = theEvent.targetTouches[0].pageY;	
 	}
 
-	// Adjust for canvasRed
+	
 	mouseX *=canvasRes;
 	mouseY *=canvasRes;
 }
@@ -1113,7 +1183,7 @@ function mainLoop(timestamp) {
 	
 	debugText = [];
 
-	console.log("currentSeatedDeck:"+currentSeatedDeck.length + " / currentDeckOfCards:"+currentDeckOfCards.length);
+	
 
 	timeCounter+= 1;
 	
@@ -1361,7 +1431,8 @@ function mainLoop(timestamp) {
 			window["layoutCard_"+i].actionOnDrag="drag";
 			window["layoutCard_"+i].componentType="card";
 			window["layoutCard_"+i].passenger = currentDeckOfPassengerInfo[i]; 
-			window["layoutCard_"+i].passenger.myPosInDeck=i;
+			window["layoutCard_"+i].passenger.myPosInDeck=i; 
+			window["layoutCard_"+i].passenger.myNumInDeck=i; 
 			parentComponents(window["layoutCard_"+i],layoutDeckDropArea);		
 			approachDelay = (currentDeckOfPassengerInfo.length - window["layoutCard_"+i].passenger.myPosInDeck)*2;
 			if(isPortrait){ 
@@ -1369,7 +1440,7 @@ function mainLoop(timestamp) {
 			}else{
 				window["layoutCard_"+i].posXRel=2+approachDelay;
 			}
-			currentDeckOfCards.push(window["layoutCard_"+i]);
+			currentDeckOfCards.unshift(window["layoutCard_"+i]);
 		}
 	
 		gameState="nextCardComesIn";
@@ -1400,7 +1471,7 @@ function mainLoop(timestamp) {
 		
 		btnCreateDeck.actionOnClick="createNewCardDeck";
 		btnCreateDeck.color="green";
-		btnCreateDeck.hint = "Unsure? You can still change positions!";
+		btnCreateDeck.hint = "Unsure? You can still reposition.";
 		parentComponents(btnCreateDeck,layoutAreaForCards);	
 		
 		gameState="waitingPlayerToHitNext";
@@ -1439,6 +1510,247 @@ function mainLoop(timestamp) {
 		window.feedbackAlpha = 0;
 		
 		
+		
+		
+		
+		
+		
+
+		
+		
+		
+		
+		
+		
+		
+		
+		window.globalEssentialRequirements = [0,0]; 
+		window.globalPreferences = [0,0]; 
+		window.globalEfficient=false; if(Math.round(gameTimer/60)<120){globalEfficient=true;} 
+		
+		var me; 
+		var childAwayFromParents=true; var isNotTogether=true;
+		var isEmergencyRow=false; var isElderlyFrail; var isIsle=false; var isWindow=false; var isTogether=false; var hasCode=false; var hasPref=false; var siblingOnMy="none"; 
+		
+		for(var i=0;i<columnCount;i++){
+			for(var j=0;j<rowCount;j++){
+				if(arrayOfSeatedPassengers[i][j]!=null && arrayOfSeatedPassengers[i][j]!=passengerPreseat){
+					me = arrayOfSeatedPassengers[i][j];
+					me.feedback="none";
+					
+					console.log(i+","+j+" Checking "+me.name);
+					
+					isEmergencyRow=false;
+					isIsle=false;
+					isWindow=false;
+					isTogether=false;
+					childAwayFromParents=true;
+					isNotTogether=true;
+					isElderlyFrail=false;
+					hasCode=false;
+					hasPref=false;
+					siblingOnMy="false";
+					
+					if(i==aisleToRightOfColumn[0] || i==aisleToRightOfColumn[0]-1){
+						isIsle=true;
+						console.log("Is in isle seat. ");
+					}
+					if(i==0 || i==columnCount-1){
+						isWindow=true;
+						console.log("Is in window seat. ");
+					}
+					if(j==emergencyRows[0]-1){
+						isEmergencyRow=true;
+						console.log("Is in emergency row. ");
+					}
+					if(typeof me.code !== 'undefined'){
+						hasCode=true;
+						console.log("Has code:"+ me.code);
+						globalEssentialRequirements[0]+=1;
+					}
+					
+					if(typeof me.pref !== 'undefined'){
+						hasPref=true; 
+					}
+					if(hasPref){
+						var prefTemp = me.pref;
+						if(prefTemp.includes(prefIsle)||prefTemp.includes(prefWindow)||prefTemp.includes(prefTogether)){ 
+							globalPreferences[0]+=1;
+							console.log("Has pref:"+ me.pref.length);
+						}
+						if(me.pref.includes(elderlyFrail)){
+							isElderlyFrail=true;
+							globalEssentialRequirements[0]+=1;
+						}
+					}
+					
+					
+					if(isElderlyFrail){
+						if(isEmergencyRow){
+							me.feedback="essential";
+							globalEssentialRequirements[1]+=1; 
+							console.log("Elder frail in emergency row!"); 
+						}
+					}
+					
+					
+					if(hasCode){
+						
+						if(isEmergencyRow){
+							me.feedback="essential";
+							globalEssentialRequirements[1]+=1; 
+							console.log(me.code+" in emergency row!"); 
+						}
+						
+						if(me.code == "PWD"){
+							globalEssentialRequirements[0]+=1;
+							if(isIsle){
+								console.log(me.code+" in aisle seat"); 
+							}else{
+								me.feedback="essential";
+								globalEssentialRequirements[1]+=1; 
+								console.log(me.code+" not in aisle seat!"); 
+							}
+						}						
+						
+						childAwayFromParents=true;
+						if(me.code == "CHD"){
+							globalEssentialRequirements[0]+=1;
+							
+							if(i>0){
+								
+								if(typeof arrayOfSeatedPassengers[i-1][j].group !== 'undefined'){
+									if(arrayOfSeatedPassengers[i-1][j].group==me.group){
+										console.log(me.code+" has a parent on the left"); 
+										childAwayFromParents=false;
+									}
+								}
+							}
+							
+							if(childAwayFromParents && i<columnCount-2){ 
+								if(typeof arrayOfSeatedPassengers[i+1][j].group !== 'undefined'){
+									if(arrayOfSeatedPassengers[i+1][j].group==me.group){
+										console.log(me.code+" has a parent on the right"); 
+										childAwayFromParents=false;
+									}
+								}
+							}
+							
+							if(childAwayFromParents){
+								me.feedback="essential";
+								globalEssentialRequirements[1]+=1; 
+								console.log(me.code+" away from family!"); 
+								
+							}
+						}
+						
+					}
+					
+					if(typeof me.pref !== 'undefined'){
+						
+						if(me.pref.includes(prefIsle)){
+							if(isIsle){
+								console.log("Satified:"+me.pref); 
+							}else{
+								if(me.feedback!="essential"){me.feedback="preference";}
+								globalPreferences[1]+=1; 
+								console.log("Not satified:"+me.pref); 
+							}
+						}
+						
+						if(me.pref.includes(prefWindow)){
+							if(isWindow){
+								console.log("Satified:"+me.pref); 
+							}else{
+								if(me.feedback!="essential"){me.feedback="preference";}
+								globalPreferences[1]+=1; 
+								console.log("Not satified:"+me.pref); 
+							}
+						}
+						
+						if(me.pref.includes(prefTogether)){
+							isNotTogether=true;
+							
+							if(i>0){
+								
+								if(typeof arrayOfSeatedPassengers[i-1][j].group !== 'undefined'){
+									if(arrayOfSeatedPassengers[i-1][j].group==me.group){
+										console.log(me.name+" is together with "+arrayOfSeatedPassengers[i-1][j].name); 
+										isNotTogether=false
+									}
+								}
+							}
+							
+							if(isNotTogether && i<columnCount-2){ 
+								if(typeof arrayOfSeatedPassengers[i+1][j].group !== 'undefined'){
+									if(arrayOfSeatedPassengers[i+1][j].group==me.group){
+										console.log(me.name+" is together with "+arrayOfSeatedPassengers[i+1][j].name); 
+										isNotTogether=false;
+									}
+								}
+							}
+							
+							if(isNotTogether){
+								if(me.feedback!="essential"){me.feedback="preference";}
+								globalPreferences[1]+=1; 
+								console.log(me.name+" NOT  together"); 
+							}
+						}
+						
+					}
+				}
+			}
+		}	
+		
+		
+		console.log("Unmet "+ globalEssentialRequirements[1] +" out of "+globalEssentialRequirements[0]+" essential requirements");
+		console.log("Unmet "+ globalPreferences[1] +" out of "+globalPreferences[0]+" preferences");
+		
+		
+		window.feedbackTitle="Completed"; 
+		window.feedbackItems = [];
+		window.improvementItems = [];
+		window.feedbackEnd = [];
+		window.feedbackAccentColor;
+		if(globalEssentialRequirements[1]>0){
+			feedbackTitle="Try again";
+			feedbackAccentColor="red";
+			feedbackItems.push("Airline policies were not followed.");
+			feedbackEnd.push("Please try again.");
+		}else{
+			feedbackItems.push("Airline policies were followed.");
+			if(globalPreferences[1]>0){
+				feedbackTitle="You passed";
+				feedbackAccentColor="orange";
+				if(globalPreferences[1]>Math.floor(globalPreferences[0]/2)){
+					improvementItems.push("Not everyone is happy with their seats.");
+				}else{
+					improvementItems.push("Most passengers are happy with their seats.");
+				}
+			}else{
+				feedbackTitle="Good job";				
+				feedbackAccentColor="green";
+				feedbackItems.push("Everyone is happy with their seats.");
+			}
+			if(globalEfficient){
+				feedbackItems.push("You were efficient and quick.");
+			}else{
+				improvementItems.push("You took too long.");
+			}
+			feedbackEnd.push("Feel free to try again.");
+		}
+		if(globalEssentialRequirements[1]+globalPreferences[1]>0){
+			feedbackEnd.push("Select passengers to learn more.");
+		}else{
+			feedbackEnd.push("Select passengers to review your choices.");			
+		}
+
+		
+		
+		
+		
+		
+		
 	}
 
 	if(gameState=="showingFeedback"){
@@ -1456,10 +1768,11 @@ function mainLoop(timestamp) {
 		}else{
 			feedbackTitleY=layoutAreaForCards.posyPixels-layoutAreaForCards.heightPixels/6;			
 		}
-		ctx.fillStyle="green";
+		ctx.fillStyle=feedbackAccentColor;
 		ctx.font = 700+" "+fontUISize*1.3	+ "px "+fontFamilyPrimary;			
-		ctx.fillText("Your Feedback", layoutAreaForCards.posxPixels,feedbackTitleY);
+		ctx.fillText(feedbackTitle, layoutAreaForCards.posxPixels,feedbackTitleY);
 
+		
 		var normalSize = fontUISize*0.9;
 		ctx.font = 400+" "+normalSize+ "px "+fontFamilyPrimary;			
 		var currentLine = 0;
@@ -1468,35 +1781,78 @@ function mainLoop(timestamp) {
 		var textWidth = 0.7*layoutAreaForCards.widthPixels;
 		ctx.fillStyle="black";
 		ctx.textAlign="left";
-
 		ctx.globalAlpha=feedbackAlpha-currentLine/100;
 		
 		
-		ctx.fillText(bulletPoint+" First line for this feedback", layoutAreaForCards.posxPixels-textWidth/2,feedbackTextY+currentLine*lineHeight);
-		currentLine+=1;
-		ctx.fillText(bulletPoint+" Second line for this feedback", layoutAreaForCards.posxPixels-textWidth/2,feedbackTextY+currentLine*lineHeight);
-		currentLine+=1;
+		for(var i=0;i<feedbackItems.length;i++){
+			ctx.fillText(bulletPoint+" "+feedbackItems[i], layoutAreaForCards.posxPixels-textWidth/2,feedbackTextY+currentLine*lineHeight);
+			currentLine+=1;
+		}
 
 		ctx.globalAlpha=feedbackAlpha-currentLine/100;
 
+
+		
+		if(improvementItems.length>0){
+			currentLine+=0.5;
+			ctx.font = 700+" "+normalSize*1	+ "px "+fontFamilyPrimary;			
+			ctx.fillText("What could be improved", layoutAreaForCards.posxPixels-textWidth/2,feedbackTextY+currentLine*lineHeight);
+			currentLine+=1;
+			ctx.font = 400+" "+normalSize*1	+ "px "+fontFamilyPrimary;			
+			for(var i=0;i<improvementItems.length;i++){
+				ctx.fillText(bulletPoint+" "+improvementItems[i], layoutAreaForCards.posxPixels-textWidth/2,feedbackTextY+currentLine*lineHeight);
+				currentLine+=1;
+			}
+		}
+
+		ctx.globalAlpha=feedbackAlpha-currentLine/100;
+		
 		
 		currentLine+=0.5;
+		ctx.fillStyle=feedbackAccentColor;
 		ctx.font = 700+" "+normalSize*1	+ "px "+fontFamilyPrimary;			
-		ctx.fillText("What could be improved", layoutAreaForCards.posxPixels-textWidth/2,feedbackTextY+currentLine*lineHeight);
-		currentLine+=1;
-		ctx.font = 400+" "+normalSize*1	+ "px "+fontFamilyPrimary;			
-		ctx.fillText(bulletPoint+" Suggestion for improvement", layoutAreaForCards.posxPixels-textWidth/2,feedbackTextY+currentLine*lineHeight);
-		currentLine+=1;
-		
-		ctx.globalAlpha=feedbackAlpha-currentLine/100;
-		
-		
-		currentLine+=0.5;
-		ctx.fillStyle="green";
-		ctx.font = 700+" "+normalSize*1	+ "px "+fontFamilyPrimary;			
-		ctx.fillText("If you want, you can try again.", layoutAreaForCards.posxPixels-textWidth/2,feedbackTextY+currentLine*lineHeight);
-		currentLine+=1;
+		for(var i=feedbackEnd.length-1;i>-1;i--){
+			ctx.fillText(feedbackEnd[i], layoutAreaForCards.posxPixels-textWidth/2,feedbackTextY+currentLine*lineHeight);
+			currentLine+=1;
+		}
 
+
+
+		
+		if(feedbackAccentColor!="green"){ 
+			var seatWidth = layoutSeats.widthPixels/columnCountWithAisle;
+			var highlightScale = 0.8;
+			var highlightWidth = seatWidth*highlightScale;
+			var highlightShift = (seatWidth/2)*highlightScale;
+			var sx=0;
+			var sy=0;
+			ctx.save();
+			for(var i=0;i<columnCount;i++){
+				for(var j=0;j<rowCount;j++){
+					if(arrayOfSeatedPassengers[i][j]!=null && arrayOfSeatedPassengers[i][j]!=passengerPreseat && arrayOfSeatedPassengers[i][j].feedback!="none"){
+						sx = layoutSeats.posxPixels-layoutSeats.widthPixels/2 + (i+0.5)*seatWidth;
+						sy = layoutSeats.posyPixels-layoutSeats.heightPixels/2 + (j+0.5)*seatWidth;
+						if(i>2){sx +=seatWidth;}
+
+						if(0){ 
+							ctx.fillStyle="black";
+							ctx.textAlign = "center";
+							ctx.font = 100+" "+fontUISize/2	+ "px "+fontFamilyPrimary;			
+							
+							ctx.fillText(arrayOfSeatedPassengers[i][j].name, sx,sy);
+						}
+						
+						
+						ctx.strokeStyle="orange";
+						if(arrayOfSeatedPassengers[i][j].feedback=="essential"){ctx.strokeStyle="red";}
+						ctx.setLineDash([5+Math.sin(timeCounter/20)]);
+						ctx.strokeRect(sx-highlightShift, sy-highlightShift, highlightWidth, highlightWidth);
+
+					}
+				}
+			}
+			ctx.restore();
+		}		
 
 	}
 
@@ -1599,27 +1955,36 @@ function mainLoop(timestamp) {
 	
 	
 	if(gameState=="waitingPlayerPlacePassenger"){
-		if(currentDeckOfPassengerInfo.length>0){
-			
-		}
+		
+		
 		ctx.font=fontUI;
 		ctx.fillStyle=colorShadow50pct;
-		if(pointerDown	){
-			ctx.globalAlpha=0;			
-		}else{
-			ctx.globalAlpha=0.8;			
-		}
 		ctx.textAlign="center";
-		var cardType="passenger";
-		var msgYpos = layoutDeckDropArea.posyPixels-layoutDeckDropArea.heightPixels/2;
-		if(isPortrait){
-			msgYpos = layoutDeckDropArea.posyPixels-layoutDeckDropArea.heightPixels*0.8;
-		}
+		if(pointerDragging){ctx.globalAlpha=0;}else{ctx.globalAlpha=0.8;}
 		
+		
+		var cardType="passenger"; 
+		var msgAboveYpos = layoutDeckDropArea.posyPixels-layoutDeckDropArea.heightPixels/2;
+		if(isPortrait){
+			msgAboveYpos = layoutDeckDropArea.posyPixels-layoutDeckDropArea.heightPixels*0.8;
+		}
 		if((currentDeckOfCards.length+currentSeatedDeck.length)>1){
 			cardType=currentDeckOfCards[0].passenger.groupType;	
 		}
-		ctx.fillText("SEAT THIS "+ cardType.toUpperCase(), layoutDeckDropArea.posxPixels, msgYpos);
+		ctx.fillText("SEAT THIS "+ cardType.toUpperCase(), layoutDeckDropArea.posxPixels, msgAboveYpos);
+		
+		
+		
+		var msgBelowYpos = layoutDeckDropArea.posyPixels+layoutDeckDropArea.heightPixels/1.5;
+		if(isPortrait){
+			msgBelowYpos = layoutDeckDropArea.posyPixels+layoutDeckDropArea.heightPixels;
+		}
+		ctx.font = 200+" "+fontUISize*0.7+ "px "+fontFamilyPrimary;		
+		ctx.fillText("DRAG PASSENGER TO A SEAT", layoutDeckDropArea.posxPixels, msgBelowYpos);		
+		if(currentDeckOfPassengerInfo.length>1){
+			ctx.fillText("(SELECT CARD TO CYCLE GROUP)", layoutDeckDropArea.posxPixels, msgBelowYpos+fontUISize*1.2);					
+		}
+
 		ctx.globalAlpha=1;
 	}
 
@@ -1628,9 +1993,14 @@ function mainLoop(timestamp) {
 	
 	
 	if(0){
-		var seatWidth = layoutSeats.widthPixels/columnCountWithcorridor;
+
+		var seatWidth = layoutSeats.widthPixels/columnCountWithAisle;
+		var highlightScale = 0.8;
+		var highlightWidth = seatWidth*highlightScale;
+		var highlightShift = (seatWidth/2)*highlightScale;
 		var sx=0;
 		var sy=0;
+		ctx.save();
 		for(var i=0;i<columnCount;i++){
 			for(var j=0;j<rowCount;j++){
 				sx = layoutSeats.posxPixels-layoutSeats.widthPixels/2 + (i+0.5)*seatWidth;
@@ -1640,8 +2010,8 @@ function mainLoop(timestamp) {
 					sx +=seatWidth;
 				}
 
+				ctx.strokeRect(sx-highlightShift, sy-highlightShift, highlightWidth, highlightWidth);
 
-		
 				ctx.fillStyle="black";
 				ctx.textAlign = "center";
 
@@ -1654,7 +2024,11 @@ function mainLoop(timestamp) {
 				}
 			}
 		}
+		ctx.restore();
 	}
+
+
+	
 	
 	requestAnimationFrame(mainLoop); 
 }
@@ -2116,15 +2490,10 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 					currentDeckOfPassengerInfo.unshift(this.passenger);
 					currentDeckOfCards.unshift(this);
 					currentSeatedDeck.splice(currentSeatedDeck.length-1,1);
-					for(i=0;i<arrayOfComponents.length;i++){
-						if(arrayOfComponents[i]==this){
-							arrayOfComponents.push(arrayOfComponents[i]);
-							arrayOfComponents.splice(i,1);
-							break;
-						}						
-					}
+					moveToTop(this.id);
 					for(i=1;i<currentDeckOfPassengerInfo.length;i++){
 						currentDeckOfPassengerInfo[i].myPosInDeck+=1;
+						currentDeckOfCards[i].myPosInDeck+=1;
 					}					
 					
 					console.log("REMOVED "+this.passenger.name+" FROM SEAT AT "+seatMapGridPosOnPointerUpOrDown);
@@ -2142,9 +2511,51 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 				
 				if(!this.pointerIsDraggingOnMe && pointIsWithinArea([mouseX,mouseY],this.shape,this.posxPixels,this.posyPixels,this.widthPixels,this.heightPixels)){
 					
-					if(this.componentType=="card" && this.passenger.myPosInDeck==0){
+					if(this.componentType=="card" && this.passenger.myPosInDeck==0 && currentDeckOfCards.length>1){
+						console.log("bla "+this.passenger.name);
+							console.log("This should be same:"+currentDeckOfCards[0].passenger.name);
+
+						for(var i=currentDeckOfCards.length-1;i>0;i--){
+							console.log("go "+i);							
+							
+						}
+						
+						
+						
+						
+						if(1){ 
+						
+							
+							var tempCardArray = [];
+							var tempCard;
+							var tempCurrDeckLength = currentDeckOfCards.length;
+							for(var i=0;i<tempCurrDeckLength;i++){
+								tempCard = currentDeckOfCards[0]; 
+								currentDeckOfPassengerInfo.splice(0,1);
+								currentDeckOfCards.splice(0,1);		
+								
+								tempCardArray.push(tempCard);
+							}
 
 							
+							currentDeckOfPassengerInfo.push(tempCardArray[0].passenger);
+							currentDeckOfCards.push(tempCardArray[0]);
+							currentDeckOfPassengerInfo[0].myPosInDeck=tempCurrDeckLength-1; 
+							currentDeckOfCards[0].myPosInDeck=tempCurrDeckLength-1;  
+			
+							
+							var newMyPos;
+							for(var i=tempCardArray.length-1;i>0;i--){	
+								tempCard=tempCardArray[i];
+								currentDeckOfPassengerInfo.unshift(tempCard.passenger);
+								currentDeckOfCards.unshift(tempCard);
+								moveToTop(tempCard.id);
+								newMyPos=tempCurrDeckLength-currentDeckOfCards.length;
+								currentDeckOfPassengerInfo[0].myPosInDeck=newMyPos;
+								currentDeckOfCards[0].myPosInDeck=newMyPos;
+							}					
+						}
+
 						
 					}
 					
@@ -2216,6 +2627,7 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 									for(i=this.passenger.myPosInDeck+1;i<currentDeckOfPassengerInfo.length;i++){
 										console.log("Update deck pos for "+currentDeckOfPassengerInfo[i].name);
 										currentDeckOfPassengerInfo[i].myPosInDeck-=1;
+										currentDeckOfCards[i].myPosInDeck-=1;
 									}
 								}
 								currentDeckOfPassengerInfo.splice(this.passenger.myPosInDeck,1);
@@ -2286,7 +2698,7 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 				mouseLockedToGrid=true;
 
 				
-				this.pixelsPerColumn = this.widthPixels/columnCountWithcorridor;
+				this.pixelsPerColumn = this.widthPixels/columnCountWithAisle;
 				this.mouseXPosRelToThis = (mouseX+this.pixelsPerColumn/2-(this.posxPixels-this.widthPixels/2));
 				this.mouseXPosInColumns = this.mouseXPosRelToThis/this.pixelsPerColumn;
 				if(Math.round(this.mouseXPosInColumns)!=4){this.mouseXPosInColumnsRound = Math.round(this.mouseXPosInColumns)}; 
@@ -2437,17 +2849,14 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 			ctx.font = 400+" "+this.fontSize*0.9	+ "px "+fontFamilyPrimary;
 			ctx.fillText(this.passenger.age+"yo", this.posxPixels-this.widthPixels/8, this.posyPixels-this.heightPixels/2+this.fontSize*(2+this.lineHeightRel*1));
 			
-			if(this.passenger.pref){
-				if(Array.isArray(this.passenger.pref)){
-					for(var i=0; i<this.passenger.pref.length; i+=1){
-						ctx.fillText(bulletPoint+" "+this.passenger.pref[i], this.posxPixels-this.widthPixels/8, this.posyPixels-this.heightPixels/2+this.fontSize*(2+this.lineHeightRel*(2+i)));
-					}
-				}else{
-					ctx.fillText(bulletPoint+" "+this.passenger.pref, this.posxPixels-this.widthPixels/8, this.posyPixels-this.heightPixels/2+this.fontSize*(2+this.lineHeightRel*2));
+			if(typeof this.passenger.pref !== 'undefined'){
+				for(var i=0; i<this.passenger.pref.length; i+=1){
+					ctx.fillText(bulletPoint+" "+this.passenger.pref[i], this.posxPixels-this.widthPixels/8, this.posyPixels-this.heightPixels/2+this.fontSize*(2+this.lineHeightRel*(2+i)));
 				}
+
 			}
 			
-			if(this.passenger.code){
+			if(typeof this.passenger.code !== 'undefined'){
 				ctx.font = 600+" "+this.fontSize*0.7	+ "px "+fontFamilyPrimary;
 				
 				this.codeTextBoxWidth = ctx.measureText(this.passenger.code).width+paddingNormal*2;
@@ -2459,13 +2868,24 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 			}			
 			ctx.globalAlpha=1;
 			
+			
+			if(typeof this.passenger.group !== 'undefined'){
+				ctx.globalAlpha=0.6;
+				ctx.font = 400+" "+this.fontSize*0.8	+ "px "+fontFamilyPrimary;
+				ctx.fillStyle="black";
+				ctx.textAlign="left";
+				ctx.fillText((this.passenger.myNumInDeck+1)+"/"+(currentDeckOfCards.length+currentSeatedDeck.length), this.posxPixels-this.widthPixels/2+paddingNormal*1.5, this.posyPixels+this.heightPixels/2-paddingNormal*1.5);
+				ctx.globalAlpha=1;
+				
+			}
+			
 		}
 		
 		
 		if(this.componentType=="graphic"){
 			myDrawImage(this.label,this.compX1, this.compY1,this.graphicScale);
 		}
-		if(this.passenger){ 
+		if(typeof this.passenger !== 'undefined'){ 
 			this.avatar.passport = this.passenger.passport;
 			if(this.componentType=="card"){
 				this.avatar.x = this.posxPixels-(this.widthPixels/2)+this.widthPixels/5;
@@ -2474,7 +2894,7 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 			}else{
 				this.avatar.x = this.posxPixels;
 				this.avatar.y = this.posyPixels;		
-				this.widthRel=1/columnCountWithcorridor;
+				this.widthRel=1/columnCountWithAisle;
 				this.widthPixels=this.widthRel*layoutSeats.widthPixels;
 				this.avatar.sizePixels = this.widthPixels/3;
 			}

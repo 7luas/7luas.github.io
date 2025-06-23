@@ -346,7 +346,7 @@ function adjustToCanvasSizeAndRes(event){
 	}
 
 }
-window.addEventListener('resize', reload);				
+//window.addEventListener('resize', reload);				
 
 function initializeGeneralStuff(){													
 

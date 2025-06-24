@@ -21,9 +21,7 @@ if (1) {
 	
 	
 	
-	
-	
-	
+
 	
 	
 	
@@ -55,6 +53,7 @@ if (1) {
 	
 		
 		
+	
 	
 	
 	
@@ -82,6 +81,7 @@ var limitNumberOfPassengers=0;
 
 
 var timeCounter = 0;	
+
 
 
 var newline = "\r\n";
@@ -132,8 +132,8 @@ var arrayOfAssets = [];
 var allAssetsLoaded = false;		
 
 
-loadAsset("svgExample1","svg");
-loadAsset("svgExample2","svg");
+
+
 
 
 var usingLocalStorage = false;			
@@ -157,7 +157,8 @@ var pointerDown = false;
 var pointerDragging = false;			
 var pointerDownGlobalOneOffWarning = false;				
 var pointerUpGlobalOneOffWarning = false;				
-
+var pointerPosWhenDown = [0,0]; var pointerPosWhenUp=[0,0];
+var pointerClickedInPlaceGlobalOneOffWarning =false;
 
 
 var keySpace=false;
@@ -171,6 +172,12 @@ var colorShadow10pct = "rgba(0,0,0,0.1)";
 var colorShadow20pct = "rgba(0,0,0,0.2)";
 var colorShadow50pct = "rgba(0,0,0,0.5)";
 var colorHighlight10pct = "rgba(255,255,255,0.1)";
+var colorOrange = "orange";
+var colorOrangeStrong = "#FF6D00";
+var colorBadStrong = "#D70F0A";
+var colorBadLight = "tomato";
+var colorReviewMode = colorOrange; 
+
 
 
 
@@ -197,6 +204,7 @@ var paddingNormal;
 
 
 var arrayOfComponents=[]; 
+var arrayOfSeatedComponents=[]; 
 
 
 var dragDelta; 					
@@ -220,10 +228,50 @@ var seatMapGridActivePos=[0,0];
 var seatMapGridPosOnPointerUpOrDown=[0,0];
 var lastObjectWithPassengerClickedOrDragged; 
 
+var cardWidth; var cardHeight;
+var cardHeightPropWidth=0.4;
+var layoutDeckDropAreaPos=[0,0];
+
+var reviewModeGlobal=false;
+
+var reviewFeedbackText="";
+
+var lineDashOffset= 0;
+var lineDashSize=5;
+
+var ageAdultMin=21;
+
 
 loadAsset("logo","png");
+loadAsset("logoAcademy","png");
+
 loadAsset("iconReset","svg");
 loadAsset("iconHelp","svg");
+
+loadAsset("seat","svg");
+loadAsset("windowsLeft","svg");
+loadAsset("windowsRight","svg");
+
+loadAsset("faceWhite","svg","faceBase");
+loadAsset("faceOrange","svg","faceBase");
+loadAsset("faceBrown","svg","faceBase");
+loadAsset("Bob","svg","people");
+loadAsset("Lorraine","svg","people");
+loadAsset("Jorge","svg","people");
+loadAsset("Jess","svg","people");
+loadAsset("Frank","svg","people");
+loadAsset("Carina","svg","people");
+loadAsset("Scott","svg","people");
+loadAsset("Heath","svg","people");
+loadAsset("Carla","svg","people");
+loadAsset("Charles","svg","people");
+loadAsset("Hilda","svg","people");
+loadAsset("Howard","svg","people");
+loadAsset("Jon","svg","people");
+loadAsset("Jane","svg","people");
+
+
+var avatarWidth; var avatarHeight; 
 
 var totalPassengersOriginallyInCue=0;
 var totalPassengersSeated=0;
@@ -246,7 +294,7 @@ function onLoad(){
 	defineInputFunctions(); 	
 }
 
-function reload(){
+function myReload(){
 	location.reload();
 }
 
@@ -320,7 +368,7 @@ function adjustToCanvasSizeAndRes(event){
 	}
 
 }
-window.addEventListener('resize', reload);				
+window.addEventListener('resize', myReload);				
 
 function initializeGeneralStuff(){													
 
@@ -344,6 +392,8 @@ function initializeGeneralStuff(){
 		if (assetCount==arrayOfAssets.length){
 		allAssetsLoaded=true;
 		requestAnimationFrame(mainLoop);
+		avatarWidth=faceWhite.width;
+		avatarHeight=faceWhite.height;
 	}
 		
 	
@@ -394,7 +444,7 @@ function initializeProjectSpecificStuff(){
 	
 	
 	window.prefWindow = "Prefers window seat.";
-	window.prefIsle = "Prefers isle seat.";
+	window.prefAisle = "Prefers aisle seat.";
 	window.prefTogether = "Prefers seating together.";
 	window.elderlyFrail = "Frail elderly person.";
 	window.elderyAble = "Able-bodied elderly person."
@@ -410,14 +460,14 @@ function initializeProjectSpecificStuff(){
 	window.arrayOfPassengers = []; 
 	
 	tempPassenger = {
-		passport: uniqueRandomNumber(),
+		passport: 0.2,
 		name: "Bob Dangerfield",
 		age: 35
 	}
 	arrayOfPassengers.push(tempPassenger);
 	
 	tempPassenger = {
-		passport: uniqueRandomNumber(),
+		passport: 0.3,
 		name: "Lorraine McFly",
 		age: 23,
 		code: "PREG"
@@ -425,15 +475,16 @@ function initializeProjectSpecificStuff(){
 	arrayOfPassengers.push(tempPassenger);
 	
 	tempPassenger = {
-		passport: uniqueRandomNumber(),
+		passport: 0.8,
 		name: "Jorge L. Borges",
 		age: 25,
-		code: "PWD"
+		code: "PWD",
+		pref: [prefAisle]
 	}
 	arrayOfPassengers.push(tempPassenger);
 	
 	tempPassenger = {
-		passport: uniqueRandomNumber(),
+		passport: 0.5,
 		name: "Jess Law",
 		age: 30,
 		pref: ["Baby on lap"],
@@ -442,7 +493,7 @@ function initializeProjectSpecificStuff(){
 	arrayOfPassengers.push(tempPassenger);
 	
 	tempPassenger = {
-		passport: uniqueRandomNumber(),
+		passport: 0.32,
 		name: "Frank Abagnale",
 		age: 10,
 		code: "UMNR"
@@ -450,7 +501,7 @@ function initializeProjectSpecificStuff(){
 	arrayOfPassengers.push(tempPassenger);
 	
 	tempPassenger = {
-		passport: uniqueRandomNumber(),
+		passport: 0.78,
 		name: "Carina Nuvem",
 		age: 37,
 		pref: [prefTogether],
@@ -461,7 +512,7 @@ function initializeProjectSpecificStuff(){
 	arrayOfPassengers.push(tempPassenger);
 	
 	tempPassenger = {
-		passport: uniqueRandomNumber(),
+		passport: 0.342,
 		name: "Scott Cloud",
 		age: 29,
 		pref: [prefTogether],
@@ -471,36 +522,37 @@ function initializeProjectSpecificStuff(){
 	arrayOfPassengers.push(tempPassenger);	
 	
 	tempPassenger = {
-		passport: uniqueRandomNumber(),
+		passport: 0.5221,
 		name: "Heath Longlegs",
 		age: 20,
-		pref: [prefIsle]
+		pref: [prefAisle]
 	}
 	arrayOfPassengers.push(tempPassenger);
 	
 	tempPassenger = {
-		passport: uniqueRandomNumber(),
+		passport: 0.21166,
 		name: "Carla Horn",
 		age: 42,
 		group: "CarlaAndCharlie",
 		groupType: "couple",
-		pref: [prefIsle],
+		pref: [prefTogether,prefAisle],
 		code: "NERV"
 	}
 	arrayOfPassengers.push(tempPassenger);	
 	
 	tempPassenger = {
-		passport: uniqueRandomNumber(),
+		passport: 0.6666,
 		name: "Charles Hunt",
 		age: 29,
 		group: "CarlaAndCharlie",
+		pref: [prefTogether],
 		groupType: "couple",
 		groupLeader: "true"		
 	}
 	arrayOfPassengers.push(tempPassenger);
 	
 	tempPassenger = {
-		passport: uniqueRandomNumber(),
+		passport: 0.1111,
 		name: "Hilda Hilst",
 		age: 88,
 		pref: [elderlyFrail]
@@ -508,7 +560,7 @@ function initializeProjectSpecificStuff(){
 	arrayOfPassengers.push(tempPassenger);
 	
 	tempPassenger = {
-		passport: uniqueRandomNumber(),
+		passport: 0.81142,
 		name: "Howard Happy",
 		age: 78,
 		pref: [prefWindow,elderyAble]
@@ -516,7 +568,7 @@ function initializeProjectSpecificStuff(){
 	arrayOfPassengers.push(tempPassenger);
 	
 	tempPassenger = {
-		passport: uniqueRandomNumber(),
+		passport: 0.39001,
 		name: "Jon Smith",
 		age: 38,
 		pref: [prefTogether],
@@ -527,7 +579,7 @@ function initializeProjectSpecificStuff(){
 	arrayOfPassengers.push(tempPassenger);	
 	
 	tempPassenger = {
-		passport: uniqueRandomNumber(),
+		passport: 0.39002,
 		name: "Jane Smith",
 		age: 30,
 		pref: [prefTogether],
@@ -537,7 +589,7 @@ function initializeProjectSpecificStuff(){
 	arrayOfPassengers.push(tempPassenger);
 	
 	tempPassenger = {
-		passport: uniqueRandomNumber(),
+		passport: 0.39003,
 		name: "Billy Smith",
 		age: 4,
 		pref: [prefTogether],		
@@ -548,7 +600,7 @@ function initializeProjectSpecificStuff(){
 	arrayOfPassengers.push(tempPassenger);
 	
 	tempPassenger = {
-		passport: uniqueRandomNumber(),
+		passport: 0.39004,
 		name: "Lilly Smith",
 		age: 9,
 		pref: [prefTogether],
@@ -557,6 +609,19 @@ function initializeProjectSpecificStuff(){
 		groupType: "family",		
 	}
 	arrayOfPassengers.push(tempPassenger);
+	
+	
+	if(0){
+				
+		var blabla = {
+			passport: 0.1111,
+			name: "Hilda Hilst",
+			age: 88,
+			pref: [elderlyFrail]
+		}
+		arrayOfPassengers=[blabla];
+		
+	}
 
 	
 	if(limitNumberOfPassengers>0){
@@ -602,45 +667,54 @@ function initializeProjectSpecificStuff(){
 			}
 		}
 	}
-	
-	arrayOfSeatedPassengers[0][0]=passengerPreseat;
-	arrayOfSeatedPassengers[0][2]=passengerPreseat;
-	arrayOfSeatedPassengers[0][3]=passengerPreseat;
-	arrayOfSeatedPassengers[0][4]=passengerPreseat;
-	arrayOfSeatedPassengers[1][0]=passengerPreseat;
-	arrayOfSeatedPassengers[3][2]=passengerPreseat;
-	arrayOfSeatedPassengers[3][4]=passengerPreseat;
-	arrayOfSeatedPassengers[5][0]=passengerPreseat; 
-	arrayOfSeatedPassengers[4][2]=passengerPreseat;
-	arrayOfSeatedPassengers[4][3]=passengerPreseat;
-	arrayOfSeatedPassengers[4][4]=passengerPreseat;
-	arrayOfSeatedPassengers[5][2]=passengerPreseat;
-	arrayOfSeatedPassengers[5][3]=passengerPreseat;
-	arrayOfSeatedPassengers[5][4]=passengerPreseat;
-
+	if(1){	
+		arrayOfSeatedPassengers[0][0]=passengerPreseat;
+		arrayOfSeatedPassengers[0][2]=passengerPreseat;
+		arrayOfSeatedPassengers[0][3]=passengerPreseat;
+		arrayOfSeatedPassengers[0][4]=passengerPreseat;
+		arrayOfSeatedPassengers[1][0]=passengerPreseat;
+		arrayOfSeatedPassengers[3][2]=passengerPreseat;
+		arrayOfSeatedPassengers[3][4]=passengerPreseat;
+		arrayOfSeatedPassengers[5][0]=passengerPreseat; 
+		arrayOfSeatedPassengers[4][3]=passengerPreseat;
+		arrayOfSeatedPassengers[4][4]=passengerPreseat;
+		arrayOfSeatedPassengers[5][3]=passengerPreseat;
+		arrayOfSeatedPassengers[5][4]=passengerPreseat;
+	}
+	if(0){ 
+		var copyOfarrayOfPassengers = arrayOfPassengers.slice();
+		for(var i=0;i<columnCount;i++){		
+			for(var j=0;j<rowCount;j++){
+				if(copyOfarrayOfPassengers.length>0){
+					arrayOfSeatedPassengers[i][j]=copyOfarrayOfPassengers.splice(0,1)[0];
+					console.log(arrayOfSeatedPassengers[i][j].name);
+				}
+			}
+		}	
+	}
 	
 	var seatsVar = new seats();
 
  	
 	var tempComponentPointer; 
 	
-	tempComponentPointer=new component(logo,0.05,0.5); 
+	tempComponentPointer=new component(logoAcademy,0.05,0.6); 
 	tempComponentPointer.anchorLeft=true;
 	tempComponentPointer.color="none";
-	tempComponentPointer.heightRel=0.75;
+	tempComponentPointer.heightRel=0.85;
 	
 	
 	parentComponents(tempComponentPointer,layoutHeader);
-	tempComponentPointer=new component(iconReset,0.82,0.5);
+	window.componentIconReset =new component(iconReset,0.82,0.5);
+	componentIconReset.color="none";
+	componentIconReset.heightRel=0.75;
+	componentIconReset.actionOnClick="reload";
+	componentIconReset.anchorRight=true;
+	
+	parentComponents(componentIconReset,layoutHeader);
+	tempComponentPointer=new component(iconHelp,0.95,0.5);
 	tempComponentPointer.color="none";
 	tempComponentPointer.heightRel=0.75;
-	tempComponentPointer.actionOnClick="reload";
-	tempComponentPointer.anchorRight=true;
-	
-	parentComponents(tempComponentPointer,layoutHeader);
-	tempComponentPointer=new component(iconHelp,0.95,0.55);
-	tempComponentPointer.color="none";
-	tempComponentPointer.heightRel=0.87;
 	tempComponentPointer.anchorRight=true;
 	parentComponents(tempComponentPointer,layoutHeader);
 	
@@ -649,6 +723,8 @@ function initializeProjectSpecificStuff(){
 	statPercentage.heightRel=0.8;
 	statPercentage.color="green";
 	statPercentage.anchorTop=true;
+	statPercentage.alpha=0;
+	statPercentage.targetAlpha=0;
 	statPercentage.widthPropHeight=true;
 	statPercentage.componentType="stat";
 	parentComponents(statPercentage,layoutFooter);
@@ -713,6 +789,7 @@ function seats(){
 	var tempSeat;
 	for(var i=0;i<columnCountWithAisle;i++){
 		for(var j=0;j<rowCount;j++){
+			
 			tempSeat = new component("",(1/(columnCountWithAisle))*i,(1/(rowCount))*j);
 			tempSeat.anchorLeft=true;
 			tempSeat.anchorTop=true;
@@ -729,6 +806,14 @@ function seats(){
 				}
 			}
 			parentComponents(tempSeat,layoutSeats);
+			for(var r=0;r<aisleToRightOfColumn.length;r++){
+				if(i!=aisleToRightOfColumn[r]){
+					
+					tempSeat =new component(seat,(1/(columnCountWithAisle))*(i+0.5),(1/(rowCount))*(j+0.5));
+					tempSeat.color="none";
+					tempSeat.heightRel=0.18;
+					parentComponents(tempSeat,layoutSeats);				}
+				}
 		}
 	}
 	
@@ -780,7 +865,20 @@ function seats(){
 	}
 
 	
-	seatMapGridActivePos
+	
+	tempSeat =new component(windowsLeft,-0.05,0.5);
+	tempSeat.color="none";
+	tempSeat.heightRel=1;
+	parentComponents(tempSeat,layoutSeats);
+	
+	tempSeat =new component(windowsRight,1.05,0.5);
+	tempSeat.color="none";
+	tempSeat.heightRel=1;
+	parentComponents(tempSeat,layoutSeats);
+
+
+
+	
 	window.posHint = new component("",0.5,1.11);	
 	posHint.color="none";
 	posHint.fontColor	= "black";	
@@ -796,13 +894,16 @@ function seats(){
 				
 				tempPerson = new component("",(1/(columnCountWithAisle))*fakeColumnCounter,(1/(rowCount))*j);
 				tempPerson.passenger = arrayOfSeatedPassengers[i][j];
-				if(tempPerson.passenger.passport==0){tempPerson.disabled=true;}
+				if(1){tempPerson.disabled=true;}
+				tempPerson.mySeatPos=[i,j];
 				tempPerson.anchorLeft=true;
 				tempPerson.anchorTop=true;
 				tempPerson.widthRel=1/columnCountWithAisle;
 				tempPerson.heightRel=1/rowCount;
 				tempPerson.actionOnDrag="drag";
 				parentComponents(tempPerson,layoutSeats);	
+
+				console.log("> "+tempPerson.passenger.name);
 				
 				if(0){
 					tempSeat = new component(arrayOfSeatedPassengers[i][j].name,(1/(columnCountWithAisle))*fakeColumnCounter,(1/(rowCount))*j);
@@ -832,12 +933,12 @@ function seats(){
 	
 	
 }
+
 function avatarGraphic(passport,x,y,sizePixels){	
 	if(typeof passport==='undefined'){this.passport=0;}else{this.passport=passport;}
 	if(typeof x==='undefined'){this.x=0;}else{this.x=x;}
 	if(typeof y==='undefined'){this.y=0;}else{this.y=y;}
 	if(typeof sizePixels==='undefined'){this.sizePixels=0;}else{this.sizePixels=sizePixels;}
-
 
 	this.tagColor = "blue";
 
@@ -850,22 +951,27 @@ function avatarGraphic(passport,x,y,sizePixels){
 	this.smileSizeTarget = 0.3;
 	this.headShakeAmountTarget = 0;
 	this.headShakeAmount = 0;
-	this.headShake;
+	this.headShake;	
 	
 	this.updateAndDraw = function(){
+
+		
+		if(this.passport==0.39003 || this.passport==0.39004){this.sizePixels*=0.8;}
+		if(this.passport==0.32){this.sizePixels*=0.9;}
+	
+		
 
 		this.headShakeAmount+=(this.headShakeAmountTarget-this.headShakeAmount)/easeSpeedNormal;
 
 		this.headShake = this.headShakeAmount*Math.sin(timeCounter/10)*this.eyeDist;
 
+		ctx.globalAlpha=1;	
 		if(this.passport==0){
-			ctx.globalAlpha=0.5;
-		}else{
-			ctx.globalAlpha=1;
+			
 		}
 
 		this.eyeHeight = this.sizePixels/2;
-		this.eyeDist = this.sizePixels/3;	
+		this.eyeDist = this.sizePixels/2.5;	
 		this.lineWeight = (strokeBaseThickness/1.5)+this.sizePixels/25;
 
 		ctx.lineWidth = this.lineWeight;
@@ -875,7 +981,39 @@ function avatarGraphic(passport,x,y,sizePixels){
 		}
 
 		
-		drawCircle(this.x,this.y,this.sizePixels,"white",true,"black",this.lineWeight);
+		
+		
+		this.newAvatarRelSize = 3; 
+		this.newAvatarProp=avatarHeight/avatarWidth;
+		this.newAvatarWidth=this.sizePixels * this.newAvatarRelSize;
+		this.newAvatarHeight=this.newAvatarWidth*this.newAvatarProp;
+		ctx.drawImage(faceWhite,this.x-this.newAvatarWidth/2,this.y-(this.newAvatarHeight*0.55),this.newAvatarWidth,this.newAvatarHeight);
+		ctx.globalAlpha=0.2+this.passport*0.8;
+		ctx.drawImage(faceOrange,this.x-this.newAvatarWidth/2,this.y-(this.newAvatarHeight*0.55),this.newAvatarWidth,this.newAvatarHeight);
+		if(this.passport>0.75){ 
+			ctx.globalAlpha=this.passport*0.2;
+			ctx.drawImage(faceBrown,this.x-this.newAvatarWidth/2,this.y-(this.newAvatarHeight*0.55),this.newAvatarWidth,this.newAvatarHeight);
+		}
+		ctx.globalAlpha=1;
+		
+		if(this.passport==0.2){ctx.drawImage(Bob,this.x-this.newAvatarWidth/2,this.y-(this.newAvatarHeight*0.55),this.newAvatarWidth,this.newAvatarHeight);}
+		if(this.passport==0.3){ctx.drawImage(Lorraine,this.x-this.newAvatarWidth/2,this.y-(this.newAvatarHeight*0.55),this.newAvatarWidth,this.newAvatarHeight);}
+		if(this.passport==0.8){ctx.drawImage(Jorge,this.x-this.newAvatarWidth/2,this.y-(this.newAvatarHeight*0.55),this.newAvatarWidth,this.newAvatarHeight);}
+		if(this.passport==0.5){ctx.drawImage(Jess,this.x-this.newAvatarWidth/2,this.y-(this.newAvatarHeight*0.55),this.newAvatarWidth,this.newAvatarHeight);}
+		if(this.passport==0.32){ctx.drawImage(Frank,this.x-this.newAvatarWidth/2,this.y-(this.newAvatarHeight*0.55),this.newAvatarWidth,this.newAvatarHeight);}
+		if(this.passport==0.78){ctx.drawImage(Carina,this.x-this.newAvatarWidth/2,this.y-(this.newAvatarHeight*0.55),this.newAvatarWidth,this.newAvatarHeight);}
+		if(this.passport==0.342){ctx.drawImage(Scott,this.x-this.newAvatarWidth/2,this.y-(this.newAvatarHeight*0.55),this.newAvatarWidth,this.newAvatarHeight);}
+		if(this.passport==0.5221){ctx.drawImage(Heath,this.x-this.newAvatarWidth/2,this.y-(this.newAvatarHeight*0.55),this.newAvatarWidth,this.newAvatarHeight);}
+		if(this.passport==0.21166){ctx.drawImage(Carla,this.x-this.newAvatarWidth/2,this.y-(this.newAvatarHeight*0.55),this.newAvatarWidth,this.newAvatarHeight);}
+		if(this.passport==0.6666){ctx.drawImage(Charles,this.x-this.newAvatarWidth/2,this.y-(this.newAvatarHeight*0.55),this.newAvatarWidth,this.newAvatarHeight);}
+		if(this.passport==0.1111){ctx.drawImage(Hilda,this.x-this.newAvatarWidth/2,this.y-(this.newAvatarHeight*0.55),this.newAvatarWidth,this.newAvatarHeight);}
+		if(this.passport==0.81142){ctx.drawImage(Howard,this.x-this.newAvatarWidth/2,this.y-(this.newAvatarHeight*0.55),this.newAvatarWidth,this.newAvatarHeight);}
+		if(this.passport==0.39001){ctx.drawImage(Jon,this.x-this.newAvatarWidth/2,this.y-(this.newAvatarHeight*0.55),this.newAvatarWidth,this.newAvatarHeight);}
+		if(this.passport==0.39002){ctx.drawImage(Jane,this.x-this.newAvatarWidth/2,this.y-(this.newAvatarHeight*0.55),this.newAvatarWidth,this.newAvatarHeight);}
+		if(this.passport==0.39003){ctx.drawImage(Jon,this.x-this.newAvatarWidth/2,this.y-(this.newAvatarHeight*0.55),this.newAvatarWidth,this.newAvatarHeight);}
+		if(this.passport==0.39004){ctx.drawImage(Jane,this.x-this.newAvatarWidth/2,this.y-(this.newAvatarHeight*0.55),this.newAvatarWidth,this.newAvatarHeight);}
+ 	
+		
 
 		
 		ctx.beginPath();
@@ -886,8 +1024,13 @@ function avatarGraphic(passport,x,y,sizePixels){
 		if(this.smileSizeTarget!=0.3){
 			this.smileSizeTarget-=(this.smileSizeTarget-0.3)/2;
 		}
-
-		ctx.arc(this.x+this.headShake,this.y-this.sizePixels/4,this.sizePixels/1.5, Math.PI*this.smileSize, Math.PI*(1-this.smileSize));
+		ctx.lineWidth = this.lineWeight*0.65;
+		if(this.passport==0.5){this.smileSize=0.42;}
+		if(!this.isSad){
+			ctx.arc(this.x+this.headShake,this.y-this.sizePixels/4,this.sizePixels/1.5, Math.PI*this.smileSize, Math.PI*(1-this.smileSize));
+		}else{
+			ctx.arc(this.x+this.headShake,this.y+this.sizePixels*0.9,this.sizePixels/1.5, 1*Math.PI*(1+this.smileSize), Math.PI*(2-this.smileSize));
+		}
 		ctx.strokeStyle = strokeBaseColor;
 		ctx.stroke();
 
@@ -909,7 +1052,7 @@ function avatarGraphic(passport,x,y,sizePixels){
 		
 		
 		if(this.passport!=0){
-			drawCircle(this.x-this.sizePixels*0.8,this.y-this.sizePixels*0.8,this.sizePixels/2,this.tagColor);
+			
 		}
 
 		
@@ -950,7 +1093,7 @@ function pickPersonAndBuildDeck(){
 	return returnArray
 }
 function checkPlacing(){
-	if(arrayOfSeatedPassengers[(seatMapGridActivePos[0]-1)][(seatMapGridActivePos[1]-1)]==null){
+	if(arrayOfSeatedPassengers[(seatMapGridPosOnPointerUpOrDown[0]-1)][(seatMapGridPosOnPointerUpOrDown[1]-1)]==null){
 		return "accept";
 	}else{
 		return "reject";
@@ -965,6 +1108,18 @@ function moveToTop(id){
 		}						
 	}
 }
+function notSeated(card){
+	console.log("function notSeated concluded:");
+	for(var i=0; i<currentSeatedDeck.length;i++){
+		if(currentSeatedDeck[i].id==card.id){
+			console.log("FALSE");
+			return false;
+		}
+	}
+	
+	console.log("TRUE");	
+	return true;
+}
 
 function defineInputFunctions() { 											
  
@@ -972,10 +1127,8 @@ function defineInputFunctions() {
 	canvasp.addEventListener("mousedown", mouseDown, false);
 	canvasp.addEventListener("touchstart", mouseDown, false);
 	function mouseDown(event) {
-		pointerDown = true;
-		
+		pointerDown = true;		
 		pointerDownGlobalOneOffWarning=true; 
-				
 		updatePointerCanvasPos(event);
 	}
 
@@ -983,12 +1136,13 @@ function defineInputFunctions() {
 	canvasp.addEventListener("mouseup", mouseUp, false);
 	canvasp.addEventListener("touchend", mouseUp, false);
 	function mouseUp(event){
+		
 		event.preventDefault();		
 
 		pointerUpGlobalOneOffWarning=true; 
 
 		pointerDown = false;
-		pointerDragging = false;
+		pointerDragging = false;			
  	
 	}
 
@@ -1118,6 +1272,8 @@ function updateLayoutElements(){
 		layoutFooter.heightRel=0.15;
 		
 	}
+
+	
 }
 
 function parentComponents(me,dad,warnSon){
@@ -1182,6 +1338,26 @@ function writeLocalVars(){
 function mainLoop(timestamp) { 												
 	
 	debugText = [];
+
+	if(lineDashOffset<0){lineDashOffset=lineDashSize*3;}else{lineDashOffset-=1/4;}
+	
+	cardWidth = 0.8*layoutAreaForCards.widthPixels;
+	cardHeight = cardHeightPropWidth * cardWidth;
+	layoutDeckDropAreaPos=[layoutDeckDropArea.posxPixels,layoutDeckDropArea.posyPixels];
+	
+	
+	if(pointerDownGlobalOneOffWarning){
+		pointerPosWhenDown=[mouseX,mouseY];
+	}
+
+	
+	
+	if(pointerUpGlobalOneOffWarning){
+		pointerPosWhenUp=[mouseX,mouseY];
+		if(pointsAreCloserThan(pointerPosWhenDown,pointerPosWhenUp,dragDelta)){
+			pointerClickedInPlaceGlobalOneOffWarning=true;
+		}
+	}
 
 	
 
@@ -1433,6 +1609,7 @@ function mainLoop(timestamp) {
 			window["layoutCard_"+i].passenger = currentDeckOfPassengerInfo[i]; 
 			window["layoutCard_"+i].passenger.myPosInDeck=i; 
 			window["layoutCard_"+i].passenger.myNumInDeck=i; 
+			arrayOfSeatedComponents.push(window["layoutCard_"+i]);
 			parentComponents(window["layoutCard_"+i],layoutDeckDropArea);		
 			approachDelay = (currentDeckOfPassengerInfo.length - window["layoutCard_"+i].passenger.myPosInDeck)*2;
 			if(isPortrait){ 
@@ -1514,7 +1691,6 @@ function mainLoop(timestamp) {
 		
 		
 		
-		
 
 		
 		
@@ -1553,7 +1729,7 @@ function mainLoop(timestamp) {
 					
 					if(i==aisleToRightOfColumn[0] || i==aisleToRightOfColumn[0]-1){
 						isIsle=true;
-						console.log("Is in isle seat. ");
+						console.log("Is in aisle seat. ");
 					}
 					if(i==0 || i==columnCount-1){
 						isWindow=true;
@@ -1567,14 +1743,13 @@ function mainLoop(timestamp) {
 						hasCode=true;
 						console.log("Has code:"+ me.code);
 						globalEssentialRequirements[0]+=1;
-					}
-					
+					}	
 					if(typeof me.pref !== 'undefined'){
 						hasPref=true; 
 					}
 					if(hasPref){
 						var prefTemp = me.pref;
-						if(prefTemp.includes(prefIsle)||prefTemp.includes(prefWindow)||prefTemp.includes(prefTogether)){ 
+						if(prefTemp.includes(prefAisle)||prefTemp.includes(prefWindow)||prefTemp.includes(prefTogether)){ 
 							globalPreferences[0]+=1;
 							console.log("Has pref:"+ me.pref.length);
 						}
@@ -1589,6 +1764,7 @@ function mainLoop(timestamp) {
 						if(isEmergencyRow){
 							me.feedback="essential";
 							globalEssentialRequirements[1]+=1; 
+							me.myReviewFeedbackText="Frail person in emergency row";
 							console.log("Elder frail in emergency row!"); 
 						}
 					}
@@ -1600,18 +1776,8 @@ function mainLoop(timestamp) {
 							me.feedback="essential";
 							globalEssentialRequirements[1]+=1; 
 							console.log(me.code+" in emergency row!"); 
+							me.myReviewFeedbackText=me.code+" in emergency row"
 						}
-						
-						if(me.code == "PWD"){
-							globalEssentialRequirements[0]+=1;
-							if(isIsle){
-								console.log(me.code+" in aisle seat"); 
-							}else{
-								me.feedback="essential";
-								globalEssentialRequirements[1]+=1; 
-								console.log(me.code+" not in aisle seat!"); 
-							}
-						}						
 						
 						childAwayFromParents=true;
 						if(me.code == "CHD"){
@@ -1619,25 +1785,30 @@ function mainLoop(timestamp) {
 							
 							if(i>0){
 								
-								if(typeof arrayOfSeatedPassengers[i-1][j].group !== 'undefined'){
-									if(arrayOfSeatedPassengers[i-1][j].group==me.group){
-										console.log(me.code+" has a parent on the left"); 
-										childAwayFromParents=false;
+								if(arrayOfSeatedPassengers[i-1][j]!=null){
+									if(typeof arrayOfSeatedPassengers[i-1][j].group !== 'undefined'){
+										if(arrayOfSeatedPassengers[i-1][j].group==me.group && arrayOfSeatedPassengers[i-1][j].age>ageAdultMin){
+											console.log(me.code+" has a parent on the left"); 
+											childAwayFromParents=false;
+										}
 									}
 								}
 							}
 							
-							if(childAwayFromParents && i<columnCount-2){ 
-								if(typeof arrayOfSeatedPassengers[i+1][j].group !== 'undefined'){
-									if(arrayOfSeatedPassengers[i+1][j].group==me.group){
-										console.log(me.code+" has a parent on the right"); 
-										childAwayFromParents=false;
+							if(childAwayFromParents && i<columnCount-1){ 
+								if(arrayOfSeatedPassengers[i+1][j]!=null){
+									if(typeof arrayOfSeatedPassengers[i+1][j].group !== 'undefined'){
+										if(arrayOfSeatedPassengers[i+1][j].group==me.group && arrayOfSeatedPassengers[i+1][j].age>ageAdultMin){
+											console.log(me.code+" has a parent on the right"); 
+											childAwayFromParents=false;
+										}
 									}
 								}
 							}
 							
 							if(childAwayFromParents){
 								me.feedback="essential";
+								me.myReviewFeedbackText=me.code +" away from parent";
 								globalEssentialRequirements[1]+=1; 
 								console.log(me.code+" away from family!"); 
 								
@@ -1648,7 +1819,7 @@ function mainLoop(timestamp) {
 					
 					if(typeof me.pref !== 'undefined'){
 						
-						if(me.pref.includes(prefIsle)){
+						if(me.pref.includes(prefAisle)){
 							if(isIsle){
 								console.log("Satified:"+me.pref); 
 							}else{
@@ -1673,19 +1844,23 @@ function mainLoop(timestamp) {
 							
 							if(i>0){
 								
-								if(typeof arrayOfSeatedPassengers[i-1][j].group !== 'undefined'){
-									if(arrayOfSeatedPassengers[i-1][j].group==me.group){
-										console.log(me.name+" is together with "+arrayOfSeatedPassengers[i-1][j].name); 
-										isNotTogether=false
+								if(arrayOfSeatedPassengers[i-1][j]!=null){
+									if(typeof arrayOfSeatedPassengers[i-1][j].group !== 'undefined'){
+										if(arrayOfSeatedPassengers[i-1][j].group==me.group){
+											console.log(me.name+" is together with "+arrayOfSeatedPassengers[i-1][j].name); 
+											isNotTogether=false
+										}
 									}
 								}
 							}
 							
-							if(isNotTogether && i<columnCount-2){ 
-								if(typeof arrayOfSeatedPassengers[i+1][j].group !== 'undefined'){
-									if(arrayOfSeatedPassengers[i+1][j].group==me.group){
-										console.log(me.name+" is together with "+arrayOfSeatedPassengers[i+1][j].name); 
-										isNotTogether=false;
+							if(isNotTogether && i<columnCount-1){ 
+								if(arrayOfSeatedPassengers[i+1][j]!=null){
+									if(typeof arrayOfSeatedPassengers[i+1][j].group !== 'undefined'){
+										if(arrayOfSeatedPassengers[i+1][j].group==me.group){ 
+											console.log(me.name+" is together with "+arrayOfSeatedPassengers[i+1][j].name); 
+											isNotTogether=false;
+										}
 									}
 								}
 							}
@@ -1714,7 +1889,7 @@ function mainLoop(timestamp) {
 		window.feedbackAccentColor;
 		if(globalEssentialRequirements[1]>0){
 			feedbackTitle="Try again";
-			feedbackAccentColor="red";
+			feedbackAccentColor=colorBadLight;
 			feedbackItems.push("Airline policies were not followed.");
 			feedbackEnd.push("Please try again.");
 		}else{
@@ -1725,7 +1900,7 @@ function mainLoop(timestamp) {
 				if(globalPreferences[1]>Math.floor(globalPreferences[0]/2)){
 					improvementItems.push("Not everyone is happy with their seats.");
 				}else{
-					improvementItems.push("Most passengers are happy with their seats.");
+					improvementItems.push("Some passengers are not happy with their seats.");
 				}
 			}else{
 				feedbackTitle="Good job";				
@@ -1757,11 +1932,16 @@ function mainLoop(timestamp) {
 		
 		
 
-		if(feedbackAlpha<1){
-			feedbackAlpha+=0.005;			
+		if(!reviewModeGlobal){
+			if(feedbackAlpha<1){
+				feedbackAlpha+=0.01;			
+			}
+		}else{
+			feedbackAlpha-=feedbackAlpha/2;		
 		}
 		
 		
+		ctx.globalAlpha = feedbackAlpha;
 		var feedbackTitleY;
 		if(isPortrait){
 			feedbackTitleY=layoutAreaForCards.posyPixels-layoutAreaForCards.heightPixels/2;
@@ -1819,6 +1999,7 @@ function mainLoop(timestamp) {
 
 
 		
+		ctx.globalAlpha=1;
 		if(feedbackAccentColor!="green"){ 
 			var seatWidth = layoutSeats.widthPixels/columnCountWithAisle;
 			var highlightScale = 0.8;
@@ -1843,15 +2024,28 @@ function mainLoop(timestamp) {
 						}
 						
 						
-						ctx.strokeStyle="orange";
-						if(arrayOfSeatedPassengers[i][j].feedback=="essential"){ctx.strokeStyle="red";}
-						ctx.setLineDash([5+Math.sin(timeCounter/20)]);
+						if(arrayOfSeatedPassengers[i][j].reviewMode){
+							ctx.fillStyle=colorReviewMode;
+							ctx.fillRect(sx-highlightShift, sy-highlightShift, highlightWidth, highlightWidth);
+						}
+						
+						
+						ctx.strokeStyle=colorOrangeStrong; 
+						if(arrayOfSeatedPassengers[i][j].feedback=="essential"){ctx.strokeStyle=colorBadStrong;} 
+						if(arrayOfSeatedPassengers[i][j].reviewMode){ctx.strokeStyle="white";} 
+						ctx.lineDashOffset= lineDashOffset;
+						ctx.setLineDash([lineDashSize,lineDashSize*2]);
 						ctx.strokeRect(sx-highlightShift, sy-highlightShift, highlightWidth, highlightWidth);
-
+ 
+				
 					}
 				}
 			}
 			ctx.restore();
+			
+			for(var i=0;i<arrayOfSeatedComponents.length;i++){			
+				arrayOfSeatedComponents[i].updateAndDraw();
+			}
 		}		
 
 	}
@@ -1870,6 +2064,7 @@ function mainLoop(timestamp) {
 	if(gameState=="waitingPlayerPlacePassenger"){timerOn=true;}
 	if(timerOn){gameTimer+=1;}
 	statTimer.label= new Date(Math.round(gameTimer/60) * 1000).toISOString().substring(14, 19);
+
 
 	
 	
@@ -1914,13 +2109,13 @@ function mainLoop(timestamp) {
  
 	
 	if(0&&debug){
-		var tw = svgExample1.width*canvasRes;
-		var th = svgExample1.height*canvasRes; 
-		var flow = Math.sin(timeCounter/40)*cw/6;
-		var tx = flow+(cw-tw)/2;
-		var ty = (ch-th)/2;
-		myDrawImage(svgExample1,tx,ty,1.5+Math.sin(timeCounter/100),Math.sin(timeCounter/200)*360);
-		myDrawImage(svgExample2,tx,ty,1.5+Math.sin(timeCounter/50),Math.sin(timeCounter/100)*360);
+		
+		
+		
+		
+		
+		
+		
 	
 	
 	}
@@ -1935,9 +2130,6 @@ function mainLoop(timestamp) {
 		}
 	}
 	
-	pointerDownGlobalOneOffWarning=false;
-	pointerUpGlobalOneOffWarning=false;
-
 
 	
 	if(!mouseLockedToGrid){
@@ -1954,7 +2146,7 @@ function mainLoop(timestamp) {
 	}
 	
 	
-	if(gameState=="waitingPlayerPlacePassenger"){
+	if(gameState=="waitingPlayerPlacePassenger" || reviewModeGlobal){
 		
 		
 		ctx.font=fontUI;
@@ -1968,21 +2160,31 @@ function mainLoop(timestamp) {
 		if(isPortrait){
 			msgAboveYpos = layoutDeckDropArea.posyPixels-layoutDeckDropArea.heightPixels*0.8;
 		}
-		if((currentDeckOfCards.length+currentSeatedDeck.length)>1){
-			cardType=currentDeckOfCards[0].passenger.groupType;	
+		if(!reviewModeGlobal){
+			if((currentDeckOfCards.length+currentSeatedDeck.length)>1){
+				cardType=currentDeckOfCards[0].passenger.groupType;	
+			}
+			ctx.fillText("SEAT THIS "+ cardType.toUpperCase(), layoutDeckDropArea.posxPixels, msgAboveYpos);
+		}else{
+			ctx.fillStyle=colorReviewMode;
+			ctx.fillText("REVIEW MODE", layoutDeckDropArea.posxPixels, msgAboveYpos);			
 		}
-		ctx.fillText("SEAT THIS "+ cardType.toUpperCase(), layoutDeckDropArea.posxPixels, msgAboveYpos);
-		
 		
 		
 		var msgBelowYpos = layoutDeckDropArea.posyPixels+layoutDeckDropArea.heightPixels/1.5;
 		if(isPortrait){
 			msgBelowYpos = layoutDeckDropArea.posyPixels+layoutDeckDropArea.heightPixels;
 		}
-		ctx.font = 200+" "+fontUISize*0.7+ "px "+fontFamilyPrimary;		
-		ctx.fillText("DRAG PASSENGER TO A SEAT", layoutDeckDropArea.posxPixels, msgBelowYpos);		
-		if(currentDeckOfPassengerInfo.length>1){
-			ctx.fillText("(SELECT CARD TO CYCLE GROUP)", layoutDeckDropArea.posxPixels, msgBelowYpos+fontUISize*1.2);					
+		ctx.font = 600+" "+fontUISize*0.7+ "px "+fontFamilyPrimary;		
+		if(!reviewModeGlobal){
+			ctx.fillText("DRAG PASSENGER TO A SEAT", layoutDeckDropArea.posxPixels, msgBelowYpos);		
+			if(currentDeckOfPassengerInfo.length>1){
+				ctx.fillText("(SELECT CARD TO CYCLE GROUP)", layoutDeckDropArea.posxPixels, msgBelowYpos+fontUISize*1.2);					
+			}
+		}else{
+			ctx.font = 600+" "+fontUISize*0.8+ "px "+fontFamilyPrimary;		
+
+			ctx.fillText(reviewFeedbackText, layoutDeckDropArea.posxPixels, msgBelowYpos);					
 		}
 
 		ctx.globalAlpha=1;
@@ -2028,6 +2230,13 @@ function mainLoop(timestamp) {
 	}
 
 
+
+
+
+	pointerDownGlobalOneOffWarning=false;
+	pointerUpGlobalOneOffWarning=false;
+	pointerClickedInPlaceGlobalOneOffWarning=false;
+
 	
 	
 	requestAnimationFrame(mainLoop); 
@@ -2047,9 +2256,11 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 
 	this.goHome=true;
 
-
+	this.isSeated = false;
 	this.lift=0;
 	this.liftGoal = 0;
+
+	this.mySeatPos=[-1,-1];
 
 	this.fadeMeIn=true; 
 
@@ -2156,28 +2367,112 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 	
     this.updateAndDraw = function() {
 		
+
 		
+		if(this.passenger){
+			this.passenger.id=this.id; 
+			
+			
+			if(gameState=="showingFeedback"){
+				if(this.passenger.feedback=="essential" || this.passenger.feedback=="preference" ){
+					this.avatar.isSad=true;
+				}
+			}
+		}
+		
+		
+		if(!reviewModeGlobal){
+			this.reviewMode=false;
+			this.reviewAvatar=null;
+		}
+		if(this.passenger){ 
+			if(this.reviewMode){
+				this.passenger.reviewMode=true;
+			}else{
+				this.passenger.reviewMode=false;
+			}
+		}
+		if(this.reviewMode){
+			console.log("REVIEW MODE -"+this.passenger.name);
+			
+			colorReviewMode=colorOrange;
+			if(this.passenger.feedback=="essential"){
+				colorReviewMode=colorBadLight;
+			}
+			
+			
+			
+			drawCard(this.passenger,layoutDeckDropAreaPos,0,true);
+			
+			
+			if(this.passenger.feedback){
+				reviewFeedbackText="";
+				if(this.passenger.feedback=="preference"){reviewFeedbackText="PREFERENCE NOT SATISFIED"}
+				if(this.passenger.myReviewFeedbackText){reviewFeedbackText=this.passenger.myReviewFeedbackText.toUpperCase()}
+			}
+			
+			
+			if(!this.reviewAvatar){
+				moveToTop(this.id);
+				this.reviewAvatar = new avatarGraphic(0,layoutDeckDropAreaPos[0],layoutDeckDropAreaPos[1]); 
+			}else{
+				this.reviewAvatar.passport=this.passenger.passport;
+				this.reviewAvatar.sizePixels = cardWidth/15;
+				this.reviewAvatar.x = layoutDeckDropAreaPos[0]-(cardWidth/2)+(cardWidth/5);
+				this.reviewAvatar.y = layoutDeckDropAreaPos[1]-(cardHeight/2)+(cardHeight/3);		
+				if(this.avatar.isSad){this.reviewAvatar.isSad=true;}
+
+				
+				this.reviewAvatar.updateAndDraw();	
+			}
+			
+			
+			if(this.passenger.feedback!="essential" && this.passenger.feedback!="preference"){
+				var seatWidth = layoutSeats.widthPixels/columnCountWithAisle;
+				var highlightScale = 0.85;
+				var highlightWidth = seatWidth*highlightScale;
+				var highlightShift = (seatWidth/2)*highlightScale;
+				var sx=0;
+				var sy=0;
+				ctx.save();
+				
+				sx = layoutSeats.posxPixels-layoutSeats.widthPixels/2 + (this.mySeatPos[0]+0.5)*seatWidth;
+				sy = layoutSeats.posyPixels-layoutSeats.heightPixels/2 + (this.mySeatPos[1]+0.5)*seatWidth;
+
+				if(this.mySeatPos[0]>2){
+					sx +=seatWidth;
+				}
+
+				ctx.fillStyle=colorReviewMode;
+				ctx.fillRect(sx-highlightShift, sy-highlightShift, highlightWidth, highlightWidth);
+
+			
+
+				ctx.fillStyle="black";
+				ctx.textAlign = "center";
+
+				ctx.font = 100+" "+fontUISize/2	+ "px "+fontFamilyPrimary;			
+								
+				ctx.restore();
+			}
+			
+		}
+			
+
 			
 		
 		if(this.pointerIsHoveringMe){
 			if(this.pointerHoverStateOnMe=="hovered"){this.pointerHoverStateOnMe="hovering";}
-			if(this.pointerHoverStateOnMe=="no"){this.pointerHoverStateOnMe="hovered";}
+			if(this.pointerHoverStateOnMe=="no"){this.pointerHoverStateOnMe="hovered";}		
 		}else{
 			this.pointerHoverStateOnMe="no";
 		}
-		
-		
+
 		
 		
 		if(this.passenger && this.componentType!="card"){this.componentType="passenger";}
 
-		
-		if(this.passenger && !this.avatar){
-			
-			
-			this.avatar =  new avatarGraphic(0,0,0); 
-			
-		}
+
 		
 
 		if(this.pai=="god"){
@@ -2217,10 +2512,7 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 		}
 		ctx.font = this.font;
 	
-
-
-
-		
+ 
 		
 		this.posxPixels=this.paiPosPixels[0]-this.paiSizePixels[0]/2+(this.posXRel*this.paiSizePixels[0]);
 		this.posyPixels=this.paiPosPixels[1]-this.paiSizePixels[1]/2+(this.posYRel*this.paiSizePixels[1]);
@@ -2234,12 +2526,23 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 		if(this.componentType=="card" && !this.pointerIsDraggingOnMe){
 			
 			this.lift+=(this.liftGoal-this.lift)/easeSpeedNormal;
-			this.posxPixels+=this.lift;
-			this.posyPixels-=this.lift;
+
 		}
 
 
+		
+		if(this.passenger && !this.avatar ){
+			
+			this.avatar = new avatarGraphic(0,this.posxPixels,this.posyPixels); 
+			console.log("New avatar for "+ this.passenger.name);
+ 				
+			this.avatar.targetx=this.posxPixels;
+			this.avatar.targety=this.posyPixels;
 
+			this.avatar.isSad=false;
+			
+			this.avatar.easeSpeed =1; 
+		}
 		
 		
 		
@@ -2274,8 +2577,8 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 
 		if(this.componentType=="card"){
 			this.color="AliceBlue";
-			this.widthPixels=0.8*layoutAreaForCards.widthPixels; 
-			this.heightPropWidth=0.4;
+			this.widthPixels=cardWidth; 
+			this.heightPropWidth=cardHeightPropWidth;
 		}
 
 		
@@ -2301,6 +2604,7 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 					
 					
 					
+					
 					this.targetx=mouseXlock;
 					this.targety=mouseYlock;
 
@@ -2308,7 +2612,8 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 					
 					
 
-				}else{					
+				}else{
+					
 					this.targetx=mouseX+this.pointerClickOffsetX;
 					this.targety=mouseY+this.pointerClickOffsetY;
 				}
@@ -2319,10 +2624,12 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 
 		
 		
-		if(this.componentType=="card" && !this.pointerIsDraggingOnMe){
+		if(this.componentType=="card" && !this.pointerIsDraggingOnMe && !this.goHome && !this.isSeated){
+			
 			this.goHome=true;
 		}
 
+ 
 
 		
 		if(this.passenger && !this.disabled){
@@ -2345,18 +2652,20 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 			}
 			
 			if(this.pointerIsDraggingOnMe && this.nextToSeatMap && this.componentType!="passenger" && topmostComponentOnLocationOfLastPointerDown==this){
-				this.componentType="passenger";
+ 				this.componentType="passenger";
 				this.anchorLeft=false;
 				parentComponents(this,layoutSeatmap,true);
 			}
 			
 			if((this.pointerIsDraggingOnMe && !this.nextToSeatMap  && this.componentType!="card" && topmostComponentOnLocationOfLastPointerDown==this)||this.goHome){
-
+  
 				if(this.goHome){
-					var fanAmount = this.widthPixels/70;
+					
+					var fanAmount = this.widthPixels/70; 
 					this.targety=layoutDeckDropArea.posyPixels+this.passenger.myPosInDeck*fanAmount;
 					this.targetx=layoutDeckDropArea.posxPixels+this.passenger.myPosInDeck*fanAmount;
 				}else{							
+					
 					this.targety=layoutDeckDropArea.posyPixels;
 					this.targetx=layoutDeckDropArea.posxPixels;
 				}
@@ -2366,7 +2675,8 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 
 				if((Math.abs(this.posxPixels-layoutDeckDropArea.posxPixels)<practicallyZero)&&(Math.abs(this.posyPixels-layoutDeckDropArea.posyPixels)<practicallyZero)){
 					parentComponents(this,layoutDeckDropArea,true);	 
-					this.goHome=false;
+					this.goHome=false; 
+					
 				}
 			}
 		
@@ -2438,11 +2748,11 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 
 					if(this.passenger){
 						lastObjectWithPassengerClickedOrDragged=this;
-						console.log("Attr Last:"+lastObjectWithPassengerClickedOrDragged.passenger.name);
+						
 					}
 				}				
 				if(this.passenger){
-					
+
 				}
 				if(this==layoutSeats){
 					seatMapGridPosOnPointerUpOrDown=seatMapGridActivePos;
@@ -2451,6 +2761,24 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 			}			
 		}
 
+
+		if(pointerClickedInPlaceGlobalOneOffWarning && this.pointerIsHoveringMe){
+			if(this.componentType=="passenger"){
+				console.log("$$ CLICKED "+this.passenger.name);
+				for(var i=0;i<arrayOfComponents.length;i++){
+					arrayOfComponents[i].reviewMode=false;
+				}
+				this.reviewMode=true;
+				reviewModeGlobal=true;
+			}
+			
+			if(this==layoutAreaForCards && reviewModeGlobal){
+				this.reviewMode=false;
+				reviewModeGlobal=false;
+				btnCreateDeck.pointerIsDownOnMe=false; 
+			}
+			
+		}
 
 
 		
@@ -2474,22 +2802,34 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 		
 	
 		
-		if(this.pointerIsDownOnMe){
+		if(this.pointerIsDownOnMe && (!reviewModeGlobal||this==componentIconReset)){
 			if(debug){
 				ctx.fillStyle = "yellow";
 				ctx.fillRect(this.compX1-this.fontSize, this.compY1-this.fontSize,this.fontSize,this.fontSize);
 			}
 
 			
-			
 			if(((Math.abs(mouseX-this.posxPixels+this.pointerClickOffsetX)>dragDelta)||(Math.abs(mouseY-this.posyPixels+this.pointerClickOffsetY)>dragDelta))&&!this.pointerIsDraggingOnMe){
 				
 				
 				if(this.passenger && layoutSeatmap.pointerIsDraggingOnMe){
+					this.isSeated=false;
+					this.mySeatPos=[-1.-1];
 					
 					currentDeckOfPassengerInfo.unshift(this.passenger);
 					currentDeckOfCards.unshift(this);
-					currentSeatedDeck.splice(currentSeatedDeck.length-1,1);
+					
+					console.log("currentSeatedDeck:");
+					for(var i=0; i<currentSeatedDeck.length;i++){
+						console.log(i+":"+currentSeatedDeck[i].passenger.name);
+					}
+					
+					for(var i=0; i<currentSeatedDeck.length;i++){
+						if(currentSeatedDeck[i].id==this.id){
+							currentSeatedDeck.splice(i,1);
+						}
+					}
+
 					moveToTop(this.id);
 					for(i=1;i<currentDeckOfPassengerInfo.length;i++){
 						currentDeckOfPassengerInfo[i].myPosInDeck+=1;
@@ -2497,6 +2837,14 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 					}					
 					
 					console.log("REMOVED "+this.passenger.name+" FROM SEAT AT "+seatMapGridPosOnPointerUpOrDown);
+
+					
+
+					console.log("currentSeatedDeck:");
+					for(var i=0; i<currentSeatedDeck.length;i++){
+						console.log(i+":"+currentSeatedDeck[i].passenger.name);
+					}
+
 					arrayOfSeatedPassengers[(seatMapGridPosOnPointerUpOrDown[0]-1)][(seatMapGridPosOnPointerUpOrDown[1]-1)]=null;					
 					totalPassengersSeated-=1;
 					
@@ -2507,24 +2855,20 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 			
 			
 			if(!pointerDown){
-				
+		
+ 
 				
 				if(!this.pointerIsDraggingOnMe && pointIsWithinArea([mouseX,mouseY],this.shape,this.posxPixels,this.posyPixels,this.widthPixels,this.heightPixels)){
 					
+				
+				
+					
 					if(this.componentType=="card" && this.passenger.myPosInDeck==0 && currentDeckOfCards.length>1){
-						console.log("bla "+this.passenger.name);
-							console.log("This should be same:"+currentDeckOfCards[0].passenger.name);
 
-						for(var i=currentDeckOfCards.length-1;i>0;i--){
-							console.log("go "+i);							
-							
-						}
 						
-						
-						
-						
+								
 						if(1){ 
-						
+					
 							
 							var tempCardArray = [];
 							var tempCard;
@@ -2559,6 +2903,7 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 						
 					}
 					
+					
 					if(this.actionOnClick=="fadeOutAndRemove"){
 						this.actionOnFade="remove";
 						this.fadeOut();
@@ -2573,12 +2918,15 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 						gameState="beforeFirstPassenger";
 					}
 					if(this.actionOnClick=="createNewCardDeck"){
-						for(i=0;i<currentSeatedDeck.length;i++){
-							currentSeatedDeck[i].disabled=true;
-						}
-						currentSeatedDeck=[];
+						if(!reviewModeGlobal){
+							console.log("NEXT DECK!");
+							for(i=0;i<currentSeatedDeck.length;i++){
+								currentSeatedDeck[i].disabled=true;
+							}
+							currentSeatedDeck=[];
 
-						gameState="createNewCardDeck";
+							gameState="createNewCardDeck";
+						}
 					}					
 					if(this.actionOnClick=="submit"){
 						for(i=0;i<currentSeatedDeck.length;i++){
@@ -2590,7 +2938,7 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 					}
 
 					if(this.actionOnClick=="reload"){
-						reload();
+						myReload();
 					}
 					
 					if(this.actionOnClick=="chaos"){
@@ -2601,67 +2949,108 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 							}
 						}	
 					}
+
+
+
 				}
 				
 				
-				if(this.pointerIsDraggingOnMe){
+				if(this.pointerIsDraggingOnMe && !this.isSeated){ 
 					
-					if(this.passenger && typeof lastObjectWithPassengerClickedOrDragged !== undefined && lastObjectWithPassengerClickedOrDragged==this){
-						
-						if(layoutSeats.pointerIsHoveringMe){ 
-							if(checkPlacing()=="accept"){
-								
-								totalPassengersSeated+=1;
-								
-								
-								
-								
-
-								
-								arrayOfSeatedPassengers[(seatMapGridPosOnPointerUpOrDown[0]-1)][(seatMapGridPosOnPointerUpOrDown[1]-1)]=lastObjectWithPassengerClickedOrDragged.passenger;
-								
-								console.log(this.passenger.name +": this.passenger.myPosInDeck:"+this.passenger.myPosInDeck);
-								console.log(this.passenger.name +": OLD currentDeckOfPassengerInfo.length:"+currentDeckOfPassengerInfo.length);
-								if(currentDeckOfPassengerInfo.length>1){
-									console.log("currentDeckOfPassengerInfo.length>1");
-									for(i=this.passenger.myPosInDeck+1;i<currentDeckOfPassengerInfo.length;i++){
-										console.log("Update deck pos for "+currentDeckOfPassengerInfo[i].name);
-										currentDeckOfPassengerInfo[i].myPosInDeck-=1;
-										currentDeckOfCards[i].myPosInDeck-=1;
-									}
-								}
-								currentDeckOfPassengerInfo.splice(this.passenger.myPosInDeck,1);
-								currentDeckOfCards.splice(this.passenger.myPosInDeck,1);
-								currentSeatedDeck.push(this);
-								console.log(this.passenger.name +":NEW currentDeckOfPassengerInfo.length:"+currentDeckOfPassengerInfo.length);
-								
-								if(currentDeckOfPassengerInfo.length>0){
-								}else{
-									if(arrayOfPassengers.length>0){
-										gameState="showNextButton";
-									}else{
-										gameState="showSubmitButton";
-									}
-								}
-								this.pointerIsDraggingOnMe=false;
-							}else{
-								
-								console.log(this.passenger.name+" timeCounter:"+timeCounter);
- 								console.log("reject:"+this.passenger.name);
-								this.goHome=true;
-							}
+					if(typeof lastObjectWithPassengerClickedOrDragged !== 'undefined'){
+						if(this.passenger && lastObjectWithPassengerClickedOrDragged==this){
 							
-						}else{
-								this.goHome=true;
- 								console.log("go home");							
+							if(layoutSeats.pointerIsHoveringMe){ 
+								console.log("None of these can ever be zero")
+								console.log("seatMapGridPosOnPointerUpOrDown[0]:"+seatMapGridPosOnPointerUpOrDown[0])
+								console.log("seatMapGridPosOnPointerUpOrDown[1]:"+seatMapGridPosOnPointerUpOrDown[1])
+								var tgx = seatMapGridPosOnPointerUpOrDown[0];
+								var tgy = seatMapGridPosOnPointerUpOrDown[1];
+								if(typeof tgx==='undefined' || tgx==0){
+									seatMapGridPosOnPointerUpOrDown[0]=3;
+									console.log("Fake pos to avoid glitch");
+								}
+								if(typeof tgy==='undefined' || tgy==0){seatMapGridPosOnPointerUpOrDown[1]=5;}
+								if(typeof tgx!=='undefined' && tgx!=0 && typeof tgy!=='undefined' && tgy!=0){
+									if(checkPlacing()=="accept"){
+										
+										totalPassengersSeated+=1;
+
+										this.isSeated=true;
+										this.componentType="passenger";
+
+										console.log("Accepted: "+this.passenger.name);
+										console.log("seatMapGridActivePos:"+seatMapGridActivePos);
+										console.log("seatMapGridPosOnPointerUpOrDown:"+seatMapGridPosOnPointerUpOrDown);
+	 
+										
+										arrayOfSeatedPassengers[(seatMapGridPosOnPointerUpOrDown[0]-1)][(seatMapGridPosOnPointerUpOrDown[1]-1)]=lastObjectWithPassengerClickedOrDragged.passenger;
+										this.mySeatPos=[(seatMapGridPosOnPointerUpOrDown[0]-1),(seatMapGridPosOnPointerUpOrDown[1]-1)];
+										
+										
+										
+										if(currentDeckOfPassengerInfo.length>1){						
+											for(i=this.passenger.myPosInDeck+1;i<currentDeckOfPassengerInfo.length;i++){
+												
+												currentDeckOfPassengerInfo[i].myPosInDeck-=1;
+												currentDeckOfCards[i].myPosInDeck-=1;
+											}
+										}
+										currentDeckOfPassengerInfo.splice(this.passenger.myPosInDeck,1);
+										currentDeckOfCards.splice(this.passenger.myPosInDeck,1);
+										currentSeatedDeck.push(this);
+										
+										
+										if(currentDeckOfPassengerInfo.length>0){
+											
+										}else{
+											if(arrayOfPassengers.length>0){
+												gameState="showNextButton";
+											}else{
+												gameState="showSubmitButton";
+											}
+										}
+										
+										var seatWidth = layoutSeats.widthPixels/columnCountWithAisle;
+										if(seatMapGridPosOnPointerUpOrDown[0]<4){seatMapGridPosOnPointerUpOrDown[0]=seatMapGridPosOnPointerUpOrDown[0]-1;}
+										this.targetx=layoutSeats.posxPixels-layoutSeats.widthPixels/2 + (seatMapGridPosOnPointerUpOrDown[0]+0.5)*seatWidth;
+										this.targety=layoutSeats.posyPixels-layoutSeats.heightPixels/2 + (seatMapGridPosOnPointerUpOrDown[1]-1+0.5)*seatWidth;
+										console.log("Making sure "+this.passenger.name+" stays where they were seated. PS: this.goHome ="+ this.goHome);
+										this.goHome=false;
+										this.pointerIsDraggingOnMe=false;
+									}else{
+										
+										console.log("reject:"+this.passenger.name +" timeCounter:"+timeCounter);
+										this.goHome=true;
+										this.mySeatPos=[-1,-1];
+										
+										
+										
+										console.log("Confirm they didnt remain in array of seated");
+										for(var i=0;i<columnCount;i++){
+											for(var j=0;j<rowCount;j++){
+												if(arrayOfSeatedPassengers[i][j]!=null && arrayOfSeatedPassengers[i][j]!=passengerPreseat){
+													if(arrayOfSeatedPassengers[i][j].name==this.passenger.name){													
+														arrayOfSeatedPassengers[i][j]=null;
+														console.log("Found. Removed");
+													}
+												}
+											}
+										}
+									}
+								}else{
+									this.goHome=true;
+									console.log("go home due to glitch:"+this.passenger.name);
+									lastObjectWithPassengerClickedOrDragged=undefined;									
+								}
+								
+							}else{
+									this.goHome=true;
+									console.log("go home");							
+							}
 						}
 					}
 				}
-
-
-			
-
-
 
 				this.pointerIsDownOnMe=false;
 				this.pointerIsDraggingOnMe=false;
@@ -2675,18 +3064,21 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 		}
 
 		if(pointerUpGlobalOneOffWarning && this.pointerIsHoveringMe){
-			if(this.disabled && this.passenger){
-				this.avatar.headShakeAmountTarget=1;
+			if(this.passenger){
+				if(this.disabled){
+					
+				}
 			}
 			if(this==layoutSeats){
 				seatMapGridPosOnPointerUpOrDown=seatMapGridActivePos;
 			}
+			
+
 		}
 
 
 		
 		if(pointIsWithinArea([mouseX,mouseY],this.shape,this.posxPixels,this.posyPixels,this.widthPixels,this.heightPixels)){
-			
 			
 			
 			this.pointerIsHoveringMe=true;
@@ -2712,24 +3104,21 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 				mouseYlock=(this.posyPixels-this.heightPixels/2)+this.mouseYPosInRowsRound*this.pixelsPerColumn-this.pixelsPerColumn/2;
 				
 				
-				if(this.mouseXPosInColumnsRound>3){this.mouseXPosInColumnsRound-=1;} 
-				seatMapGridActivePos=[this.mouseXPosInColumnsRound,this.mouseYPosInRowsRound];
-
 				
+				
+				if(this.mouseXPosInColumnsRound>3){this.mouseXPosInColumnsRound-=1;}
+				seatMapGridActivePos=[this.mouseXPosInColumnsRound,this.mouseYPosInRowsRound];
+				
+
 			}
 
 			if(this.componentType=="passenger"){
 				this.avatar.smileSizeTarget=0.25;
  			}
 			
-			if(this.componentType=="card"){
-				if(!this.goHome && this.pointerHoverStateOnMe!="hovering"){
-					this.liftGoal=paddingNormal/2;
-				}else{
-					this.liftGoal=0;
-				}
-			}			
+			if(this.componentType=="card" && this.passenger.myPosInDeck==0){this.liftGoal=paddingNormal/2;}			
 		}else{
+			
 			this.pointerIsHoveringMe=false;
 
 			if(this.componentType=="button"){this.highlight=false;}
@@ -2770,21 +3159,13 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 		
 		ctx.globalAlpha = this.alpha;
 		
-		if(this.color!="none" && this.componentType!="passenger"){
+		if(this.color!="none" && this.componentType!="passenger" && this.componentType!="card"){ 
 			ctx.fillStyle = this.color;
 
 			if(this.pointerHoverStateOnMe=="hovered"){ 
 
 			}
 						
-			if(this.componentType=="card"){
-				
-				ctx.shadowColor = colorShadow10pct;	
-				ctx.shadowBlur = paddingNormal;
-				ctx.shadowOffsetX = +paddingNormal-this.lift;
-				ctx.shadowOffsetY = paddingNormal+this.lift;		
-
-			}
 			if(this.shape=="rectangle"){
 				ctx.fillRect(this.compX1, this.compY1, this.widthPixels, this.heightPixels);
 				
@@ -2839,45 +3220,7 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 		
 		if(this.componentType=="card"){
 			
-			ctx.fillStyle = "black";			
-			ctx.textAlign = "left";
-			this.lineHeightRel = 1.5;		
-			
-			ctx.fillText(this.passenger.name, this.posxPixels-this.widthPixels/8, this.posyPixels-this.heightPixels/2+this.fontSize*2);
-			ctx.globalAlpha=0.8;
-			
-			ctx.font = 400+" "+this.fontSize*0.9	+ "px "+fontFamilyPrimary;
-			ctx.fillText(this.passenger.age+"yo", this.posxPixels-this.widthPixels/8, this.posyPixels-this.heightPixels/2+this.fontSize*(2+this.lineHeightRel*1));
-			
-			if(typeof this.passenger.pref !== 'undefined'){
-				for(var i=0; i<this.passenger.pref.length; i+=1){
-					ctx.fillText(bulletPoint+" "+this.passenger.pref[i], this.posxPixels-this.widthPixels/8, this.posyPixels-this.heightPixels/2+this.fontSize*(2+this.lineHeightRel*(2+i)));
-				}
-
-			}
-			
-			if(typeof this.passenger.code !== 'undefined'){
-				ctx.font = 600+" "+this.fontSize*0.7	+ "px "+fontFamilyPrimary;
-				
-				this.codeTextBoxWidth = ctx.measureText(this.passenger.code).width+paddingNormal*2;
-				ctx.fillRect(this.posxPixels+(this.widthPixels/2)-(this.widthPixels/7)-this.codeTextBoxWidth+paddingNormal, this.posyPixels-this.heightPixels/2+this.fontSize*(2+this.lineHeightRel/2), this.codeTextBoxWidth,this.fontSize);
-				
-				ctx.textAlign = "right";
-				ctx.fillStyle="white";
-				ctx.fillText(this.passenger.code, this.posxPixels+(this.widthPixels/2)-this.widthPixels/7, this.posyPixels-this.heightPixels/2+this.fontSize*(2+this.lineHeightRel*1));
-			}			
-			ctx.globalAlpha=1;
-			
-			
-			if(typeof this.passenger.group !== 'undefined'){
-				ctx.globalAlpha=0.6;
-				ctx.font = 400+" "+this.fontSize*0.8	+ "px "+fontFamilyPrimary;
-				ctx.fillStyle="black";
-				ctx.textAlign="left";
-				ctx.fillText((this.passenger.myNumInDeck+1)+"/"+(currentDeckOfCards.length+currentSeatedDeck.length), this.posxPixels-this.widthPixels/2+paddingNormal*1.5, this.posyPixels+this.heightPixels/2-paddingNormal*1.5);
-				ctx.globalAlpha=1;
-				
-			}
+			drawCard(this.passenger,[this.posxPixels,this.posyPixels],this.lift,false	);
 			
 		}
 		
@@ -2886,22 +3229,33 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 			myDrawImage(this.label,this.compX1, this.compY1,this.graphicScale);
 		}
 		if(typeof this.passenger !== 'undefined'){ 
+
+
 			this.avatar.passport = this.passenger.passport;
 			if(this.componentType=="card"){
-				this.avatar.x = this.posxPixels-(this.widthPixels/2)+this.widthPixels/5;
-				this.avatar.y = this.posyPixels-(this.heightPixels/2)+this.heightPixels/3;				
+				this.avatar.targetx = this.posxPixels-(this.widthPixels/2)+(this.widthPixels/5)-this.lift;
+				this.avatar.targety = this.posyPixels-(this.heightPixels/2)+(this.heightPixels/3)-this.lift;				
 				this.avatar.sizePixels = this.widthPixels/15;
 			}else{
-				this.avatar.x = this.posxPixels;
-				this.avatar.y = this.posyPixels;		
+				this.avatar.targetx = this.posxPixels;
+				this.avatar.targety = this.posyPixels;		
 				this.widthRel=1/columnCountWithAisle;
 				this.widthPixels=this.widthRel*layoutSeats.widthPixels;
 				this.avatar.sizePixels = this.widthPixels/3;
 			}
+			
+			
+			if(this.passenger!=passengerPreseat){
+				this.avatar.x += (this.avatar.targetx-this.avatar.x)/this.avatar.easeSpeed;
+				this.avatar.y += (this.avatar.targety-this.avatar.y)/this.avatar.easeSpeed;		
+			}else{
+				this.avatar.x += (this.avatar.targetx-this.avatar.x);
+				this.avatar.y += (this.avatar.targety-this.avatar.y);	
+			}
 
 			if(!this.disabled && this.componentType!="card" && !this.pointerIsDraggingOnMe){
 				
-				this.avatar.y+=Math.sin(timeCounter/6)*2;					
+				this.avatar.y+=Math.sin((Math.PI)*this.id+timeCounter/6)*2;					
 			}
 			
 			this.avatar.updateAndDraw();
@@ -3118,12 +3472,12 @@ function uniqueRandomNumber(){
 }
 
 function randomColor(seed,alpha){
-	if(typeof alpha==='undefined'){	this.alpha = 1;}else{this.alpha=alpha;}
+ 	if(typeof alpha==='undefined'){	this.alpha = 1;}else{this.alpha=alpha;}
 	if(typeof seed==='undefined'){
 		return "rgba("+Math.random()*255+", "+Math.random()*255+", "+Math.random()*255+", "+this.alpha+")"; 
 	}else{
 		this.seed=seed;
-		return "rgba("+(randomFromSeed(this.seed)*155+100)+", "+(randomFromSeed(1-this.seed)*155+100)+", "+randomFromSeed(1-this.seed)*255+", "+this.alpha+")"; 		
+		return "rgba("+(randomFromSeed(this.seed)*255)+", "+(randomFromSeed(this.seed*2)*255)+", "+randomFromSeed(this.seed*3)*255+", "+this.alpha+")"; 		
 	}
 }
 
@@ -3164,6 +3518,12 @@ function pointIsWithinArea(point,shape,posx,posy,width,height){
 	
 	return false;
 }
+function pointsAreCloserThan(point1,point2,distance){	
+	if((Math.abs(point1[0]-point2[0])<distance) && (Math.abs(point1[1]-point2[1])<distance)){
+		return true;
+	}
+	return false;
+}
 function isGraphic(thing){
 	if(typeof thing != "string" && typeof thing != "number"){
 		return true;
@@ -3171,12 +3531,113 @@ function isGraphic(thing){
 		return false;
 	}
 }
+function drawCard(pass,pos,lift,reviewModeTemp){
+	if(typeof reviewModeTemp==='undefined'){
+		this.reviewModeTemp=false;
+	}else{
+		this.reviewModeTemp=reviewModeTemp;
+	}
+	
+ 
+		
+	
+	var actualX = pos[0]-lift;
+	var actualY = pos[1]-lift;
+	
+	
+	
+	
+	
+	
+	var compX1 = actualX-(cardWidth/2);
+	var compY1 = actualY-(cardHeight/2);
+	var compX2 = compX1+cardWidth;
+	var compY2 = compY1+ cardHeight;
+ 
+	ctx.fillStyle="AliceBlue";
+	ctx.globalAlpha=1;
+	ctx.shadowColor = colorShadow10pct;	
+	ctx.shadowBlur = paddingNormal;
+	ctx.shadowOffsetX = +paddingNormal;
+	ctx.shadowOffsetY = paddingNormal;		
+ 
+ 	ctx.fillRect(compX1, compY1, cardWidth, cardHeight);
+ 
+	ctx.shadowColor = "transparent";
 
-function loadAsset(name,ext){												
+	if(this.reviewModeTemp){
+ 		ctx.fillStyle=colorReviewMode;
+		ctx.fillRect(compX1, compY1, cardWidth, cardHeight);
+ 	}
+
+ 
+	
+	
+	ctx.fillStyle = "black";			
+	ctx.textAlign = "left";
+	var fontSize = fontUISize;
+	ctx.font = fontUI;				
+	var lineHeightRel = 1.5;		
+	
+	ctx.fillText(pass.name, actualX-cardWidth/8, actualY-cardHeight/2+fontSize*2);
+	ctx.globalAlpha=0.8;
+	
+	ctx.font = 400+" "+fontSize*0.9	+ "px "+fontFamilyPrimary;
+	ctx.fillText(pass.age+"yo", actualX-cardWidth/8, actualY-cardHeight/2+fontSize*(2+lineHeightRel*1));
+	
+	if(typeof pass.pref !== 'undefined'){
+		for(var i=0; i<pass.pref.length; i+=1){
+			ctx.fillText(bulletPoint+" "+pass.pref[i], actualX-cardWidth/8, actualY-cardHeight/2+fontSize*(2+lineHeightRel*(2+i)));
+		}
+	}
+	
+	if(typeof pass.code !== 'undefined'){
+		ctx.font = 600+" "+fontSize*0.7 + "px "+fontFamilyPrimary;
+		
+		var codeTextBoxWidth = ctx.measureText(pass.code).width+paddingNormal*2;
+		ctx.fillRect(actualX+(cardWidth/2)-(cardWidth/7)-codeTextBoxWidth+paddingNormal, actualY-cardHeight/2+fontSize*(2+lineHeightRel/2), codeTextBoxWidth,fontSize);
+		
+		ctx.textAlign = "right";
+		ctx.fillStyle="white";
+		ctx.fillText(pass.code, actualX+(cardWidth/2)-cardWidth/7, actualY-cardHeight/2+fontSize*(2+lineHeightRel*1));
+	}			
+	ctx.globalAlpha=1;	
+
+	
+	if(typeof pass.group !== 'undefined'){
+		ctx.globalAlpha=0.6;
+		ctx.font = 400+" "+fontSize*0.8	+ "px "+fontFamilyPrimary;
+		ctx.fillStyle="black";
+		ctx.textAlign="left";
+		ctx.fillText((pass.myNumInDeck+1)+"/"+(currentDeckOfCards.length+currentSeatedDeck.length), actualX-cardWidth/2+paddingNormal*1.5, actualY+cardHeight/2-paddingNormal*1.5);
+		ctx.globalAlpha=1;
+		
+	}
+	
+	
+	if(this.reviewModeTemp){
+		var glowAmount=0.5;
+		ctx.globalAlpha=(1-glowAmount)+glowAmount*Math.sin(timeCounter/8);
+		ctx.fillStyle="black";
+		if(pass.feedback=="essential"){ctx.fillStyle="white";}
+		ctx.font = 900+" "+fontSize*0.9	+ "px "+fontFamilyPrimary;
+		ctx.fillText("X", actualX+cardWidth/2-fontSize, actualY-cardHeight/2+fontSize*1.1);
+		
+	}
+	
+}
+
+function loadAsset(name,ext,subFolder){												
+	if(typeof subFolder==='undefined'){
+		this.subFolder="";
+	}else{
+		this.subFolder=subFolder+"/";
+	}
+
 	assetCount+=1;
 
 	window[name] = new Image();
-	window[name].src="assets/"+name+"."+ext;
+	window[name].src="assets/"+this.subFolder+name+"."+ext;
 	window[name].onload=function(){
 		arrayOfAssets.push(this);
 	}
@@ -3211,7 +3672,7 @@ function drawCircle(posx,posy,rad,fillColor, strokeAdd, strokeColor, strokeThick
 	}
 }
 
-function generateUniqueID() {
+function generateUniqueID() {			
   return Date.now().toString()+Math.random();
 }
 

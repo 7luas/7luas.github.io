@@ -387,7 +387,7 @@ function adjustToCanvasSizeAndRes(event){ 									// Function to adjust canvas 
 	}
 
 }
-window.addEventListener('resize', myReload);				// ... on resize (and whenever canvasRes is changed - via number keys)
+//window.addEventListener('resize', myReload);				// ... on resize (and whenever canvasRes is changed - via number keys)
 
 function initializeGeneralStuff(){													// Initializing (General)
 

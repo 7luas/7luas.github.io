@@ -21,8 +21,7 @@ if (1) {
 	
 	
 	
-
-	
+ 
 	
 	
 	
@@ -60,6 +59,8 @@ if (1) {
 	
 	
 	
+	
+		
 	
 	
 	
@@ -105,6 +106,7 @@ var canvas; 		var ctx;
 var canvasf; 		var ctxf;												
 var canvasd;		var ctxd;												
 var canvasp;		var ctxp;												
+var minWidth=500;
 
 
 var usingFakePixelsCanvas = false;											
@@ -234,12 +236,28 @@ var layoutDeckDropAreaPos=[0,0];
 
 var reviewModeGlobal=false;
 
+var isShowingHelp=false;
+
+var isShowingResetConfirmation=false;
+
+var checkPlacingVar ="";
+
 var reviewFeedbackText="";
 
 var lineDashOffset= 0;
 var lineDashSize=5;
 
 var ageAdultMin=21;
+
+var showWarning=""; 
+var showWarningDelay= 150;
+var showWarningCutoff=20;
+var showWarningCounter=showWarningDelay;
+var warningSeatList=[]; 
+
+var loneSeats = [];
+var loneSeatsMsg = ""; 
+											
 
 
 loadAsset("logo","png");
@@ -283,7 +301,6 @@ var timerOn = false;
 var gameTimer = 0;
 }
 
-	
 function onLoad(){															
 
 	if(usingLocalStorage){
@@ -305,6 +322,8 @@ function adjustToCanvasSizeAndRes(event){
 	
 	ww = window.innerWidth; 
 	wh = window.innerHeight;
+	
+	 
 	
 	
 	
@@ -383,6 +402,7 @@ function initializeGeneralStuff(){
 		canvasf = document.getElementById("fakePixelsCanvas");
 		ctxf = canvasf.getContext("2d");
 	}
+	introText = document.getElementById("introText");
 
 	
 	adjustToCanvasSizeAndRes();	
@@ -622,18 +642,112 @@ function initializeProjectSpecificStuff(){
 		arrayOfPassengers=[blabla];
 		
 	}
+	
+	if(0){
+		
+		arrayOfPassengers=[];
+		tempPassenger = {
+			passport: 0.39001,
+			name: "Jon Smith",
+			age: 38,
+			pref: [prefTogether],
+			group: "smiths",
+			groupType: "family",
+			groupLeader: "true"
+		}
+		arrayOfPassengers.push(tempPassenger);	
+		
+		tempPassenger = {
+			passport: 0.39002,
+			name: "Jane Smith",
+			age: 30,
+			pref: [prefTogether],
+			group: "smiths",
+			groupType: "family"
+		}
+		arrayOfPassengers.push(tempPassenger);
+		
+		tempPassenger = {
+			passport: 0.39003,
+			name: "Billy Smith",
+			age: 4,
+			pref: [prefTogether],		
+			code: "CHD",
+			group: "smiths",
+			groupType: "family",		
+		}
+		arrayOfPassengers.push(tempPassenger);
+		
+		tempPassenger = {
+			passport: 0.39004,
+			name: "Lilly Smith",
+			age: 9,
+			pref: [prefTogether],
+			code: "CHD",
+			group: "smiths",
+			groupType: "family",		
+		}
+		arrayOfPassengers.push(tempPassenger);
+		
+		
+	}
+	
+	if(0){
+				arrayOfPassengers=[];
 
+			
+	tempPassenger = {
+		passport: 0.32,
+		name: "Frank Abagnale",
+		age: 10,
+		code: "UMNR"
+	}
+	arrayOfPassengers.push(tempPassenger);
+	
+	tempPassenger = {
+		passport: 0.78,
+		name: "Carina Nuvem",
+		age: 37,
+		pref: [prefTogether],
+		group: "CarinaAndScott",
+		groupType: "couple",
+		groupLeader: "true"
+	}
+	arrayOfPassengers.push(tempPassenger);
+	
+	tempPassenger = {
+		passport: 0.342,
+		name: "Scott Cloud",
+		age: 29,
+		pref: [prefTogether],
+		group: "CarinaAndScott",
+		groupType: "couple"
+	}
+	arrayOfPassengers.push(tempPassenger);	
+	
+	tempPassenger = {
+		passport: 0.5221,
+		name: "Heath Longlegs",
+		age: 20,
+		pref: [prefAisle]
+	}
+	arrayOfPassengers.push(tempPassenger);
+
+	}
+	
 	
 	if(limitNumberOfPassengers>0){
 		arrayOfPassengers.splice(limitNumberOfPassengers,arrayOfPassengers.length-limitNumberOfPassengers);
 	}
+
+	window.arrayOfPassengersUntouched = arrayOfPassengers.slice();
 	
 	totalPassengersOriginallyInCue=arrayOfPassengers.length;
 	
 
 
 	
-	window.gameState = "beforeFirstPassenger"; 
+	window.gameState = "init"; 
 
 
 	
@@ -670,10 +784,12 @@ function initializeProjectSpecificStuff(){
 	if(1){	
 		arrayOfSeatedPassengers[0][0]=passengerPreseat;
 		arrayOfSeatedPassengers[0][2]=passengerPreseat;
-		arrayOfSeatedPassengers[0][3]=passengerPreseat;
 		arrayOfSeatedPassengers[0][4]=passengerPreseat;
 		arrayOfSeatedPassengers[1][0]=passengerPreseat;
-		arrayOfSeatedPassengers[3][2]=passengerPreseat;
+		arrayOfSeatedPassengers[1][2]=passengerPreseat;
+		if(Math.random()<0.5){
+			arrayOfSeatedPassengers[2][3]=passengerPreseat;
+		}
 		arrayOfSeatedPassengers[3][4]=passengerPreseat;
 		arrayOfSeatedPassengers[5][0]=passengerPreseat; 
 		arrayOfSeatedPassengers[4][3]=passengerPreseat;
@@ -710,12 +826,15 @@ function initializeProjectSpecificStuff(){
 	componentIconReset.heightRel=0.75;
 	componentIconReset.actionOnClick="reload";
 	componentIconReset.anchorRight=true;
+	componentIconReset.isButton=true;
 	
 	parentComponents(componentIconReset,layoutHeader);
 	tempComponentPointer=new component(iconHelp,0.95,0.5);
 	tempComponentPointer.color="none";
 	tempComponentPointer.heightRel=0.75;
+	tempComponentPointer.actionOnClick="showHelp";
 	tempComponentPointer.anchorRight=true;
+	tempComponentPointer.isButton=true;
 	parentComponents(tempComponentPointer,layoutHeader);
 	
 	
@@ -989,9 +1108,12 @@ function avatarGraphic(passport,x,y,sizePixels){
 		this.newAvatarHeight=this.newAvatarWidth*this.newAvatarProp;
 		ctx.drawImage(faceWhite,this.x-this.newAvatarWidth/2,this.y-(this.newAvatarHeight*0.55),this.newAvatarWidth,this.newAvatarHeight);
 		ctx.globalAlpha=0.2+this.passport*0.8;
-		ctx.drawImage(faceOrange,this.x-this.newAvatarWidth/2,this.y-(this.newAvatarHeight*0.55),this.newAvatarWidth,this.newAvatarHeight);
-		if(this.passport>0.75){ 
-			ctx.globalAlpha=this.passport*0.2;
+		if(this.passport>0){ 
+			ctx.globalAlpha=this.passport*2;
+			ctx.drawImage(faceOrange,this.x-this.newAvatarWidth/2,this.y-(this.newAvatarHeight*0.55),this.newAvatarWidth,this.newAvatarHeight);
+		}
+		if(this.passport>0.5){ 
+			ctx.globalAlpha=0.1+this.passport*0.35	;
 			ctx.drawImage(faceBrown,this.x-this.newAvatarWidth/2,this.y-(this.newAvatarHeight*0.55),this.newAvatarWidth,this.newAvatarHeight);
 		}
 		ctx.globalAlpha=1;
@@ -1092,11 +1214,12 @@ function pickPersonAndBuildDeck(){
 	
 	return returnArray
 }
-function checkPlacing(){
+function checkPlacing(){ 
 	if(arrayOfSeatedPassengers[(seatMapGridPosOnPointerUpOrDown[0]-1)][(seatMapGridPosOnPointerUpOrDown[1]-1)]==null){
 		return "accept";
 	}else{
-		return "reject";
+		
+		return "occupied";
 	}
 }
 function moveToTop(id){
@@ -1119,6 +1242,113 @@ function notSeated(card){
 	
 	console.log("TRUE");	
 	return true;
+}
+function highlightSeats(listOfSeats,hiColor){ 
+	if(typeof hiColor==='undefined'){
+		this.hiColor = colorReviewMode;
+	}else{
+		this.hiColor = hiColor;
+	}
+	
+	var seatWidth = layoutSeats.widthPixels/columnCountWithAisle;
+	var highlightScale = 0.8;
+	var highlightWidth = seatWidth*highlightScale;
+	var highlightShift = (seatWidth/2)*highlightScale;
+	var sx=0;
+	var sy=0;
+
+
+	for(var i=0;i<listOfSeats.length;i++){
+		sx = layoutSeats.posxPixels-layoutSeats.widthPixels/2 + (listOfSeats[i][0]+0.5)*seatWidth;
+		sy = layoutSeats.posyPixels-layoutSeats.heightPixels/2 + (listOfSeats[i][1]+0.5)*seatWidth;
+		if(listOfSeats[i][0]>2){sx +=seatWidth;}
+
+		if(0){ 
+			ctx.fillStyle="black";
+			ctx.textAlign = "center";
+			ctx.font = 100+" "+fontUISize/2	+ "px "+fontFamilyPrimary;			
+			
+			ctx.fillText(arrayOfSeatedPassengers[i][j].name, sx,sy);
+		}
+		
+		ctx.fillStyle=this.hiColor;
+		ctx.fillRect(sx-highlightShift, sy-highlightShift, highlightWidth, highlightWidth);
+	}
+							
+	
+}
+function checkForLoneSeats(){
+	var pointS;
+	var listOfLoneSeats = [];
+	var foundLoneWindowSeat=false;
+	var foundLoneMiddleSeat=false;
+	
+
+	
+	
+	for(var j=0;j<rowCount;j++){
+		if(arrayOfSeatedPassengers[0][j]==null){
+			console.log("In col A, row "+j+" is an empty window seat");
+			if(arrayOfSeatedPassengers[1][j]!=null){		
+				console.log("to its right is a non -empty window seat - so ADD ME TO LONE SEAT ARRAY");
+				listOfLoneSeats.push([0,j]);
+				foundLoneWindowSeat=true;
+			}
+		}
+	}
+	
+	for(var j=0;j<rowCount;j++){
+		if(arrayOfSeatedPassengers[5][j]==null){
+			console.log("In col F, row "+j+" is an empty window seat");
+			if(arrayOfSeatedPassengers[4][j]!=null){		
+				console.log("to its left is a non -empty window seat - so ADD me TO LONE SEAT ARRAY");
+				listOfLoneSeats.push([5,j]);
+				foundLoneWindowSeat=true;
+			}
+		}
+	}
+
+	
+	
+	for(var j=0;j<rowCount;j++){
+		if(arrayOfSeatedPassengers[1][j]==null){
+			console.log("In col B, row "+j+" is an empty window seat");
+			if(arrayOfSeatedPassengers[0][j]!=null && arrayOfSeatedPassengers[2][j]!=null){		
+				console.log("it is lone - so ADD ME TO LONE SEAT ARRAY");
+				listOfLoneSeats.push([1,j]);
+				foundLoneMiddleSeat=true;
+			}
+		}
+	}
+	
+	for(var j=0;j<rowCount;j++){
+		if(arrayOfSeatedPassengers[4][j]==null){
+			console.log("In col E, row "+j+" is an empty window seat");
+			if(arrayOfSeatedPassengers[3][j]!=null && arrayOfSeatedPassengers[5][j]!=null){		
+				console.log("it is lone - so ADD ME TO LONE SEAT ARRAY");
+				listOfLoneSeats.push([4,j]);
+				foundLoneMiddleSeat=true;
+			}
+		}
+	}
+
+
+	
+	for(var i=0;i<columnCount;i++){
+		for(var j=0;j<rowCount;j++){
+			if(arrayOfSeatedPassengers[i][j]==null){
+				pointS = arrayOfSeatedPassengers[i][j];
+				
+			}
+		}
+	}
+	
+	
+	if(foundLoneWindowSeat){loneSeatsMsg="Lone window seat";}
+	if(foundLoneMiddleSeat){loneSeatsMsg="Lone middle seat";}
+	if(foundLoneWindowSeat && foundLoneMiddleSeat){loneSeatsMsg="Lone middle/window seats";}
+	
+	return listOfLoneSeats; 	
 }
 
 function defineInputFunctions() { 											
@@ -1542,7 +1772,7 @@ function mainLoop(timestamp) {
 	
 	root.updateAndDraw(); 
 	
-	if(gameState=="init"){
+	if(gameState=="init"){ 
 		
 		
 		window.introScreen = new component("",0.5,0.5);
@@ -1553,16 +1783,61 @@ function mainLoop(timestamp) {
 		parentComponents(introScreen,root);
  
 		
-		window.btnStart = new component("Let's go", 0.5, 0.8);
+		window.btnStart = new component("Let's go", 0.5, 0.85);
 		btnStart.fontType="bigButton";
 		btnStart.componentType="button";
 		
 		btnStart.actionOnClick="startGame";
 		btnStart.color="green";
 		parentComponents(btnStart,introScreen);		
-
  
 		gameState="intro";
+ 
+		
+		
+		window.btnResume = new component("Resume", 0.5, 0.85);
+		btnResume.fontType="bigButton";
+		btnResume.componentType="button";
+		btnResume.actionOnClick="resumeGame";
+		btnResume.color="green";
+		parentComponents(btnResume,introScreen);
+
+		
+		window.transpOverlay = new component("",0.5,0.5);
+		transpOverlay.heightRel=1;
+		transpOverlay.widthRel=1;
+		transpOverlay.color= "rgba(255,255,255,0.922)";
+		parentComponents(transpOverlay,root);
+
+		
+		window.areYouSure = new component("Reset game?", 0.5, 0.4);
+		areYouSure.fontType="bigButton";
+		areYouSure.color="none";
+		parentComponents(areYouSure,introScreen);	
+		
+		window.resetYes = new component("Yes", 0.35, 0.5);
+		resetYes.fontType="bigButton";
+		resetYes.componentType="button";
+		resetYes.actionOnClick="resetYes";
+		resetYes.color="green";
+		parentComponents(resetYes,introScreen);
+		
+		window.resetNo = new component(" No ", 0.65, 0.5);
+		resetNo.fontType="bigButton";
+		resetNo.componentType="button";
+		resetNo.actionOnClick="resetNo";
+		resetNo.color=colorBadStrong;
+		parentComponents(resetNo,introScreen);
+
+		
+		
+		
+		removeComponent(btnResume.id);
+		removeComponent(transpOverlay.id);
+		removeComponent(areYouSure.id);
+		removeComponent(resetYes.id);
+		removeComponent(resetNo.id);
+		
 	}
 	if(gameState=="intro"){
 		introScreen.updateAndDraw();
@@ -1578,6 +1853,7 @@ function mainLoop(timestamp) {
 		if(typeof introScreen !=='undefined'){
 			removeComponent(introScreen.id);
 			removeComponent(btnStart.id);
+			
 		}
 		
 		
@@ -1660,7 +1936,7 @@ function mainLoop(timestamp) {
 		removeComponent(btnCreateDeck.id);
 		
 		
-		window.btnCreateDeck = new component("Submit", 0.5, 0.5);
+		window.btnCreateDeck = new component("I'm Done!", 0.5, 0.5);
 		btnCreateDeck.fontType="bigButton";
 		btnCreateDeck.componentType="button"
 		
@@ -1705,30 +1981,37 @@ function mainLoop(timestamp) {
 		window.globalEfficient=false; if(Math.round(gameTimer/60)<120){globalEfficient=true;} 
 		
 		var me; 
-		var childAwayFromParents=true; var isNotTogether=true;
-		var isEmergencyRow=false; var isElderlyFrail; var isIsle=false; var isWindow=false; var isTogether=false; var hasCode=false; var hasPref=false; var siblingOnMy="none"; 
+		var childAwayFromParents=true; var isNextToSoloTraveller=false;
+		var UMNRemergencyRow=false; UMNRnextToSolo=false; UMNRnotInAisle=false;
+		var isEmergencyRow=false; var isElderlyFrail; var isAisle=false; var isWindow=false;  var hasCode=false; var hasPref=false; var siblingOnMy="none"; 
+		
+		for(var i=0;i<columnCount;i++){
+			for(var j=0;j<rowCount;j++){
+				if(arrayOfSeatedPassengers[i][j]!=null && arrayOfSeatedPassengers[i][j]!=passengerPreseat){
+					
+					groupIsTogether(i,j); 
+				}
+			}
+		}
 		
 		for(var i=0;i<columnCount;i++){
 			for(var j=0;j<rowCount;j++){
 				if(arrayOfSeatedPassengers[i][j]!=null && arrayOfSeatedPassengers[i][j]!=passengerPreseat){
 					me = arrayOfSeatedPassengers[i][j];
 					me.feedback="none";
-					
 					console.log(i+","+j+" Checking "+me.name);
 					
 					isEmergencyRow=false;
-					isIsle=false;
+					isAisle=false;
 					isWindow=false;
-					isTogether=false;
 					childAwayFromParents=true;
-					isNotTogether=true;
 					isElderlyFrail=false;
 					hasCode=false;
 					hasPref=false;
 					siblingOnMy="false";
 					
 					if(i==aisleToRightOfColumn[0] || i==aisleToRightOfColumn[0]-1){
-						isIsle=true;
+						isAisle=true;
 						console.log("Is in aisle seat. ");
 					}
 					if(i==0 || i==columnCount-1){
@@ -1769,58 +2052,10 @@ function mainLoop(timestamp) {
 						}
 					}
 					
-					
-					if(hasCode){
-						
-						if(isEmergencyRow){
-							me.feedback="essential";
-							globalEssentialRequirements[1]+=1; 
-							console.log(me.code+" in emergency row!"); 
-							me.myReviewFeedbackText=me.code+" in emergency row"
-						}
-						
-						childAwayFromParents=true;
-						if(me.code == "CHD"){
-							globalEssentialRequirements[0]+=1;
-							
-							if(i>0){
-								
-								if(arrayOfSeatedPassengers[i-1][j]!=null){
-									if(typeof arrayOfSeatedPassengers[i-1][j].group !== 'undefined'){
-										if(arrayOfSeatedPassengers[i-1][j].group==me.group && arrayOfSeatedPassengers[i-1][j].age>ageAdultMin){
-											console.log(me.code+" has a parent on the left"); 
-											childAwayFromParents=false;
-										}
-									}
-								}
-							}
-							
-							if(childAwayFromParents && i<columnCount-1){ 
-								if(arrayOfSeatedPassengers[i+1][j]!=null){
-									if(typeof arrayOfSeatedPassengers[i+1][j].group !== 'undefined'){
-										if(arrayOfSeatedPassengers[i+1][j].group==me.group && arrayOfSeatedPassengers[i+1][j].age>ageAdultMin){
-											console.log(me.code+" has a parent on the right"); 
-											childAwayFromParents=false;
-										}
-									}
-								}
-							}
-							
-							if(childAwayFromParents){
-								me.feedback="essential";
-								me.myReviewFeedbackText=me.code +" away from parent";
-								globalEssentialRequirements[1]+=1; 
-								console.log(me.code+" away from family!"); 
-								
-							}
-						}
-						
-					}
-					
 					if(typeof me.pref !== 'undefined'){
 						
 						if(me.pref.includes(prefAisle)){
-							if(isIsle){
+							if(isAisle){
 								console.log("Satified:"+me.pref); 
 							}else{
 								if(me.feedback!="essential"){me.feedback="preference";}
@@ -1840,39 +2075,219 @@ function mainLoop(timestamp) {
 						}
 						
 						if(me.pref.includes(prefTogether)){
-							isNotTogether=true;
+							globalPreferences[0]+=1;
+							
+							if(!me.myGroupIsTogether){
+								if(me.feedback!="essential"){me.feedback="preference";}
+								globalPreferences[1]+=1; 
+								
+							}else{
+								
+							}
+						}
+						
+					}					
+					
+					
+					if(hasCode){
+						
+						if(isEmergencyRow){
+							me.feedback="essential";
+							globalEssentialRequirements[1]+=1; 
+							console.log(me.code+" in emergency row!"); 
+							me.myReviewFeedbackText="\x22"+me.code+"\x22 in emergency row"
+						}
+						
+						if(me.code == "CHD"){
+							
+							var pointerCHD;
+							globalEssentialRequirements[0]+=1;
 							
 							if(i>0){
 								
 								if(arrayOfSeatedPassengers[i-1][j]!=null){
 									if(typeof arrayOfSeatedPassengers[i-1][j].group !== 'undefined'){
 										if(arrayOfSeatedPassengers[i-1][j].group==me.group){
-											console.log(me.name+" is together with "+arrayOfSeatedPassengers[i-1][j].name); 
-											isNotTogether=false
+											if(arrayOfSeatedPassengers[i-1][j].age>ageAdultMin){
+												
+												console.log(me.code+" has a parent on the left"); 
+												childAwayFromParents=false;
+											}else{
+												
+												console.log(me.code+" has a sibling on the left"); 
+												pointerCHD = i;
+												while(pointerCHD>0){
+													pointerCHD-=1;
+													if(arrayOfSeatedPassengers[pointerCHD][j]!=null){
+														if(typeof arrayOfSeatedPassengers[pointerCHD][j].group !== 'undefined'){
+															if(arrayOfSeatedPassengers[pointerCHD][j].group==me.group){
+																if(arrayOfSeatedPassengers[pointerCHD][j].age>ageAdultMin){
+																	console.log(me.code+" eventually has a parent on the left"); 
+																	childAwayFromParents=false;
+																	break;
+																}
+															}
+														}
+													}					
+												}
+											}
+
 										}
 									}
 								}
 							}
 							
-							if(isNotTogether && i<columnCount-1){ 
+							if(childAwayFromParents && i<columnCount-1){ 
 								if(arrayOfSeatedPassengers[i+1][j]!=null){
 									if(typeof arrayOfSeatedPassengers[i+1][j].group !== 'undefined'){
-										if(arrayOfSeatedPassengers[i+1][j].group==me.group){ 
-											console.log(me.name+" is together with "+arrayOfSeatedPassengers[i+1][j].name); 
-											isNotTogether=false;
+										if(arrayOfSeatedPassengers[i+1][j].group==me.group){
+											if(arrayOfSeatedPassengers[i+1][j].age>ageAdultMin){
+												
+												console.log(me.code+" has a parent on the right"); 
+												childAwayFromParents=false;
+											}else{
+												
+												console.log(me.code+" has a sibling on the right"); 
+												pointerCHD = i;
+												while(pointerCHD<columnCount-1){
+													pointerCHD+=1;
+													if(arrayOfSeatedPassengers[pointerCHD][j]!=null){
+														if(typeof arrayOfSeatedPassengers[pointerCHD][j].group !== 'undefined'){
+															if(arrayOfSeatedPassengers[pointerCHD][j].group==me.group){
+																if(arrayOfSeatedPassengers[pointerCHD][j].age>ageAdultMin){
+																	console.log(me.code+" eventually has a parent on the right"); 
+																	childAwayFromParents=false;
+																	break;
+																}
+															}
+														}
+													}					
+												}												
+											}
 										}
 									}
 								}
 							}
 							
-							if(isNotTogether){
-								if(me.feedback!="essential"){me.feedback="preference";}
-								globalPreferences[1]+=1; 
-								console.log(me.name+" NOT  together"); 
+							if(childAwayFromParents){
+								me.feedback="essential";
+								if(typeof me.myReviewFeedbackText==='undefined'){
+									
+									me.myReviewFeedbackText="\x22"+me.code+"\x22 away from parent";									
+								}else{
+									
+									me.myReviewFeedbackText+=" and alone";
+								}
+								globalEssentialRequirements[1]+=1; 
+								console.log(me.code+" away from family!"); 
+								
 							}
 						}
-						
+						if(me.code == "PWD"){
+							
+							globalEssentialRequirements[0]+=1;
+							if(Math.abs(j-2)<2){
+								globalEssentialRequirements[1]+=1; 
+								me.feedback="essential";
+								me.myReviewFeedbackText="\x22"+me.code+"\x22 near emergency row";
+							}
+						}
+						if(me.code == "UMNR"){
+							
+							
+							
+							
+							globalEssentialRequirements[0]+=1;
+							
+							globalEssentialRequirements[0]+=1;
+							isNextToSoloTraveller=false;
+							
+							if(i>0){
+								if(arrayOfSeatedPassengers[i-1][j]!=null){
+									if(typeof arrayOfSeatedPassengers[i-1][j].group==='undefined'){ 
+										if(typeof arrayOfSeatedPassengers[i-1][j].code !== 'undefined'){ 
+											if(arrayOfSeatedPassengers[i-1][j].code!="UMNR"){
+												console.log(me.name+" UMNR has solo traveller on left");
+												isNextToSoloTraveller=true;												
+											}
+										}else{
+												console.log(me.name+" UMNR has solo traveller on left");
+												isNextToSoloTraveller=true;																							
+										}
+									}else{
+										
+										if(typeof arrayOfSeatedPassengers[i-1][j].myGroupIsTogether!=='undefined'){
+											if(!arrayOfSeatedPassengers[i-1][j].myGroupIsTogether && !arrayOfSeatedPassengers[i-1][j].isNextToAtLeastOnePersonFromGroup){
+												console.log(me.name+" UMNR has solo traveller on left (debanded from group):"+arrayOfSeatedPassengers[i-1][j].name);
+												isNextToSoloTraveller=true;		
+											}
+										}
+									}
+								}
+							}
+							
+							if(!isNextToSoloTraveller){ 
+								if(i<columnCount-1){
+									if(arrayOfSeatedPassengers[i+1][j]!=null){
+										if(typeof arrayOfSeatedPassengers[i+1][j].group==='undefined'){ 
+											if(typeof arrayOfSeatedPassengers[i+1][j].code !== 'undefined'){
+												if(arrayOfSeatedPassengers[i+1][j].code!="UMNR"){
+													console.log(me.name+" UMNR has solo traveller on right");
+													isNextToSoloTraveller=true;
+												}
+											}else{
+													console.log(me.name+" UMNR has solo traveller on right");
+													isNextToSoloTraveller=true;												
+											}
+										}else{
+											
+											if(typeof arrayOfSeatedPassengers[i+1][j].myGroupIsTogether!=='undefined'){
+												if(!arrayOfSeatedPassengers[i+1][j].myGroupIsTogether && !arrayOfSeatedPassengers[i+1][j].isNextToAtLeastOnePersonFromGroup){
+													console.log(me.name+" UMNR has solo traveller on right (debanded from group):"+arrayOfSeatedPassengers[i+1][j].name);
+													isNextToSoloTraveller=true;		
+												}
+											}
+										}
+									}
+									
+								}
+							}
+							if(isNextToSoloTraveller){
+								globalEssentialRequirements[1]+=1;
+								console.log(me.name+" UMNR is next to solo traveller indeed.");
+								me.myReviewFeedbackText="\x22"+me.code+"\x22 near solo traveller";
+								me.feedback="essential";
+							}
+							
+							
+							if(!isAisle){
+								globalEssentialRequirements[1]+=1;
+								console.log(me.name+" UMNR not in aisle");
+								me.myReviewFeedbackText="\x22"+me.code+"\x22 not in aisle seat";
+								me.feedback="essential";
+							}
+							
+							
+							if(isEmergencyRow && (isNextToSoloTraveller||!isAisle)){
+								me.myReviewFeedbackText="Emergency row";
+								if(isNextToSoloTraveller){
+									if(isAisle){
+										me.myReviewFeedbackText+=", near solo traveller";
+									}else{										
+										me.myReviewFeedbackText+=", solo traveller, not aisle";
+									}
+								}else{			
+									 me.myReviewFeedbackText+=", not aisle seat";
+								}
+							}else{
+								if(isNextToSoloTraveller && !isAisle){
+									me.myReviewFeedbackText="Next to solo traveller, not aisle";
+								}								
+							}
+
+						}
 					}
+
 				}
 			}
 		}	
@@ -2033,6 +2448,7 @@ function mainLoop(timestamp) {
 						ctx.strokeStyle=colorOrangeStrong; 
 						if(arrayOfSeatedPassengers[i][j].feedback=="essential"){ctx.strokeStyle=colorBadStrong;} 
 						if(arrayOfSeatedPassengers[i][j].reviewMode){ctx.strokeStyle="white";} 
+						ctx.lineWidth=strokeBaseThickness;
 						ctx.lineDashOffset= lineDashOffset;
 						ctx.setLineDash([lineDashSize,lineDashSize*2]);
 						ctx.strokeRect(sx-highlightShift, sy-highlightShift, highlightWidth, highlightWidth);
@@ -2042,6 +2458,7 @@ function mainLoop(timestamp) {
 				}
 			}
 			ctx.restore();
+			
 			
 			for(var i=0;i<arrayOfSeatedComponents.length;i++){			
 				arrayOfSeatedComponents[i].updateAndDraw();
@@ -2144,6 +2561,13 @@ function mainLoop(timestamp) {
 		drawCircle(mouseX,mouseY,4,"black");
 		drawCircle(mouseXlock,mouseYlock,8,"none", true);
 	}
+
+
+	
+	var msgAboveYpos = layoutDeckDropArea.posyPixels-layoutDeckDropArea.heightPixels/2;
+	if(isPortrait){
+		msgAboveYpos = layoutDeckDropArea.posyPixels-layoutDeckDropArea.heightPixels*0.8;
+	}	
 	
 	
 	if(gameState=="waitingPlayerPlacePassenger" || reviewModeGlobal){
@@ -2156,10 +2580,6 @@ function mainLoop(timestamp) {
 		
 		
 		var cardType="passenger"; 
-		var msgAboveYpos = layoutDeckDropArea.posyPixels-layoutDeckDropArea.heightPixels/2;
-		if(isPortrait){
-			msgAboveYpos = layoutDeckDropArea.posyPixels-layoutDeckDropArea.heightPixels*0.8;
-		}
 		if(!reviewModeGlobal){
 			if((currentDeckOfCards.length+currentSeatedDeck.length)>1){
 				cardType=currentDeckOfCards[0].passenger.groupType;	
@@ -2171,9 +2591,10 @@ function mainLoop(timestamp) {
 		}
 		
 		
-		var msgBelowYpos = layoutDeckDropArea.posyPixels+layoutDeckDropArea.heightPixels/1.5;
+		var msgBelowYpos = layoutDeckDropArea.posyPixels+layoutDeckDropArea.heightPixels*0.5 + currentDeckOfCards.length*fontBaseSizePrimary/2;
 		if(isPortrait){
-			msgBelowYpos = layoutDeckDropArea.posyPixels+layoutDeckDropArea.heightPixels;
+			console.log(currentDeckOfCards.length);
+			msgBelowYpos = layoutDeckDropArea.posyPixels+layoutDeckDropArea.heightPixels*0.75 + currentDeckOfCards.length*fontBaseSizePrimary/2;
 		}
 		ctx.font = 600+" "+fontUISize*0.7+ "px "+fontFamilyPrimary;		
 		if(!reviewModeGlobal){
@@ -2184,7 +2605,7 @@ function mainLoop(timestamp) {
 		}else{
 			ctx.font = 600+" "+fontUISize*0.8+ "px "+fontFamilyPrimary;		
 
-			ctx.fillText(reviewFeedbackText, layoutDeckDropArea.posxPixels, msgBelowYpos);					
+			ctx.fillText(reviewFeedbackText, layoutDeckDropArea.posxPixels, msgBelowYpos);
 		}
 
 		ctx.globalAlpha=1;
@@ -2230,14 +2651,59 @@ function mainLoop(timestamp) {
 	}
 
 
+	if(isShowingHelp){
+		introScreen.updateAndDraw();
+		btnResume.updateAndDraw();
+	}
 
-
+	if(isShowingResetConfirmation){
+		transpOverlay.updateAndDraw();
+		areYouSure.updateAndDraw();
+		resetYes.updateAndDraw();
+		resetNo.updateAndDraw();
+		
+ 
+	}
 
 	pointerDownGlobalOneOffWarning=false;
 	pointerUpGlobalOneOffWarning=false;
 	pointerClickedInPlaceGlobalOneOffWarning=false;
 
-	
+	if(showWarning!=""){
+		var pulseAlpha = Math.sin(timeCounter/5)/4;
+		var pulseBeta = Math.sin(Math.PI+timeCounter/5)/4;
+		if(showWarningCounter<showWarningCutoff){ctx.globalAlpha=showWarningCounter/showWarningCutoff;}
+		ctx.globalAlpha = 0.5+pulseAlpha;
+				
+		
+		if(warningSeatList.length>0){
+			highlightSeats(warningSeatList,colorBadStrong);
+		}
+			
+		console.log("SHOWING WARNING:"+layoutDeckDropArea.posxPixels	);
+			
+		
+		ctx.font=fontUI;
+		ctx.fillStyle=colorBadStrong;
+		var warnWidth = layoutAreaForCards.widthPixels*0.8;
+		ctx.globalAlpha= 1;
+		ctx.fillRect(layoutDeckDropArea.posxPixels-warnWidth/2, msgAboveYpos-(fontUISize*1.25), warnWidth, fontUISize*2);
+		ctx.fillStyle="white";
+		ctx.globalAlpha= 1+pulseBeta;
+		ctx.fillText(showWarning, layoutDeckDropArea.posxPixels, msgAboveYpos);
+		if(showWarningCounter>0){
+			showWarningCounter-=1;
+		}else{
+			showWarning=false;
+			showWarningCounter=showWarningDelay;
+		}
+		
+		
+		for(var i=0;i<arrayOfSeatedComponents.length;i++){			
+			arrayOfSeatedComponents[i].updateAndDraw();
+		}
+
+	}
 	
 	requestAnimationFrame(mainLoop); 
 }
@@ -2393,7 +2859,7 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 			}
 		}
 		if(this.reviewMode){
-			console.log("REVIEW MODE -"+this.passenger.name);
+			
 			
 			colorReviewMode=colorOrange;
 			if(this.passenger.feedback=="essential"){
@@ -2405,10 +2871,13 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 			drawCard(this.passenger,layoutDeckDropAreaPos,0,true);
 			
 			
-			if(this.passenger.feedback){
-				reviewFeedbackText="";
-				if(this.passenger.feedback=="preference"){reviewFeedbackText="PREFERENCE NOT SATISFIED"}
-				if(this.passenger.myReviewFeedbackText){reviewFeedbackText=this.passenger.myReviewFeedbackText.toUpperCase()}
+			reviewFeedbackText="";
+			if(this.passenger.feedback=="essential"||this.passenger.feedback=="preference"){
+				if(typeof this.passenger.myReviewFeedbackText === 'undefined'){						
+					reviewFeedbackText="PREFERENCE NOT SATISFIED"; 
+				}else{
+					reviewFeedbackText=this.passenger.myReviewFeedbackText.toUpperCase()
+				}
 			}
 			
 			
@@ -2734,50 +3203,59 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 
 		
 		if(pointerDownGlobalOneOffWarning){
-			if(pointIsWithinArea([mouseX,mouseY],this.shape,this.posxPixels,this.posyPixels,this.widthPixels,this.heightPixels)){
-				this.pointerIsDownOnMe=true;
-				if(!this.disabled){
-					this.pointerClickOffsetX = this.posxPixels-mouseX;
-					this.pointerClickOffsetY = this.posyPixels-mouseY;
-					
-					
-					topmostComponentOnLocationOfLastPointerDown=this;
-					
-					this.targetx=undefined;
-					this.targety=undefined;
-
-					if(this.passenger){
-						lastObjectWithPassengerClickedOrDragged=this;
+			if(showWarning!==""){
+				showWarningCounter=showWarningCutoff;
+			}
+			
+			if(!isShowingResetConfirmation||this==resetYes||this==resetNo){
+				
+				if(pointIsWithinArea([mouseX,mouseY],this.shape,this.posxPixels,this.posyPixels,this.widthPixels,this.heightPixels)){
+					this.pointerIsDownOnMe=true;
+					if(!this.disabled){
+						this.pointerClickOffsetX = this.posxPixels-mouseX;
+						this.pointerClickOffsetY = this.posyPixels-mouseY;
 						
+						
+						topmostComponentOnLocationOfLastPointerDown=this;
+						
+						this.targetx=undefined;
+						this.targety=undefined;
+
+						if(this.passenger){
+							lastObjectWithPassengerClickedOrDragged=this;
+							
+						}
+					}				
+					if(this.passenger){
+
 					}
-				}				
-				if(this.passenger){
+					if(this==layoutSeats){
+						seatMapGridPosOnPointerUpOrDown=seatMapGridActivePos;
+					}
 
-				}
-				if(this==layoutSeats){
-					seatMapGridPosOnPointerUpOrDown=seatMapGridActivePos;
-				}
-
-			}			
+				}			
+			}
+			
 		}
 
 
 		if(pointerClickedInPlaceGlobalOneOffWarning && this.pointerIsHoveringMe){
-			if(this.componentType=="passenger"){
-				console.log("$$ CLICKED "+this.passenger.name);
-				for(var i=0;i<arrayOfComponents.length;i++){
-					arrayOfComponents[i].reviewMode=false;
+			if(!isShowingResetConfirmation){
+				if(this.componentType=="passenger"){
+					console.log("$$ CLICKED "+this.passenger.name);
+					for(var i=0;i<arrayOfComponents.length;i++){
+						arrayOfComponents[i].reviewMode=false;
+					}
+					this.reviewMode=true;
+					reviewModeGlobal=true;
 				}
-				this.reviewMode=true;
-				reviewModeGlobal=true;
-			}
-			
-			if(this==layoutAreaForCards && reviewModeGlobal){
+				
+				if(this==layoutAreaForCards && reviewModeGlobal){
 				this.reviewMode=false;
 				reviewModeGlobal=false;
 				btnCreateDeck.pointerIsDownOnMe=false; 
 			}
-			
+			}
 		}
 
 
@@ -2802,7 +3280,7 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 		
 	
 		
-		if(this.pointerIsDownOnMe && (!reviewModeGlobal||this==componentIconReset)){
+		if(this.pointerIsDownOnMe && (!reviewModeGlobal||this==componentIconReset||this==resetYes||this==resetNo)){
 			if(debug){
 				ctx.fillStyle = "yellow";
 				ctx.fillRect(this.compX1-this.fontSize, this.compY1-this.fontSize,this.fontSize,this.fontSize);
@@ -2915,30 +3393,39 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 						this.color="green";
 					}
 					if(this.actionOnClick=="startGame"){
+						introText.style.opacity="0";
 						gameState="beforeFirstPassenger";
 					}
-					if(this.actionOnClick=="createNewCardDeck"){
+					if(this.actionOnClick=="createNewCardDeck" || this.actionOnClick=="submit"){
 						if(!reviewModeGlobal){
-							console.log("NEXT DECK!");
-							for(i=0;i<currentSeatedDeck.length;i++){
-								currentSeatedDeck[i].disabled=true;
+							loneSeats=checkForLoneSeats();
+							if(loneSeats.length>0){
+								
+								warningSeatList=loneSeats;
+								showWarning=loneSeatsMsg;
+								showWarningCounter=showWarningDelay;	
+							}else{
+								
+								for(i=0;i<currentSeatedDeck.length;i++){
+									currentSeatedDeck[i].disabled=true;
+								}
+								currentSeatedDeck=[];								
+								if(this.actionOnClick=="createNewCardDeck"){								
+									
+									console.log("NEXT DECK!");
+									gameState="createNewCardDeck";
+								}
+								if(this.actionOnClick=="submit"){
+									
+									gameState="showFeedback";						
+								}
 							}
-							currentSeatedDeck=[];
-
-							gameState="createNewCardDeck";
 						}
 					}					
-					if(this.actionOnClick=="submit"){
-						for(i=0;i<currentSeatedDeck.length;i++){
-							currentSeatedDeck[i].disabled=true;
-						}
-						currentSeatedDeck=[];
-						
-						gameState="showFeedback";						
-					}
 
 					if(this.actionOnClick=="reload"){
-						myReload();
+						
+						isShowingResetConfirmation=true;
 					}
 					
 					if(this.actionOnClick=="chaos"){
@@ -2950,8 +3437,28 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 						}	
 					}
 
+					if(this.actionOnClick=="showHelp"){
+						introText.style.opacity="1";
+ 						console.log("showHelp");
+						isShowingHelp=true;
+						
+					}
+					if(this.actionOnClick=="resumeGame"){
+						introText.style.opacity="0";
+ 						console.log("resumeGame");
+						isShowingHelp=false;						
+					}
 
+					if(this.actionOnClick=="resetNo"){
+ 						console.log("resetNo");
+						isShowingResetConfirmation=false;
+					}
 
+					if(this.actionOnClick=="resetYes"){
+						myReload();
+					}
+
+	
 				}
 				
 				
@@ -2972,7 +3479,9 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 								}
 								if(typeof tgy==='undefined' || tgy==0){seatMapGridPosOnPointerUpOrDown[1]=5;}
 								if(typeof tgx!=='undefined' && tgx!=0 && typeof tgy!=='undefined' && tgy!=0){
-									if(checkPlacing()=="accept"){
+									checkPlacingVar = checkPlacing();
+									if(checkPlacingVar=="accept"){
+										
 										
 										totalPassengersSeated+=1;
 
@@ -2988,7 +3497,6 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 										this.mySeatPos=[(seatMapGridPosOnPointerUpOrDown[0]-1),(seatMapGridPosOnPointerUpOrDown[1]-1)];
 										
 										
-										
 										if(currentDeckOfPassengerInfo.length>1){						
 											for(i=this.passenger.myPosInDeck+1;i<currentDeckOfPassengerInfo.length;i++){
 												
@@ -2999,11 +3507,12 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 										currentDeckOfPassengerInfo.splice(this.passenger.myPosInDeck,1);
 										currentDeckOfCards.splice(this.passenger.myPosInDeck,1);
 										currentSeatedDeck.push(this);
+																				
 										
-										
-										if(currentDeckOfPassengerInfo.length>0){
+										if(currentDeckOfPassengerInfo.length==0){
 											
-										}else{
+
+											
 											if(arrayOfPassengers.length>0){
 												gameState="showNextButton";
 											}else{
@@ -3018,10 +3527,16 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 										console.log("Making sure "+this.passenger.name+" stays where they were seated. PS: this.goHome ="+ this.goHome);
 										this.goHome=false;
 										this.pointerIsDraggingOnMe=false;
-									}else{
+									}
+									if(checkPlacingVar=="occupied"){ 
 										
 										console.log("reject:"+this.passenger.name +" timeCounter:"+timeCounter);
 										this.goHome=true;
+										
+										showWarning="Seat already occupied";
+										showWarningCounter=showWarningDelay;
+										warningSeatList=[[seatMapGridPosOnPointerUpOrDown[0]-1,seatMapGridPosOnPointerUpOrDown[1]-1]];
+										
 										this.mySeatPos=[-1,-1];
 										
 										
@@ -3070,6 +3585,7 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 				}
 			}
 			if(this==layoutSeats){
+				console.log("got from: "+seatMapGridActivePos);
 				seatMapGridPosOnPointerUpOrDown=seatMapGridActivePos;
 			}
 			
@@ -3083,7 +3599,7 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 			
 			this.pointerIsHoveringMe=true;
 
-			if(this.componentType=="button"){this.highlight=true;}
+			if(this.componentType=="button" || this.isButton){this.highlight=true;}
 			
 			
 			if(this.label=="layoutSeats"){
@@ -3093,7 +3609,11 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 				this.pixelsPerColumn = this.widthPixels/columnCountWithAisle;
 				this.mouseXPosRelToThis = (mouseX+this.pixelsPerColumn/2-(this.posxPixels-this.widthPixels/2));
 				this.mouseXPosInColumns = this.mouseXPosRelToThis/this.pixelsPerColumn;
-				if(Math.round(this.mouseXPosInColumns)!=4){this.mouseXPosInColumnsRound = Math.round(this.mouseXPosInColumns)}; 
+				if(Math.round(this.mouseXPosInColumns)!=4){ 
+					this.mouseXPosInColumnsRound = Math.round(this.mouseXPosInColumns);
+				} else{
+					this.mouseXPosInColumnsRound = 3;
+				}
 				mouseXlock=(this.posxPixels-this.widthPixels/2)+this.mouseXPosInColumnsRound*this.pixelsPerColumn-this.pixelsPerColumn/2;
 
 				
@@ -3107,8 +3627,12 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 				
 				
 				if(this.mouseXPosInColumnsRound>3){this.mouseXPosInColumnsRound-=1;}
-				seatMapGridActivePos=[this.mouseXPosInColumnsRound,this.mouseYPosInRowsRound];
 				
+				
+				if(typeof this.mouseXPosInColumnsRound !== 'undefined'){
+					seatMapGridActivePos=[this.mouseXPosInColumnsRound,this.mouseYPosInRowsRound];
+					
+				}
 
 			}
 
@@ -3121,7 +3645,7 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 			
 			this.pointerIsHoveringMe=false;
 
-			if(this.componentType=="button"){this.highlight=false;}
+			if(this.componentType=="button" || this.isButton){this.highlight=false;}
 			
 			if(this.componentType=="card"){
 				this.liftGoal=0;
@@ -3200,6 +3724,9 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 		ctx.font = this.font;
 		if(this.componentType=="text" || this.componentType=="button" || this.componentType=="stat"){
 			ctx.fillStyle = this.fontColor;
+			if(this.color=="none"){
+					ctx.fillStyle="black";
+			}
 			ctx.textAlign = "center";
 			
 			var yp = this.posyPixels+this.fontSize/4;
@@ -3227,6 +3754,15 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 		
 		if(this.componentType=="graphic"){
 			myDrawImage(this.label,this.compX1, this.compY1,this.graphicScale);
+			
+			if(this.highlight){ 
+				ctx.save();
+				ctx.filter = "contrast(1.2)";
+				myDrawImage(this.label,this.compX1, this.compY1,this.graphicScale);
+				ctx.restore();
+			}
+			
+			
 		}
 		if(typeof this.passenger !== 'undefined'){ 
 
@@ -3624,6 +4160,105 @@ function drawCard(pass,pos,lift,reviewModeTemp){
 		ctx.fillText("X", actualX+cardWidth/2-fontSize, actualY-cardHeight/2+fontSize*1.1);
 		
 	}
+	
+}
+
+						
+function groupIsTogether(i,j){
+	
+	var isTogLeft=false;
+	var isTogRight=false;
+	var groupCounter = 1;
+	var tempPerson = arrayOfSeatedPassengers[i][j];
+	var tempLine = [];
+	tempLine.push(tempPerson);
+	
+	var pointer = i;
+	
+	console.log("Checking if group is Together for "+tempPerson.name);
+	
+	
+	console.log("Check to left");
+	while(pointer>0){
+		pointer-=1;
+		if(arrayOfSeatedPassengers[pointer][j]!=null){
+			if(typeof arrayOfSeatedPassengers[pointer][j].group !== 'undefined'){
+				if(arrayOfSeatedPassengers[pointer][j].group==tempPerson.group){
+					groupCounter+=1;
+					console.log("Person to left is of my group:"+arrayOfSeatedPassengers[pointer][j].name);
+				}else{					
+					console.log("BREAK: Person to left is not of my group:"+arrayOfSeatedPassengers[pointer][j].name);
+					break;
+				}
+			}else{
+				console.log("BREAK: Person to left is not my group, as has no group:"+arrayOfSeatedPassengers[pointer][j].name);
+				break; 
+			}
+		}else{
+			console.log("BREAK: Nobody further left.");
+			break;
+		}
+	}
+	pointer = i;
+	
+	console.log("Check to right");
+	while(pointer<columnCount-1){
+		pointer+=1;
+		if(arrayOfSeatedPassengers[pointer][j]!=null){
+			if(typeof arrayOfSeatedPassengers[pointer][j].group !== 'undefined'){
+				if(arrayOfSeatedPassengers[pointer][j].group==tempPerson.group){
+					console.log("Person to right is of my group:"+arrayOfSeatedPassengers[pointer][j].name);
+					groupCounter+=1;
+				}else{
+					console.log("BREAK: Person to right is not of my group:"+arrayOfSeatedPassengers[pointer][j].name);
+					break;
+				}
+			}else{
+				console.log("BREAK: Person to right is not my group, as has no group:"+arrayOfSeatedPassengers[pointer][j].name);
+				break; 
+			}
+		}else{
+			console.log("BREAK: Nobody further right.");
+			break;
+		}
+	}
+	
+	
+	var actualGroupCount=0;
+	for(var a=0;a<arrayOfPassengersUntouched.length;a++){
+		if(arrayOfPassengersUntouched[a].group==tempPerson.group){
+			actualGroupCount+=1;
+		}
+	}
+	
+	console.log(groupCounter+": groupCounter x actualGroupCount :"+actualGroupCount);
+	
+	
+	if(groupCounter>1){
+		tempPerson.isNextToAtLeastOnePersonFromGroup=true;
+	}else{
+		tempPerson.isNextToAtLeastOnePersonFromGroup=false;		
+	}
+	
+	
+	var result = groupCounter==actualGroupCount;
+
+	
+	for(var i=0;i<columnCount;i++){		
+		for(var j=0;j<rowCount;j++){
+			if(arrayOfSeatedPassengers[i][j]!=null){
+				if(typeof arrayOfSeatedPassengers[i][j].group !== 'undefined'){
+					if(arrayOfSeatedPassengers[i][j].group==tempPerson.group){
+						arrayOfSeatedPassengers[i][j].myGroupIsTogether=result;
+						console.log(arrayOfSeatedPassengers[i][j].name+" got var myGroupIsTogether as:"+result);
+					}
+				}
+			}
+		}
+	}
+	
+	
+	return result;
 	
 }
 

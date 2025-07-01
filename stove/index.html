@@ -1,0 +1,126 @@
+<html>
+	<head>
+		<title>Passenger Seating (Template v0.2 2025/06/03)</title>
+		<meta name="viewport" content="user-scalable=no,initial-scale=1,maximum-scale=1,minimum-scale=1,width=device-width">
+		<meta name="robots" content="noindex">
+		<script language="javascript" type="text/javascript" src="script.js"></script>
+		<style>
+			body {
+				background-color:#000000; 
+				width: 100%; 
+				height: 100%; 
+				margin: 0;
+				font-family: Arial, Helvetica, sans-serif;
+				line-height: 1.5em;
+				font-size: 0.95em;
+			}
+			#everything {
+				background-color:#FFFFFF; 
+				width: 100%; 
+				height: 100%;  
+				margin:0; 
+				position: relative;
+			
+			}
+			
+			#mainCanvas, #fakePixelsCanvas, #debugCanvas, #pointerCanvas {
+				width: 100%;
+				height: 100%;  
+				margin:0; 
+				touch-action: none; 
+				position: absolute;
+			}
+			
+			#fakePixelsCanvas {
+				image-rendering: -moz-crisp-edges;
+				image-rendering: -webkit-crisp-edges;
+				image-rendering: pixelated;			
+			}
+			
+			#introText {
+				color:black;
+				z-index: 999;
+				touch-action: none; 
+				pointer-events: none;
+				margin: auto;
+				inset: 0px;
+				margin-top:2em;
+				position: fixed;
+				display:inline;	
+				width:80%;
+				text-align:left;
+			}
+ 
+ 			@media (min-width: 500px) {
+				#introText {
+					width: 350px;
+				}
+			}
+ 			@media (max-width: 500px) {
+				#introText {
+					min-width: 350px;
+				}
+			}
+			
+			ul {
+			list-style: none;
+			padding-left: 0em;
+			margin-left: 0em;
+			xline-height:3.5em;
+			}
+			li {
+				font-size: 0.85em;
+			}
+			li::before {
+				content: '';
+				display: inline-block;
+				height: 3.2rem;
+				width: 3.2rem;
+				vertical-align: middle;
+				margin-right: 0.6rem;
+			}
+			
+			#iconHand {
+				background-image: url(assets/iconHand.svg);
+				background-size: contain;
+				background-repeat: no-repeat;
+			}			
+			#iconRed {
+				background-image: url(assets/iconRed.svg);
+				background-size: contain;
+				background-repeat: no-repeat;
+			}
+			#iconPreseat {
+				background-image: url(assets/preSeat.svg);
+				background-size: contain;
+				background-repeat: no-repeat;
+				stroke-width:0px;
+				
+ 			}
+			
+		</style>
+	</head>
+	<body onload="mainOnLoad();" onkeydown="onKeyDown(event)" onkeyup="onKeyUp(event);">
+
+		<div id="introText">		
+			<p><b>Your task is to assign seats to passengers and groups as they arrive at the check-in desk.</b></p>
+			<p>You will meet families, solo travellers and passengers with special needs. Make sure everyone is seated according to safety regulations and operational guidelines. Also, do your best to satisfy any preferences the passengers might have.</p>
+			<ul>
+			  <li id="iconHand">Drag and drop to seat passengers</li>
+			  <li id="iconPreseat">Some seats are already allocated</li>
+			  <li id="iconRed">Emergency exit row is indicated in red</li>
+			</ul>
+			<p>The aircraft is a narrow-body B737, simplified here to 5 rows.</p>
+			<p><b>Don't worry if you get stuck. You can retry as many times as you want.</b></p>
+		</div>
+
+		<div id="everything">
+			<canvas id="fakePixelsCanvas"></canvas>
+			<canvas id="mainCanvas"></canvas>
+			<canvas id="debugCanvas"></canvas>
+			<canvas id="pointerCanvas"></canvas>
+		</div>
+
+
+	</body>
+</html>

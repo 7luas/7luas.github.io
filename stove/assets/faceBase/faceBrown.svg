@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_2" data-name="Layer 2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 122.14 131.69">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #725d3f;
+        stroke: #000;
+        stroke-miterlimit: 10;
+        stroke-width: 4px;
+      }
+
+      .cls-2 {
+        fill: #fcb856;
+        opacity: 0;
+      }
+    </style>
+  </defs>
+  <g id="Avatars_final" data-name="Avatars final">
+    <rect class="cls-2" width="122.14" height="131.69"/>
+    <circle id="face_brown" data-name="face brown" class="cls-1" cx="61.09" cy="70.58" r="43.17"/>
+  </g>
+</svg>

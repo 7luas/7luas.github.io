@@ -108,6 +108,10 @@ var canvasd;		var ctxd;
 var canvasp;		var ctxp;												
 var minWidth=500;
 
+var screenProp; var screenPropSupported = true;
+var screenPropCutoffMobile= 0.64; var screenPropCutoffDesktop=1.52;
+var screenPropCutoffMiddle= 1.08;
+
 
 var usingFakePixelsCanvas = false;											
 var widthInFakePixels=0;	var heightInFakePixels=0;						
@@ -177,6 +181,7 @@ var colorHighlight10pct = "rgba(255,255,255,0.1)";
 var colorOrange = "orange";
 var colorOrangeStrong = "#FF6D00";
 var colorBadStrong = "#D70F0A";
+var colorAcademyDarkRed = "#750707";
 var colorBadLight = "tomato";
 var colorReviewMode = colorOrange; 
 
@@ -301,7 +306,7 @@ var timerOn = false;
 var gameTimer = 0;
 }
 
-function onLoad(){															
+function mainOnLoad(){									
 
 	if(usingLocalStorage){
 		readLocalVars();
@@ -321,9 +326,10 @@ function adjustToCanvasSizeAndRes(event){
 	
 	
 	ww = window.innerWidth; 
-	wh = window.innerHeight;
+	wh =  window.innerHeight;
 	
-	 
+	screenProp=ww/wh;
+	console.log(screenProp); 
 	
 	
 	
@@ -339,7 +345,7 @@ function adjustToCanvasSizeAndRes(event){
 
 	
 	
-	fontBaseSizePrimary = 16*canvasRes; 
+	fontBaseSizePrimary = 16*canvasRes*0.85; 
 	if(isMobile){fontBaseSizePrimary=(fontBaseSizePrimary*0.5)+(fontBaseSizePrimary*0.5*(ww/mobileWidth));} 
 	fontPrimary = fontBaseSizePrimary + "px "+fontFamilyPrimary;
 	
@@ -405,6 +411,20 @@ function initializeGeneralStuff(){
 	introText = document.getElementById("introText");
 
 	
+	
+	window.root = new component("root",0.5,0.5);
+	
+	
+	root.fadeMeIn=false;
+
+	
+	window.propWarning = new component("Please use portrait or landscape",0.5,0.5);
+	propWarning.widthRel = 1;
+	propWarning.heightRel = 1;
+	propWarning.color = colorBadLight;
+	removeComponent(propWarning.id);
+
+	
 	adjustToCanvasSizeAndRes();	
 
 	
@@ -417,14 +437,6 @@ function initializeGeneralStuff(){
 	}
 		
 	
-	
-	
-	window.root = new component("root",0.5,0.5);
-	root.widthRel = 1;
-	root.heightRel = 1;
-	
-	
-	root.fadeMeIn=false;
 	
 	
 	if(usingLocalStorage){
@@ -786,13 +798,11 @@ function initializeProjectSpecificStuff(){
 		arrayOfSeatedPassengers[0][2]=passengerPreseat;
 		arrayOfSeatedPassengers[0][4]=passengerPreseat;
 		arrayOfSeatedPassengers[1][0]=passengerPreseat;
-		arrayOfSeatedPassengers[1][2]=passengerPreseat;
-		if(Math.random()<0.5){
-			arrayOfSeatedPassengers[2][3]=passengerPreseat;
-		}
-		arrayOfSeatedPassengers[3][4]=passengerPreseat;
+		
+		
+		
 		arrayOfSeatedPassengers[5][0]=passengerPreseat; 
-		arrayOfSeatedPassengers[4][3]=passengerPreseat;
+		
 		arrayOfSeatedPassengers[4][4]=passengerPreseat;
 		arrayOfSeatedPassengers[5][3]=passengerPreseat;
 		arrayOfSeatedPassengers[5][4]=passengerPreseat;
@@ -1288,7 +1298,7 @@ function checkForLoneSeats(){
 	
 	for(var j=0;j<rowCount;j++){
 		if(arrayOfSeatedPassengers[0][j]==null){
-			console.log("In col A, row "+j+" is an empty window seat");
+			
 			if(arrayOfSeatedPassengers[1][j]!=null){		
 				console.log("to its right is a non -empty window seat - so ADD ME TO LONE SEAT ARRAY");
 				listOfLoneSeats.push([0,j]);
@@ -1299,9 +1309,9 @@ function checkForLoneSeats(){
 	
 	for(var j=0;j<rowCount;j++){
 		if(arrayOfSeatedPassengers[5][j]==null){
-			console.log("In col F, row "+j+" is an empty window seat");
+			
 			if(arrayOfSeatedPassengers[4][j]!=null){		
-				console.log("to its left is a non -empty window seat - so ADD me TO LONE SEAT ARRAY");
+				
 				listOfLoneSeats.push([5,j]);
 				foundLoneWindowSeat=true;
 			}
@@ -1312,9 +1322,9 @@ function checkForLoneSeats(){
 	
 	for(var j=0;j<rowCount;j++){
 		if(arrayOfSeatedPassengers[1][j]==null){
-			console.log("In col B, row "+j+" is an empty window seat");
+			
 			if(arrayOfSeatedPassengers[0][j]!=null && arrayOfSeatedPassengers[2][j]!=null){		
-				console.log("it is lone - so ADD ME TO LONE SEAT ARRAY");
+				
 				listOfLoneSeats.push([1,j]);
 				foundLoneMiddleSeat=true;
 			}
@@ -1323,9 +1333,9 @@ function checkForLoneSeats(){
 	
 	for(var j=0;j<rowCount;j++){
 		if(arrayOfSeatedPassengers[4][j]==null){
-			console.log("In col E, row "+j+" is an empty window seat");
+			
 			if(arrayOfSeatedPassengers[3][j]!=null && arrayOfSeatedPassengers[5][j]!=null){		
-				console.log("it is lone - so ADD ME TO LONE SEAT ARRAY");
+				
 				listOfLoneSeats.push([4,j]);
 				foundLoneMiddleSeat=true;
 			}
@@ -1503,7 +1513,34 @@ function updateLayoutElements(){
 		
 	}
 
+
 	
+	
+	root.heightRel = 1;
+	root.widthRel = 1;
+	var fixedWee=0;
+	var fixedHee=0;
+	introText.style.width="70%";
+	
+	if(screenProp>screenPropCutoffMobile && screenProp<screenPropCutoffMiddle){
+		fixedWee = (ch*screenPropCutoffMobile);
+		root.widthRel = fixedWee/cw;
+		introText.style.width=fixedWee*0.7;
+
+	}
+	
+	if(screenProp>screenPropCutoffMiddle && screenProp<screenPropCutoffDesktop){
+		fixedHee = (cw/screenPropCutoffDesktop);
+		root.heightRel = fixedHee/ch;
+		introText.style.width="50%";
+		introText.style.top="10%";
+	}
+	
+	if(screenProp>screenPropCutoffDesktop){
+		introText.style.width="30%";		
+	}
+	
+
 }
 
 function parentComponents(me,dad,warnSon){
@@ -1840,8 +1877,13 @@ function mainLoop(timestamp) {
 		
 	}
 	if(gameState=="intro"){
-		introScreen.updateAndDraw();
-		btnStart.updateAndDraw();
+		if(screenPropSupported){
+			introScreen.updateAndDraw();
+			btnStart.updateAndDraw();
+		}
+		
+		
+		
   	}
 	if(gameState!="intro"  && gameState!="init"){ 		
 		for(var i=0;i<arrayOfComponents.length;i++){ 	
@@ -2593,7 +2635,6 @@ function mainLoop(timestamp) {
 		
 		var msgBelowYpos = layoutDeckDropArea.posyPixels+layoutDeckDropArea.heightPixels*0.5 + currentDeckOfCards.length*fontBaseSizePrimary/2;
 		if(isPortrait){
-			console.log(currentDeckOfCards.length);
 			msgBelowYpos = layoutDeckDropArea.posyPixels+layoutDeckDropArea.heightPixels*0.75 + currentDeckOfCards.length*fontBaseSizePrimary/2;
 		}
 		ctx.font = 600+" "+fontUISize*0.7+ "px "+fontFamilyPrimary;		
@@ -2648,6 +2689,13 @@ function mainLoop(timestamp) {
 			}
 		}
 		ctx.restore();
+	
+		
+		ctx.fillStyle="black";
+		ctx.font = fontUI;
+		ctx.fillText("deck length:"+currentDeckOfCards.length, cw/2,20);
+
+	
 	}
 
 
@@ -2680,7 +2728,7 @@ function mainLoop(timestamp) {
 			highlightSeats(warningSeatList,colorBadStrong);
 		}
 			
-		console.log("SHOWING WARNING:"+layoutDeckDropArea.posxPixels	);
+		
 			
 		
 		ctx.font=fontUI;
@@ -2703,6 +2751,20 @@ function mainLoop(timestamp) {
 			arrayOfSeatedComponents[i].updateAndDraw();
 		}
 
+	}
+	
+	
+	
+	if(0){
+		
+		if(screenProp>screenPropCutoffMobile && screenProp<screenPropCutoffDesktop){
+			screenPropSupported=false;
+			console.log("Unsupported proportion");
+			propWarning.updateAndDraw();
+			introText.style.opacity="0";
+		}else{
+			screenPropSupported=true;
+		}
 	}
 	
 	requestAnimationFrame(mainLoop); 
@@ -3291,6 +3353,12 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 				
 				
 				if(this.passenger && layoutSeatmap.pointerIsDraggingOnMe){
+					
+					console.log("A currentDeckOfCards:");
+					for(var i=0; i<currentDeckOfCards.length;i++){
+						console.log(i+":"+currentDeckOfCards[i].passenger.name);
+					}
+					
 					this.isSeated=false;
 					this.mySeatPos=[-1.-1];
 					
@@ -3308,6 +3376,14 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 						}
 					}
 
+					
+					console.log("B currentDeckOfCards:");
+					for(var i=0; i<currentDeckOfCards.length;i++){
+						console.log(i+":"+currentDeckOfCards[i].passenger.name);
+					}
+					
+
+
 					moveToTop(this.id);
 					for(i=1;i<currentDeckOfPassengerInfo.length;i++){
 						currentDeckOfPassengerInfo[i].myPosInDeck+=1;
@@ -3317,7 +3393,14 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 					console.log("REMOVED "+this.passenger.name+" FROM SEAT AT "+seatMapGridPosOnPointerUpOrDown);
 
 					
+					console.log("C currentDeckOfCards:");
+					for(var i=0; i<currentDeckOfCards.length;i++){
+						console.log(i+":"+currentDeckOfCards[i].passenger.name);
+					}
+					
 
+
+					
 					console.log("currentSeatedDeck:");
 					for(var i=0; i<currentSeatedDeck.length;i++){
 						console.log(i+":"+currentSeatedDeck[i].passenger.name);
@@ -3438,7 +3521,12 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 					}
 
 					if(this.actionOnClick=="showHelp"){
-						introText.style.opacity="1";
+						if(screenPropSupported){
+							introText.style.opacity="1";
+						}else{
+							introText.style.opacity="0";
+							
+						}
  						console.log("showHelp");
 						isShowingHelp=true;
 						
@@ -3468,9 +3556,9 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 						if(this.passenger && lastObjectWithPassengerClickedOrDragged==this){
 							
 							if(layoutSeats.pointerIsHoveringMe){ 
-								console.log("None of these can ever be zero")
-								console.log("seatMapGridPosOnPointerUpOrDown[0]:"+seatMapGridPosOnPointerUpOrDown[0])
-								console.log("seatMapGridPosOnPointerUpOrDown[1]:"+seatMapGridPosOnPointerUpOrDown[1])
+								
+								
+								
 								var tgx = seatMapGridPosOnPointerUpOrDown[0];
 								var tgy = seatMapGridPosOnPointerUpOrDown[1];
 								if(typeof tgx==='undefined' || tgx==0){
@@ -3525,6 +3613,7 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 										this.targetx=layoutSeats.posxPixels-layoutSeats.widthPixels/2 + (seatMapGridPosOnPointerUpOrDown[0]+0.5)*seatWidth;
 										this.targety=layoutSeats.posyPixels-layoutSeats.heightPixels/2 + (seatMapGridPosOnPointerUpOrDown[1]-1+0.5)*seatWidth;
 										console.log("Making sure "+this.passenger.name+" stays where they were seated. PS: this.goHome ="+ this.goHome);
+										console.log("---------------------------------------------------");
 										this.goHome=false;
 										this.pointerIsDraggingOnMe=false;
 									}
@@ -3585,7 +3674,7 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 				}
 			}
 			if(this==layoutSeats){
-				console.log("got from: "+seatMapGridActivePos);
+				console.log("pointer Up at: "+seatMapGridActivePos);
 				seatMapGridPosOnPointerUpOrDown=seatMapGridActivePos;
 			}
 			

@@ -20,7 +20,6 @@
 				height: 100%;  
 				margin:0; 
 				position: relative;
-			
 			}
 			
 			#mainCanvas, #fakePixelsCanvas, #debugCanvas, #pointerCanvas {
@@ -29,6 +28,11 @@
 				margin:0; 
 				touch-action: none; 
 				position: absolute;
+			}
+			
+			#mainCanvas {
+				background-color: #750707;
+				box-shadow: 10px 10px 5px black;
 			}
 			
 			#fakePixelsCanvas {
@@ -47,20 +51,10 @@
 				margin-top:2em;
 				position: fixed;
 				display:inline;	
-				width:80%;
+				width:70%;
 				text-align:left;
 			}
  
- 			@media (min-width: 500px) {
-				#introText {
-					width: 350px;
-				}
-			}
- 			@media (max-width: 500px) {
-				#introText {
-					min-width: 350px;
-				}
-			}
 			
 			ul {
 			list-style: none;
@@ -91,7 +85,7 @@
 				background-repeat: no-repeat;
 			}
 			#iconPreseat {
-				background-image: url(assets/preseat.svg);
+				background-image: url(assets/preSeat.svg);
 				background-size: contain;
 				background-repeat: no-repeat;
 				stroke-width:0px;
@@ -100,7 +94,7 @@
 			
 		</style>
 	</head>
-	<body onload="onLoad();" onkeydown="onKeyDown(event)" onkeyup="onKeyUp(event);">
+	<body onload="mainOnLoad();" onkeydown="onKeyDown(event)" onkeyup="onKeyUp(event);">
 
 		<div id="introText">		
 			<p><b>Your task is to assign seats to passengers and groups as they arrive at the check-in desk.</b></p>

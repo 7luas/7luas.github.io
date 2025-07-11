@@ -106,9 +106,10 @@ var canvas; 		var ctx;
 var canvasf; 		var ctxf;												
 var canvasd;		var ctxd;												
 var canvasp;		var ctxp;												
-var minWidth=500;
+var minWidth = 450;
+var minHeight = 710;
 
-var screenProp; var screenPropSupported = true;
+var screenProp; var screenSizeAndPropSupported = true;
 var screenPropCutoffMobile= 0.64; var screenPropCutoffDesktop=1.52;
 var screenPropCutoffMiddle= 1.08;
 
@@ -329,7 +330,7 @@ function adjustToCanvasSizeAndRes(event){
 	wh =  window.innerHeight;
 	
 	screenProp=ww/wh;
-	console.log(screenProp); 
+	
 	
 	
 	
@@ -425,6 +426,13 @@ function initializeGeneralStuff(){
 	removeComponent(propWarning.id);
 
 	
+	window.sizeWarning = new component("Please increase screen size",0.5,0.5);
+	sizeWarning.widthRel = 1;
+	sizeWarning.heightRel = 1;
+	sizeWarning.color = colorBadLight;
+	removeComponent(sizeWarning.id);
+
+	
 	adjustToCanvasSizeAndRes();	
 
 	
@@ -510,8 +518,7 @@ function initializeProjectSpecificStuff(){
 		passport: 0.8,
 		name: "Jorge L. Borges",
 		age: 25,
-		code: "PWD",
-		pref: [prefAisle]
+		code: "WCHC"
 	}
 	arrayOfPassengers.push(tempPassenger);
 	
@@ -794,17 +801,17 @@ function initializeProjectSpecificStuff(){
 		}
 	}
 	if(1){	
-		arrayOfSeatedPassengers[0][0]=passengerPreseat;
+		
 		arrayOfSeatedPassengers[0][2]=passengerPreseat;
 		arrayOfSeatedPassengers[0][4]=passengerPreseat;
-		arrayOfSeatedPassengers[1][0]=passengerPreseat;
 		
 		
 		
-		arrayOfSeatedPassengers[5][0]=passengerPreseat; 
+		
 		
 		arrayOfSeatedPassengers[4][4]=passengerPreseat;
-		arrayOfSeatedPassengers[5][3]=passengerPreseat;
+		
+		
 		arrayOfSeatedPassengers[5][4]=passengerPreseat;
 	}
 	if(0){ 
@@ -813,7 +820,7 @@ function initializeProjectSpecificStuff(){
 			for(var j=0;j<rowCount;j++){
 				if(copyOfarrayOfPassengers.length>0){
 					arrayOfSeatedPassengers[i][j]=copyOfarrayOfPassengers.splice(0,1)[0];
-					console.log(arrayOfSeatedPassengers[i][j].name);
+					
 				}
 			}
 		}	
@@ -1032,7 +1039,7 @@ function seats(){
 				tempPerson.actionOnDrag="drag";
 				parentComponents(tempPerson,layoutSeats);	
 
-				console.log("> "+tempPerson.passenger.name);
+				
 				
 				if(0){
 					tempSeat = new component(arrayOfSeatedPassengers[i][j].name,(1/(columnCountWithAisle))*fakeColumnCounter,(1/(rowCount))*j);
@@ -1242,15 +1249,15 @@ function moveToTop(id){
 	}
 }
 function notSeated(card){
-	console.log("function notSeated concluded:");
+	
 	for(var i=0; i<currentSeatedDeck.length;i++){
 		if(currentSeatedDeck[i].id==card.id){
-			console.log("FALSE");
+			
 			return false;
 		}
 	}
 	
-	console.log("TRUE");	
+	
 	return true;
 }
 function highlightSeats(listOfSeats,hiColor){ 
@@ -1300,7 +1307,7 @@ function checkForLoneSeats(){
 		if(arrayOfSeatedPassengers[0][j]==null){
 			
 			if(arrayOfSeatedPassengers[1][j]!=null){		
-				console.log("to its right is a non -empty window seat - so ADD ME TO LONE SEAT ARRAY");
+				
 				listOfLoneSeats.push([0,j]);
 				foundLoneWindowSeat=true;
 			}
@@ -1532,14 +1539,16 @@ function updateLayoutElements(){
 	if(screenProp>screenPropCutoffMiddle && screenProp<screenPropCutoffDesktop){
 		fixedHee = (cw/screenPropCutoffDesktop);
 		root.heightRel = fixedHee/ch;
-		introText.style.width="50%";
+		introText.style.width="75%";
 		introText.style.top="10%";
+			
 	}
 	
 	if(screenProp>screenPropCutoffDesktop){
 		introText.style.width="30%";		
 	}
 	
+	 
 
 }
 
@@ -1877,7 +1886,7 @@ function mainLoop(timestamp) {
 		
 	}
 	if(gameState=="intro"){
-		if(screenPropSupported){
+		if(screenSizeAndPropSupported){
 			introScreen.updateAndDraw();
 			btnStart.updateAndDraw();
 		}
@@ -2024,7 +2033,7 @@ function mainLoop(timestamp) {
 		
 		var me; 
 		var childAwayFromParents=true; var isNextToSoloTraveller=false;
-		var UMNRemergencyRow=false; UMNRnextToSolo=false; UMNRnotInAisle=false;
+		var UMNRtopRow=true; UMNRnextToSolo=false; UMNRnotInAisle=false;
 		var isEmergencyRow=false; var isElderlyFrail; var isAisle=false; var isWindow=false;  var hasCode=false; var hasPref=false; var siblingOnMy="none"; 
 		
 		for(var i=0;i<columnCount;i++){
@@ -2041,7 +2050,7 @@ function mainLoop(timestamp) {
 				if(arrayOfSeatedPassengers[i][j]!=null && arrayOfSeatedPassengers[i][j]!=passengerPreseat){
 					me = arrayOfSeatedPassengers[i][j];
 					me.feedback="none";
-					console.log(i+","+j+" Checking "+me.name);
+					
 					
 					isEmergencyRow=false;
 					isAisle=false;
@@ -2054,19 +2063,19 @@ function mainLoop(timestamp) {
 					
 					if(i==aisleToRightOfColumn[0] || i==aisleToRightOfColumn[0]-1){
 						isAisle=true;
-						console.log("Is in aisle seat. ");
+						
 					}
 					if(i==0 || i==columnCount-1){
 						isWindow=true;
-						console.log("Is in window seat. ");
+						
 					}
 					if(j==emergencyRows[0]-1){
 						isEmergencyRow=true;
-						console.log("Is in emergency row. ");
+						
 					}
 					if(typeof me.code !== 'undefined'){
 						hasCode=true;
-						console.log("Has code:"+ me.code);
+						
 						globalEssentialRequirements[0]+=1;
 					}	
 					if(typeof me.pref !== 'undefined'){
@@ -2076,7 +2085,7 @@ function mainLoop(timestamp) {
 						var prefTemp = me.pref;
 						if(prefTemp.includes(prefAisle)||prefTemp.includes(prefWindow)||prefTemp.includes(prefTogether)){ 
 							globalPreferences[0]+=1;
-							console.log("Has pref:"+ me.pref.length);
+							
 						}
 						if(me.pref.includes(elderlyFrail)){
 							isElderlyFrail=true;
@@ -2090,7 +2099,7 @@ function mainLoop(timestamp) {
 							me.feedback="essential";
 							globalEssentialRequirements[1]+=1; 
 							me.myReviewFeedbackText="Frail person in emergency row";
-							console.log("Elder frail in emergency row!"); 
+							
 						}
 					}
 					
@@ -2098,21 +2107,21 @@ function mainLoop(timestamp) {
 						
 						if(me.pref.includes(prefAisle)){
 							if(isAisle){
-								console.log("Satified:"+me.pref); 
+								
 							}else{
 								if(me.feedback!="essential"){me.feedback="preference";}
 								globalPreferences[1]+=1; 
-								console.log("Not satified:"+me.pref); 
+								
 							}
 						}
 						
 						if(me.pref.includes(prefWindow)){
 							if(isWindow){
-								console.log("Satified:"+me.pref); 
+								
 							}else{
 								if(me.feedback!="essential"){me.feedback="preference";}
 								globalPreferences[1]+=1; 
-								console.log("Not satified:"+me.pref); 
+								
 							}
 						}
 						
@@ -2136,7 +2145,7 @@ function mainLoop(timestamp) {
 						if(isEmergencyRow){
 							me.feedback="essential";
 							globalEssentialRequirements[1]+=1; 
-							console.log(me.code+" in emergency row!"); 
+							
 							me.myReviewFeedbackText="\x22"+me.code+"\x22 in emergency row"
 						}
 						
@@ -2152,11 +2161,11 @@ function mainLoop(timestamp) {
 										if(arrayOfSeatedPassengers[i-1][j].group==me.group){
 											if(arrayOfSeatedPassengers[i-1][j].age>ageAdultMin){
 												
-												console.log(me.code+" has a parent on the left"); 
+												
 												childAwayFromParents=false;
 											}else{
 												
-												console.log(me.code+" has a sibling on the left"); 
+												
 												pointerCHD = i;
 												while(pointerCHD>0){
 													pointerCHD-=1;
@@ -2164,7 +2173,7 @@ function mainLoop(timestamp) {
 														if(typeof arrayOfSeatedPassengers[pointerCHD][j].group !== 'undefined'){
 															if(arrayOfSeatedPassengers[pointerCHD][j].group==me.group){
 																if(arrayOfSeatedPassengers[pointerCHD][j].age>ageAdultMin){
-																	console.log(me.code+" eventually has a parent on the left"); 
+																	
 																	childAwayFromParents=false;
 																	break;
 																}
@@ -2185,11 +2194,11 @@ function mainLoop(timestamp) {
 										if(arrayOfSeatedPassengers[i+1][j].group==me.group){
 											if(arrayOfSeatedPassengers[i+1][j].age>ageAdultMin){
 												
-												console.log(me.code+" has a parent on the right"); 
+												
 												childAwayFromParents=false;
 											}else{
 												
-												console.log(me.code+" has a sibling on the right"); 
+												
 												pointerCHD = i;
 												while(pointerCHD<columnCount-1){
 													pointerCHD+=1;
@@ -2197,7 +2206,7 @@ function mainLoop(timestamp) {
 														if(typeof arrayOfSeatedPassengers[pointerCHD][j].group !== 'undefined'){
 															if(arrayOfSeatedPassengers[pointerCHD][j].group==me.group){
 																if(arrayOfSeatedPassengers[pointerCHD][j].age>ageAdultMin){
-																	console.log(me.code+" eventually has a parent on the right"); 
+																	
 																	childAwayFromParents=false;
 																	break;
 																}
@@ -2221,25 +2230,35 @@ function mainLoop(timestamp) {
 									me.myReviewFeedbackText+=" and alone";
 								}
 								globalEssentialRequirements[1]+=1; 
-								console.log(me.code+" away from family!"); 
+								
 								
 							}
 						}
-						if(me.code == "PWD"){
+						if(me.code == "WCHC"){
 							
 							globalEssentialRequirements[0]+=1;
 							if(Math.abs(j-2)<2){
 								globalEssentialRequirements[1]+=1; 
 								me.feedback="essential";
 								me.myReviewFeedbackText="\x22"+me.code+"\x22 near emergency row";
-							}
+							}							
 						}
+						if(me.code == "WCHC"|| me.code == "INF"){						
+							
+							globalEssentialRequirements[0]+=1;
+							if(!isWindow){
+								globalEssentialRequirements[1]+=1; 
+								me.feedback="essential";
+								me.myReviewFeedbackText="\x22"+me.code+"\x22 not in window seat";
+							}
+						}						
 						if(me.code == "UMNR"){
 							
 							
 							
 							
-							globalEssentialRequirements[0]+=1;
+
+							
 							
 							globalEssentialRequirements[0]+=1;
 							isNextToSoloTraveller=false;
@@ -2249,18 +2268,18 @@ function mainLoop(timestamp) {
 									if(typeof arrayOfSeatedPassengers[i-1][j].group==='undefined'){ 
 										if(typeof arrayOfSeatedPassengers[i-1][j].code !== 'undefined'){ 
 											if(arrayOfSeatedPassengers[i-1][j].code!="UMNR"){
-												console.log(me.name+" UMNR has solo traveller on left");
+												
 												isNextToSoloTraveller=true;												
 											}
 										}else{
-												console.log(me.name+" UMNR has solo traveller on left");
+												
 												isNextToSoloTraveller=true;																							
 										}
 									}else{
 										
 										if(typeof arrayOfSeatedPassengers[i-1][j].myGroupIsTogether!=='undefined'){
 											if(!arrayOfSeatedPassengers[i-1][j].myGroupIsTogether && !arrayOfSeatedPassengers[i-1][j].isNextToAtLeastOnePersonFromGroup){
-												console.log(me.name+" UMNR has solo traveller on left (debanded from group):"+arrayOfSeatedPassengers[i-1][j].name);
+												
 												isNextToSoloTraveller=true;		
 											}
 										}
@@ -2274,18 +2293,18 @@ function mainLoop(timestamp) {
 										if(typeof arrayOfSeatedPassengers[i+1][j].group==='undefined'){ 
 											if(typeof arrayOfSeatedPassengers[i+1][j].code !== 'undefined'){
 												if(arrayOfSeatedPassengers[i+1][j].code!="UMNR"){
-													console.log(me.name+" UMNR has solo traveller on right");
+													
 													isNextToSoloTraveller=true;
 												}
 											}else{
-													console.log(me.name+" UMNR has solo traveller on right");
+													
 													isNextToSoloTraveller=true;												
 											}
 										}else{
 											
 											if(typeof arrayOfSeatedPassengers[i+1][j].myGroupIsTogether!=='undefined'){
 												if(!arrayOfSeatedPassengers[i+1][j].myGroupIsTogether && !arrayOfSeatedPassengers[i+1][j].isNextToAtLeastOnePersonFromGroup){
-													console.log(me.name+" UMNR has solo traveller on right (debanded from group):"+arrayOfSeatedPassengers[i+1][j].name);
+													
 													isNextToSoloTraveller=true;		
 												}
 											}
@@ -2296,36 +2315,21 @@ function mainLoop(timestamp) {
 							}
 							if(isNextToSoloTraveller){
 								globalEssentialRequirements[1]+=1;
-								console.log(me.name+" UMNR is next to solo traveller indeed.");
+								
 								me.myReviewFeedbackText="\x22"+me.code+"\x22 near solo traveller";
 								me.feedback="essential";
 							}
+
 							
 							
-							if(!isAisle){
+							globalEssentialRequirements[0]+=1;
+							if(!isAisle || j>0){
 								globalEssentialRequirements[1]+=1;
-								console.log(me.name+" UMNR not in aisle");
-								me.myReviewFeedbackText="\x22"+me.code+"\x22 not in aisle seat";
+								
+								me.myReviewFeedbackText="\x22"+me.code+"\x22 must be in aisle, first row";
 								me.feedback="essential";
 							}
-							
-							
-							if(isEmergencyRow && (isNextToSoloTraveller||!isAisle)){
-								me.myReviewFeedbackText="Emergency row";
-								if(isNextToSoloTraveller){
-									if(isAisle){
-										me.myReviewFeedbackText+=", near solo traveller";
-									}else{										
-										me.myReviewFeedbackText+=", solo traveller, not aisle";
-									}
-								}else{			
-									 me.myReviewFeedbackText+=", not aisle seat";
-								}
-							}else{
-								if(isNextToSoloTraveller && !isAisle){
-									me.myReviewFeedbackText="Next to solo traveller, not aisle";
-								}								
-							}
+		
 
 						}
 					}
@@ -2335,8 +2339,8 @@ function mainLoop(timestamp) {
 		}	
 		
 		
-		console.log("Unmet "+ globalEssentialRequirements[1] +" out of "+globalEssentialRequirements[0]+" essential requirements");
-		console.log("Unmet "+ globalPreferences[1] +" out of "+globalPreferences[0]+" preferences");
+		
+		
 		
 		
 		window.feedbackTitle="Completed"; 
@@ -2753,17 +2757,29 @@ function mainLoop(timestamp) {
 
 	}
 	
+
+	
+	if(1){
+ 		if(ww<minWidth || wh<minHeight){
+			screenSizeAndPropSupported=false;
+			
+			sizeWarning.updateAndDraw();
+			introText.style.opacity="0";
+		}else{
+			screenSizeAndPropSupported=true;
+		}
+	}
 	
 	
 	if(0){
 		
 		if(screenProp>screenPropCutoffMobile && screenProp<screenPropCutoffDesktop){
-			screenPropSupported=false;
-			console.log("Unsupported proportion");
+			screenSizeAndPropSupported=false;
+			
 			propWarning.updateAndDraw();
 			introText.style.opacity="0";
 		}else{
-			screenPropSupported=true;
+			screenSizeAndPropSupported=true;
 		}
 	}
 	
@@ -3065,7 +3081,7 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 		if(this.passenger && !this.avatar ){
 			
 			this.avatar = new avatarGraphic(0,this.posxPixels,this.posyPixels); 
-			console.log("New avatar for "+ this.passenger.name);
+			
  				
 			this.avatar.targetx=this.posxPixels;
 			this.avatar.targety=this.posyPixels;
@@ -3304,7 +3320,7 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 		if(pointerClickedInPlaceGlobalOneOffWarning && this.pointerIsHoveringMe){
 			if(!isShowingResetConfirmation){
 				if(this.componentType=="passenger"){
-					console.log("$$ CLICKED "+this.passenger.name);
+					
 					for(var i=0;i<arrayOfComponents.length;i++){
 						arrayOfComponents[i].reviewMode=false;
 					}
@@ -3354,9 +3370,9 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 				
 				if(this.passenger && layoutSeatmap.pointerIsDraggingOnMe){
 					
-					console.log("A currentDeckOfCards:");
+					
 					for(var i=0; i<currentDeckOfCards.length;i++){
-						console.log(i+":"+currentDeckOfCards[i].passenger.name);
+						
 					}
 					
 					this.isSeated=false;
@@ -3365,9 +3381,9 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 					currentDeckOfPassengerInfo.unshift(this.passenger);
 					currentDeckOfCards.unshift(this);
 					
-					console.log("currentSeatedDeck:");
+					
 					for(var i=0; i<currentSeatedDeck.length;i++){
-						console.log(i+":"+currentSeatedDeck[i].passenger.name);
+						
 					}
 					
 					for(var i=0; i<currentSeatedDeck.length;i++){
@@ -3377,9 +3393,9 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 					}
 
 					
-					console.log("B currentDeckOfCards:");
+					
 					for(var i=0; i<currentDeckOfCards.length;i++){
-						console.log(i+":"+currentDeckOfCards[i].passenger.name);
+						
 					}
 					
 
@@ -3390,20 +3406,20 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 						currentDeckOfCards[i].myPosInDeck+=1;
 					}					
 					
-					console.log("REMOVED "+this.passenger.name+" FROM SEAT AT "+seatMapGridPosOnPointerUpOrDown);
+					
 
 					
-					console.log("C currentDeckOfCards:");
+					
 					for(var i=0; i<currentDeckOfCards.length;i++){
-						console.log(i+":"+currentDeckOfCards[i].passenger.name);
+						
 					}
 					
 
 
 					
-					console.log("currentSeatedDeck:");
+					
 					for(var i=0; i<currentSeatedDeck.length;i++){
-						console.log(i+":"+currentSeatedDeck[i].passenger.name);
+						
 					}
 
 					arrayOfSeatedPassengers[(seatMapGridPosOnPointerUpOrDown[0]-1)][(seatMapGridPosOnPointerUpOrDown[1]-1)]=null;					
@@ -3495,7 +3511,7 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 								currentSeatedDeck=[];								
 								if(this.actionOnClick=="createNewCardDeck"){								
 									
-									console.log("NEXT DECK!");
+									
 									gameState="createNewCardDeck";
 								}
 								if(this.actionOnClick=="submit"){
@@ -3521,24 +3537,24 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 					}
 
 					if(this.actionOnClick=="showHelp"){
-						if(screenPropSupported){
+						if(screenSizeAndPropSupported){
 							introText.style.opacity="1";
 						}else{
 							introText.style.opacity="0";
 							
 						}
- 						console.log("showHelp");
+ 						
 						isShowingHelp=true;
 						
 					}
 					if(this.actionOnClick=="resumeGame"){
 						introText.style.opacity="0";
- 						console.log("resumeGame");
+ 						
 						isShowingHelp=false;						
 					}
 
 					if(this.actionOnClick=="resetNo"){
- 						console.log("resetNo");
+ 						
 						isShowingResetConfirmation=false;
 					}
 
@@ -3563,7 +3579,7 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 								var tgy = seatMapGridPosOnPointerUpOrDown[1];
 								if(typeof tgx==='undefined' || tgx==0){
 									seatMapGridPosOnPointerUpOrDown[0]=3;
-									console.log("Fake pos to avoid glitch");
+									
 								}
 								if(typeof tgy==='undefined' || tgy==0){seatMapGridPosOnPointerUpOrDown[1]=5;}
 								if(typeof tgx!=='undefined' && tgx!=0 && typeof tgy!=='undefined' && tgy!=0){
@@ -3576,9 +3592,9 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 										this.isSeated=true;
 										this.componentType="passenger";
 
-										console.log("Accepted: "+this.passenger.name);
-										console.log("seatMapGridActivePos:"+seatMapGridActivePos);
-										console.log("seatMapGridPosOnPointerUpOrDown:"+seatMapGridPosOnPointerUpOrDown);
+										
+										
+										
 	 
 										
 										arrayOfSeatedPassengers[(seatMapGridPosOnPointerUpOrDown[0]-1)][(seatMapGridPosOnPointerUpOrDown[1]-1)]=lastObjectWithPassengerClickedOrDragged.passenger;
@@ -3612,14 +3628,14 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 										if(seatMapGridPosOnPointerUpOrDown[0]<4){seatMapGridPosOnPointerUpOrDown[0]=seatMapGridPosOnPointerUpOrDown[0]-1;}
 										this.targetx=layoutSeats.posxPixels-layoutSeats.widthPixels/2 + (seatMapGridPosOnPointerUpOrDown[0]+0.5)*seatWidth;
 										this.targety=layoutSeats.posyPixels-layoutSeats.heightPixels/2 + (seatMapGridPosOnPointerUpOrDown[1]-1+0.5)*seatWidth;
-										console.log("Making sure "+this.passenger.name+" stays where they were seated. PS: this.goHome ="+ this.goHome);
-										console.log("---------------------------------------------------");
+										
+										
 										this.goHome=false;
 										this.pointerIsDraggingOnMe=false;
 									}
 									if(checkPlacingVar=="occupied"){ 
 										
-										console.log("reject:"+this.passenger.name +" timeCounter:"+timeCounter);
+										
 										this.goHome=true;
 										
 										showWarning="Seat already occupied";
@@ -3630,13 +3646,13 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 										
 										
 										
-										console.log("Confirm they didnt remain in array of seated");
+										
 										for(var i=0;i<columnCount;i++){
 											for(var j=0;j<rowCount;j++){
 												if(arrayOfSeatedPassengers[i][j]!=null && arrayOfSeatedPassengers[i][j]!=passengerPreseat){
 													if(arrayOfSeatedPassengers[i][j].name==this.passenger.name){													
 														arrayOfSeatedPassengers[i][j]=null;
-														console.log("Found. Removed");
+														
 													}
 												}
 											}
@@ -3644,13 +3660,13 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 									}
 								}else{
 									this.goHome=true;
-									console.log("go home due to glitch:"+this.passenger.name);
+									
 									lastObjectWithPassengerClickedOrDragged=undefined;									
 								}
 								
 							}else{
 									this.goHome=true;
-									console.log("go home");							
+									
 							}
 						}
 					}
@@ -3674,7 +3690,7 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 				}
 			}
 			if(this==layoutSeats){
-				console.log("pointer Up at: "+seatMapGridActivePos);
+				
 				seatMapGridPosOnPointerUpOrDown=seatMapGridActivePos;
 			}
 			
@@ -4264,50 +4280,50 @@ function groupIsTogether(i,j){
 	
 	var pointer = i;
 	
-	console.log("Checking if group is Together for "+tempPerson.name);
 	
 	
-	console.log("Check to left");
+	
+	
 	while(pointer>0){
 		pointer-=1;
 		if(arrayOfSeatedPassengers[pointer][j]!=null){
 			if(typeof arrayOfSeatedPassengers[pointer][j].group !== 'undefined'){
 				if(arrayOfSeatedPassengers[pointer][j].group==tempPerson.group){
 					groupCounter+=1;
-					console.log("Person to left is of my group:"+arrayOfSeatedPassengers[pointer][j].name);
+					
 				}else{					
-					console.log("BREAK: Person to left is not of my group:"+arrayOfSeatedPassengers[pointer][j].name);
+					
 					break;
 				}
 			}else{
-				console.log("BREAK: Person to left is not my group, as has no group:"+arrayOfSeatedPassengers[pointer][j].name);
+				
 				break; 
 			}
 		}else{
-			console.log("BREAK: Nobody further left.");
+			
 			break;
 		}
 	}
 	pointer = i;
 	
-	console.log("Check to right");
+	
 	while(pointer<columnCount-1){
 		pointer+=1;
 		if(arrayOfSeatedPassengers[pointer][j]!=null){
 			if(typeof arrayOfSeatedPassengers[pointer][j].group !== 'undefined'){
 				if(arrayOfSeatedPassengers[pointer][j].group==tempPerson.group){
-					console.log("Person to right is of my group:"+arrayOfSeatedPassengers[pointer][j].name);
+					
 					groupCounter+=1;
 				}else{
-					console.log("BREAK: Person to right is not of my group:"+arrayOfSeatedPassengers[pointer][j].name);
+					
 					break;
 				}
 			}else{
-				console.log("BREAK: Person to right is not my group, as has no group:"+arrayOfSeatedPassengers[pointer][j].name);
+				
 				break; 
 			}
 		}else{
-			console.log("BREAK: Nobody further right.");
+			
 			break;
 		}
 	}
@@ -4320,7 +4336,7 @@ function groupIsTogether(i,j){
 		}
 	}
 	
-	console.log(groupCounter+": groupCounter x actualGroupCount :"+actualGroupCount);
+	
 	
 	
 	if(groupCounter>1){
@@ -4339,7 +4355,7 @@ function groupIsTogether(i,j){
 				if(typeof arrayOfSeatedPassengers[i][j].group !== 'undefined'){
 					if(arrayOfSeatedPassengers[i][j].group==tempPerson.group){
 						arrayOfSeatedPassengers[i][j].myGroupIsTogether=result;
-						console.log(arrayOfSeatedPassengers[i][j].name+" got var myGroupIsTogether as:"+result);
+						
 					}
 				}
 			}

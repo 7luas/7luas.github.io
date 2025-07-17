@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_2" data-name="Layer 2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 118.39 119.47">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: none;
+        stroke: #000;
+        stroke-miterlimit: 10;
+        stroke-width: 4.96px;
+      }
+
+      .cls-2 {
+        opacity: .19;
+      }
+    </style>
+  </defs>
+  <g id="Plane">
+    <g id="Seats">
+      <g id="row" class="cls-2">
+        <g>
+          <path class="cls-1" d="M115.91,0v12.96c0,10.27-11.9,18.59-26.58,18.59H29.06C14.38,31.55,2.48,23.23,2.48,12.96V0"/>
+          <path class="cls-1" d="M25.19,31.55v78.69c0,3.73-3.02,6.75-6.75,6.75H2.7V12.14"/>
+          <path class="cls-1" d="M93.41,31.55v78.69c0,3.73,3.02,6.75,6.75,6.75h15.74s0-104.85,0-104.85"/>
+        </g>
+      </g>
+    </g>
+  </g>
+</svg>

@@ -87,6 +87,7 @@ var limitNumberOfPassengers=0; // 0 = full list
 ///Flow
 var timeCounter = 0;	// TBD: clarify what exactly it's counting (probably not actual time)
 
+var randomizePassengers = true;
 
 // Useful
 var newline = "\r\n";
@@ -198,6 +199,7 @@ var colorReviewMode = colorOrange; // will change; used for review card and text
 var fontFamilyPrimary = "Arial";
 var fontBaseSizePrimary;
 var fontPrimary;
+var fontHint;
 // Project specific
 var fontUISize;
 var fontUI;
@@ -377,6 +379,7 @@ function adjustToCanvasSizeAndRes(event){ 									// Function to adjust canvas 
 		fontBaseSizePrimary = 16*canvasRes*0.75; // messy: should be coded properly above
 	}
 	fontPrimary = fontBaseSizePrimary + "px "+fontFamilyPrimary;
+	fontHint = fontBaseSizePrimary*1.2 + "px "+fontFamilyPrimary;
 	// Projectspecific fonts
 	fontUISize=fontBaseSizePrimary*1.4;
 	fontUI = 600+" "+fontUISize+ "px "+fontFamilyPrimary;
@@ -1225,19 +1228,24 @@ function avatarGraphic(passport,x,y,sizePixels){	// size: h=w
 }
 function pickPersonAndBuildDeck(){ // TBD: create array if group
 	var returnArray = [];
+	var tempPerson;
 
 	// Remove a random person from array
-	var randomPerson = arrayOfPassengers.splice(Math.floor(Math.random()*arrayOfPassengers.length),1)[0];
-
+	if(randomizePassengers){
+		tempPerson = arrayOfPassengers.splice(Math.floor(Math.random()*arrayOfPassengers.length),1)[0];
+	}else{
+		tempPerson = arrayOfPassengers.splice(0,1)[0];		
+	}
+	
 	var tempGroup="none";
 	
-	if(typeof randomPerson.group==='undefined'){
+	if(typeof tempPerson.group==='undefined'){
 		// If person is solo traveller, just return that
-		returnArray[0]= randomPerson;		
+		returnArray[0]= tempPerson;		
 	}else{
-		tempGroup=randomPerson.group;
+		tempGroup=tempPerson.group;
 		// if part of group, build array (first element in array is the leader)
-		returnArray[0]= randomPerson;
+		returnArray[0]= tempPerson;
 		for(var i=0; i<arrayOfPassengers.length; i+=1){
 			if(typeof arrayOfPassengers[i].group!=='undefined'){
 				if(arrayOfPassengers[i].group==tempGroup){
@@ -2714,7 +2722,7 @@ function mainLoop(timestamp) { 												// The main loop (calls itself at end
 		if(isPortrait){
 			msgBelowYpos = layoutDeckDropArea.posyPixels+layoutDeckDropArea.heightPixels*0.75 + currentDeckOfCards.length*fontBaseSizePrimary/2;
 		}
-		ctx.font = 600+" "+fontUISize*0.7+ "px "+fontFamilyPrimary;		
+		ctx.font = 600+" "+fontUISize*0.85+ "px "+fontFamilyPrimary;		
 		if(!reviewModeGlobal){
 			ctx.fillText("DRAG PASSENGER TO A SEAT", layoutDeckDropArea.posxPixels, msgBelowYpos);		
 			if(currentDeckOfPassengerInfo.length>1){
@@ -3357,6 +3365,68 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 			this.alpha += this.deltaAlpha/this.easeSpeed;
 		}
 
+		// On hover (very ineficient?)
+		if(pointIsWithinArea([mouseX,mouseY],this.shape,this.posxPixels,this.posyPixels,this.widthPixels,this.heightPixels)){
+			//addToDebugText("hover");
+			
+			this.pointerIsHoveringMe=true;
+
+			if(this.componentType=="button" || this.isButton){this.highlight=true;}
+			
+			// Calculate mouseLock x,y positions
+			if(this.label=="layoutSeats"){
+				mouseLockedToGrid=true;
+
+				// X
+				this.pixelsPerColumn = this.widthPixels/columnCountWithAisle;
+				this.mouseXPosRelToThis = (mouseX+this.pixelsPerColumn/2-(this.posxPixels-this.widthPixels/2));
+				this.mouseXPosInColumns = this.mouseXPosRelToThis/this.pixelsPerColumn;
+				if(Math.round(this.mouseXPosInColumns)!=4){ // Dont allow aisle
+					this.mouseXPosInColumnsRound = Math.round(this.mouseXPosInColumns);
+				} else{
+					this.mouseXPosInColumnsRound = 3;
+				}
+				mouseXlock=(this.posxPixels-this.widthPixels/2)+this.mouseXPosInColumnsRound*this.pixelsPerColumn-this.pixelsPerColumn/2;
+
+				// Y
+				this.pixelsPerRow = this.heightPixels/rowCount;
+				this.mouseYPosRelToThis = (mouseY+this.pixelsPerRow/2-(this.posyPixels-this.heightPixels/2));
+				this.mouseYPosInColumns = this.mouseYPosRelToThis/this.pixelsPerRow;
+				this.mouseYPosInRowsRound = Math.round(this.mouseYPosInColumns);
+				mouseYlock=(this.posyPixels-this.heightPixels/2)+this.mouseYPosInRowsRound*this.pixelsPerColumn-this.pixelsPerColumn/2;
+				
+				
+				
+				// Update the grid pos var
+				if(this.mouseXPosInColumnsRound>3){this.mouseXPosInColumnsRound-=1;}
+				//console.log("this.mouseXPosInColumns:"+this.mouseXPosInColumns);
+				//console.log("this.mouseXPosInColumnsRound:"+this.mouseXPosInColumnsRound);
+				if(typeof this.mouseXPosInColumnsRound !== 'undefined'){
+					seatMapGridActivePos=[this.mouseXPosInColumnsRound,this.mouseYPosInRowsRound];
+					//seatMapGridActivePos=[this.mouseXPosInColumnsRound,this.mouseYPosInRowsRound]; // Changed from this to one above
+				}
+
+			}
+
+			if(this.componentType=="passenger"){
+				this.avatar.smileSizeTarget=0.25;
+ 			}
+			
+			if(this.componentType=="card" && this.passenger.myPosInDeck==0){this.liftGoal=paddingNormal/2;}			
+		}else{
+			
+			this.pointerIsHoveringMe=false;
+
+			if(this.componentType=="button" || this.isButton){this.highlight=false;}
+			
+			if(this.componentType=="card"){
+				this.liftGoal=0;
+			}
+			
+			if(this.label=="layoutSeats"){
+				mouseLockedToGrid=false;
+			}
+		}
 
 		// Runs once, when pointer goes down (NOT when clicked , which is down+up)
 		if(pointerDownGlobalOneOffWarning){
@@ -3388,6 +3458,7 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 					}
 					if(this==layoutSeats){
 						seatMapGridPosOnPointerUpOrDown=seatMapGridActivePos;
+						console.log("**seatMapGridPosOnPointerUpOrDown="+seatMapGridActivePos);
 					}
 
 				}			
@@ -3777,68 +3848,7 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 		}
 
 
-		// On hover (very ineficient?)
-		if(pointIsWithinArea([mouseX,mouseY],this.shape,this.posxPixels,this.posyPixels,this.widthPixels,this.heightPixels)){
-			//addToDebugText("hover");
-			
-			this.pointerIsHoveringMe=true;
 
-			if(this.componentType=="button" || this.isButton){this.highlight=true;}
-			
-			// Calculate mouseLock x,y positions
-			if(this.label=="layoutSeats"){
-				mouseLockedToGrid=true;
-
-				// X
-				this.pixelsPerColumn = this.widthPixels/columnCountWithAisle;
-				this.mouseXPosRelToThis = (mouseX+this.pixelsPerColumn/2-(this.posxPixels-this.widthPixels/2));
-				this.mouseXPosInColumns = this.mouseXPosRelToThis/this.pixelsPerColumn;
-				if(Math.round(this.mouseXPosInColumns)!=4){ // Dont allow aisle
-					this.mouseXPosInColumnsRound = Math.round(this.mouseXPosInColumns);
-				} else{
-					this.mouseXPosInColumnsRound = 3;
-				}
-				mouseXlock=(this.posxPixels-this.widthPixels/2)+this.mouseXPosInColumnsRound*this.pixelsPerColumn-this.pixelsPerColumn/2;
-
-				// Y
-				this.pixelsPerRow = this.heightPixels/rowCount;
-				this.mouseYPosRelToThis = (mouseY+this.pixelsPerRow/2-(this.posyPixels-this.heightPixels/2));
-				this.mouseYPosInColumns = this.mouseYPosRelToThis/this.pixelsPerRow;
-				this.mouseYPosInRowsRound = Math.round(this.mouseYPosInColumns);
-				mouseYlock=(this.posyPixels-this.heightPixels/2)+this.mouseYPosInRowsRound*this.pixelsPerColumn-this.pixelsPerColumn/2;
-				
-				
-				
-				// Update the grid pos var
-				if(this.mouseXPosInColumnsRound>3){this.mouseXPosInColumnsRound-=1;}
-				//console.log("this.mouseXPosInColumns:"+this.mouseXPosInColumns);
-				//console.log("this.mouseXPosInColumnsRound:"+this.mouseXPosInColumnsRound);
-				if(typeof this.mouseXPosInColumnsRound !== 'undefined'){
-					seatMapGridActivePos=[this.mouseXPosInColumnsRound,this.mouseYPosInRowsRound];
-					//seatMapGridActivePos=[this.mouseXPosInColumnsRound,this.mouseYPosInRowsRound]; // Changed from this to one above
-				}
-
-			}
-
-			if(this.componentType=="passenger"){
-				this.avatar.smileSizeTarget=0.25;
- 			}
-			
-			if(this.componentType=="card" && this.passenger.myPosInDeck==0){this.liftGoal=paddingNormal/2;}			
-		}else{
-			
-			this.pointerIsHoveringMe=false;
-
-			if(this.componentType=="button" || this.isButton){this.highlight=false;}
-			
-			if(this.componentType=="card"){
-				this.liftGoal=0;
-			}
-			
-			if(this.label=="layoutSeats"){
-				mouseLockedToGrid=false;
-			}
-		}
 
 
 		// Random blinks
@@ -3919,7 +3929,7 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 			ctx.globalAlpha=1;
 			if(this.hint){
 				// If btnCreateDeck, add hint
-				ctx.font = fontPrimary;
+				ctx.font = fontHint;
 				ctx.globalAlpha=0.5;
 				ctx.fillStyle = colorShadow50pct;
 				ctx.fillText(this.hint, this.posxPixels, yp+this.heightPixels*0.9);

@@ -1,184 +1,184 @@
-// Canvas JS project template v0.3 (2025/06/09)
- 
-if (1) {																	// About
-	// This template should contain all useful core functions to create canvas+JS apps/games
 
-	// Before using it, copy to the project's folder.
-	// When using it, if there are any bugs or potential for improvement, apply to template too.
-	// When upating the template, avoid feature creep (keep it simple), include simple demo/examples whenever possible and document well. GOAL: Should be quick to develop something from scratch using this.
-	
-	// There are multiple canvas, from bottom to top:
-		// fakePixelsCanvas:  allows creating pixel-perfect art by drawing each pixel indiviually; disabled by default
-		// mainCanvas: normal canvas (though can be drawn in lower resolutions by changing canvasRes (canvas multiplier)
-		// debugCanvas: just for debug text
-		// pointerCanvas: just to catch pointer events (has to be on top)
-	// You always draw on the "context", not in the "canvas" (the context is defined based on the canvas, which is the html element).
-	// NEVER use pixel values directly. All positions/sizes should be given as a proportion of the canvas (in the correspondent axis). This facilitates layout adjustments on the fly. 
-		// Note: if you ever need to be able to use functions to draw pixels directly, add it as an exception
-	// If local storage needed, change usingLocalStorage to true
-	
-	
-	// Project-specific notes below
-	
-	// Card = single card; Deck = can be single, or group
  
-	// NEXT
-	// Fix/Simplify screen size/prop logic
-		// Make sure intro text look good regardless of size.
-		// Make sure layout always looks good regardless of size (ideed, when very small, text oveflows. Just make all text be prop to root.heightRel, like you did w Intro text)
-	// Fix touchscreen bug
-	// highlight group when reviewing individual
-	// Beautify cards: some borders/shading?
+if (1) {																	
 	
-	// NTH:
-	// Might make more sense to limit to 2 proportions (portrait and landscape); anything inbetween gets a frame, and thre's a background (otherwise its too much to expect to cate to all possible screen proportions - I mean, its  possiible, just doesnt look great)
-	// myReviewFeedbackText: have it be an array, allowing multiple reasons to show. Even better if include if essental or pref, to color code accordigly
-	// updateLayoutElements: needs to be automated, and just cycle through all components (easier to not diffeentiate etweem layout and nonlayout elements). NOte this meas you need a nicer way of describing elements layout confirguations for each screen size
-	// Changing canvasRes for some reason messses up lauoy of Graphics components
-	// allAssetsLoaded: what happens if they're... not? does the code wait?
-	// HIghilght family when reviewing (maybe grey out everyone else?) - careful the map is getting quite busy as it is already. .. Do not use the bobbing motion, as this indicated it can be moved!
-	// avatar should say no if theres an attempt of dropping someone over them (I disabled it so it doesnt say no on click)
-	// Refactor: have component be just about visual component on stage. Then added functionality (being a button, being draggable being a card - are added later somehow - but how? Are they propertie? Are they new objects within that object?
-	// REF238947329 Initially I tried this.passenger.avatar instead, and it worked, but only created 1 instance of the avatarGraphic (sharing same properties, which led to wierd behaviour)
-	// Smoother transition when this.componentType changes between card and passenger
-	// Better flow management. Its nice that EVERYTHING is a component, but its also a bit messy. Can/should I remove most of the code in there, out into subcomponents/functions, which I can then add/aply/run as needed? To avoid every single thing being a comoonent with all the code that is used for everythiing else a well within it. By the way: see what I did with btnStart. Hacky, or useful? Note: Im doing lots of things in the updateAndDraw function of the component, because when Im not passing all parameters when I call the component , I pass right after. Thoug its nice to be able to change ANYTHIG on the fly. But then there could be a function (like the updateAndDraw one, but called "updateMeasurements", or smth) that can be called only when neede
-	// Better flow management. Decide how to manage what gets updated/drawn. Maybe: have a morre streamlined workflow for creating nested stuff, (so that EVERYTHING ultimtely has a "screen" parent , meaning Intro, Game, Ending etc), then build one arrays for each  screen , dynamically based on hierarchy, . Then use that array to cycle through and draw only the relevant stuff
-	// Fake Pixels: no rush, but might be worth reviewing how this is implemented. Isn't it easier to just make canvasRes super low?
-	// Asset management: only preload what is needed at first, then load as needed (with load progress and fallback)
-	// Creating a button with explicit Width/Height might not work (as the widthRel and heightRel vars dont seem to be used) 
-	// Currently dragging INTO something counts as click and drag
-	// Separate functions: ie, instead of a btn, its a text label that you can then add behaviours to (when clicked, change color, is draggable etc) - not sure best way to do it
-	// Optimize: avoid all objects checking for clicks etc (probably there's a way to do smarter checkings, and not check what isnt needed)
-	// Definitely can/should be further improved/optimized, including in terms of data model/structure
-	// Differentiate: inheritPos from inheritDrag?
-	// Make passengers get "cheeky" on hover again
-	// Make card turn  to avatar if card goes over a bit (i.e. consider its width, not just pos)
-	// Change parentComponents to only link them; then have specific variables for linking specific attribites . e,g inheritWidth, inheritPosX etc
-		// IN PRACTICE: probably the best thing to do is: test out having one of the draggable child components be defined in proportion to parent; then have the root be simply the same 
-		// To make sure it works, try out variations where some of the attribte arent iherited (ex: element changes pos , but keep size
-	// REF28904820: make this show actual letters; note it has to invert, as letters are x axis 
-	// If active group, moving one over another should swap them (either from othe seat, or from card area)
-	// Better UI for dragging on mobile. Maybe have the avatar float slightly above the touch event?
-	// Add hint below card "Just drag me towards the seat" (for decks: "Tap to flip through cards")
-	// Avoiding having both currentDeckOfCards AND currentDeckOfPassengerInfo - I think first one is enough. I created the second one first, then the first because I needed access to the cards themselves too
-	// Maybe figure out why .myPosInDeck is NOT working when I move it to where it should (ie. under .passenger, not directly under card (THOUGH DONT MESS W IT BECAUSE IT WORKS
-	// REF7234732947 Shouldnt be repeating non stop
-	// A lot of improvement in flow can be in understanding that an object can be created, but not used (ie, not called by the updateAndDraw)
-		// The only reason all your components keep refreshing is because you add them all into an array , which is cycled every mainloop, to updateAndDraw
+
 	
-	// Minor bugs
-	// Creashes if move avatar directly in seats via aisle..? quickly
-	// Removing a button sometimes causes one of the other buttons to flicker
-	// Changing canvasRes or resizing WHILE things are moving (ie targets are not met yet) lead to unexpected behaviour
-	// Children dont retain position when canvasRes changes (and ww, wh?)
-	// Bug if changing screen size or resolution mid game: ignore for now, as is edge case
-		// This bugs out if screen resized in middle of game. Prbbly because chage in pos is interpreted as the avatars going into thedeck area. Prbbly enought to update them  to relative
-		// REF2394802
-		// Related: positions of placed avatars isnt kept relative (to reproduce: place a passenger, then resize screen). Again, probably easy t fix. 
-		// But best not to address. Unliekely will need to change reoslution in mid of game
+	
+	
+	
+	
+		
+		
+		
+		
+	
+	
+		
+	
+	
+	
+	
+	
+	
+ 
+	
+	
+		
+		
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+		
+		
+	
+	
+	
+	
+	
+	
+	
+	
+		
+	
+	
+	
+	
+	
+	
+	
+		
+		
+		
+		
 
  }
-if (1) { 																	// Define global vars (non-project specific only)
-// This is for general global vars only. For project specific global vars, check next if
+if (1) { 																	
 
-//For debug
-var limitNumberOfPassengers=0; // 0 = full list
 
-///Flow
-var timeCounter = 0;	// TBD: clarify what exactly it's counting (probably not actual time)
+
+var limitNumberOfPassengers=0; 
+
+
+var timeCounter = 0;	
 
 var randomizePassengers = true;
 
-// Useful
+
 var newline = "\r\n";
 var bulletPoint = "\u{2022}";
-var practicallyZero = 0.1;	// How low is considered zero
+var practicallyZero = 0.1;	
 
-// Debug
-var debug = false;		// to show/hide debug info (key 'd)'
-var debugText = []; 	// is rebuilt every frame
+
+var debug = false;		
+var debugText = []; 	
 var moreDebugText = "";
 
-// Display/Canvas
-var ww; 	var wh; 														// window width/height *DO NOT USE THIS TO PLACE ELEMENTS, as this is resolution dependent*
-var isPortrait; 															// if window height is bigger than width
-var isMobile=false;	var mobileWidth=800; 									// if ww smaller than a certain amount, its considered mobile (causes font to go smaller
-var cw;		var ch;															// canvas width/height (might be different to ww,wh, if canvasRes isn't 1)
-var canvasRes = 1;															// canvas multiplier. 1 = same w,h as window; 0.5 = 50% resolution; CSS will always scale it to fill window
-// There are 4 canvases; each has a context (ctx)
-// Note: ctx is where things are acually drawn
-var canvas; 		var ctx;												// canvas/context (main)
-var canvasf; 		var ctxf;												// canvas/cotext (fake pixels)
-var canvasd;		var ctxd;												// canvas/context (debug)
-var canvasp;		var ctxp;												// canvas/context (pointer)
+
+var ww; 	var wh; 														
+var isPortrait; 															
+var isMobile=false;	var mobileWidth=800; 									
+var cw;		var ch;															
+var canvasRes = 1;															
+
+
+var canvas; 		var ctx;												
+var canvasf; 		var ctxf;												
+var canvasd;		var ctxd;												
+var canvasp;		var ctxp;												
 var minWidth = 450;
 var minHeight = 710;
 
-// To ensure layout always looks good, there will be 2 fixed layout types: portrait and landscape, always same proportion.
-// Regardless of screen size, prop will always be either one of the other
+
+
 var screenPropCurrent; var screenSizeAndPropSupported = true;
 var canvasPropPortrait= 0.64; var canvasPropLandscape=1.52;
 
-// When using the Fake Pixels canvas (default is false):					// TBD: check tasks at top
-var usingFakePixelsCanvas = false;											// False: avoids many calculations
-var widthInFakePixels=0;	var heightInFakePixels=0;						// width and height in fake pixels
-var fakePixelW=0;			var fakePixelH=0;								// width and height that a fake pixel will have on screen (ideally square, but can't always be) 
-var fakePixelGrid = new Array();
-var totalPixels = 23000; 													// Used as reference to calculate fake pixel size. Based on a 480 x 270 resolution. Change as needed
 
-// Setting up requestAnimationFrame (recommended, instead of "setInterval")
-// Note: I'm  not fully sure how/why this works
-// Request
+var usingFakePixelsCanvas = false;											
+var widthInFakePixels=0;	var heightInFakePixels=0;						
+var fakePixelW=0;			var fakePixelH=0;								
+var fakePixelGrid = new Array();
+var totalPixels = 23000; 													
+
+
+
+
 window.requestAnimationFrame = window.requestAnimationFrame
     || window.mozRequestAnimationFrame
     || window.webkitRequestAnimationFrame
     || window.msRequestAnimationFrame
-    || function(f){return setTimeout(f, 1000/60)} // simulate calling code 60 
-// Cancel
+    || function(f){return setTimeout(f, 1000/60)} 
+
 window.cancelAnimationFrame = window.cancelAnimationFrame
     || window.mozCancelAnimationFrame
-    || function(requestID){clearTimeout(requestID)} //fall back
+    || function(requestID){clearTimeout(requestID)} 
 
-// Asset management
+
 var assetCount = 0;				
-var arrayOfAssets = [];				// Will point to all assets (to allow keeping track of load status)
-var allAssetsLoaded = false;		// Becomes true once all assets are loaded (check Top for potential improvements)
-// Example of loading svg images
-// PS: actual project-specific assets should be loaded in the Project-specific global var declaration
-//loadAsset("svgExample1","svg");
-//loadAsset("svgExample2","svg");
+var arrayOfAssets = [];				
+var allAssetsLoaded = false;		
 
-// Storage
-var usingLocalStorage = false;			// change to true if need to use localvars
 
-// Examples of types of variables
-var varToStoreLocally;	// just example; search for it to see how (super simple)
+
+
+
+
+var usingLocalStorage = false;			
+
+
+var varToStoreLocally;	
 var varNumber = 10;
 var varArray = ["A","B","C"];
 var varArray2 = [[0,0],[1,1]];
-var varArray3 = new Array(); // yes?
+var varArray3 = new Array(); 
 var varString = "TESTING";
 var varBoolean = false;
 
-// Mouse/pointer variables
-var mouseX;		var mouseY;				// x,y pos of mouse on normal canvas (might be needed if canvas smaller  then resized to fit)
-var mouseXlock;	var mouseYlock;			// x,y pos of mouse when locked to something
+
+var mouseX;		var mouseY;				
+var mouseXlock;	var mouseYlock;			
 var mouseLockedToGrid=false;
-var mouseXf;	var mouseYf;			// x,y pos of mouse on fake pixel canvas (i.e. in pixels)
-// State
-var pointerDown = false;				// Button is down
-var pointerDragging = false;			// Button is down and mouse is moving
-var pointerDownGlobalOneOffWarning = false;				// Click (on click, is true for one Main loop)
-var pointerUpGlobalOneOffWarning = false;				//  is true for one Main loop)
+var mouseXf;	var mouseYf;			
+
+var pointerDown = false;				
+var pointerDragging = false;			
+var pointerDownGlobalOneOffWarning = false;				
+var pointerUpGlobalOneOffWarning = false;				
 var pointerPosWhenDown = [0,0]; var pointerPosWhenUp=[0,0];
 var pointerClickedInPlaceGlobalOneOffWarning =false;
 
-// Key vars (true when key is pressed)
+
 var keySpace=false;
 var keyShift=false;
 
-// Colors
-// (change according to project)
+
+
 var colorPrimary = "red";
 var colorSecondary = "blue";
 var colorShadow10pct = "rgba(0,0,0,0.1)";
@@ -190,58 +190,58 @@ var colorOrangeStrong = "#FF6D00";
 var colorBadStrong = "#D70F0A";
 var colorAcademyDarkRed = "#750707";
 var colorBadLight = "tomato";
-var colorReviewMode = colorOrange; // will change; used for review card and text
+var colorReviewMode = colorOrange; 
 
 
-// Font(s)
-// (change according to project)
-// Note: font size is constant regardless of resolution, since needs to be readable (TBD: maybe vary a bit for very small/large situations)
+
+
+
 var fontFamilyPrimary = "Arial";
 var fontBaseSizePrimary;
 var fontPrimary;
 var fontHint;
-// Project specific
+
 var fontUISize;
 var fontUI;
 var fontBigButtonSize;
 var fontBigButton
 
-// Animation constants
-var easeSpeedNormal = 10; // these dont change with resolution ...
+
+var easeSpeedNormal = 10; 
 var easeSpeed = easeSpeedNormal;
 var easeSpeedSlow = easeSpeedNormal*5;
 var easeSpeedFast = easeSpeedNormal/4;
 
-// Layout 
+
 var paddingNormal;
 
-// Arrays of objects
-/// (this will vary based on project, but will usually include the following)
-// Note: both arrays below keep same type of object (components); only difference is the arrayOfStages is used mainly for layout
-var arrayOfComponents=[]; // all of them (rarely used really - best to have secondary arrays for context-specific sets of components)
-var arrayOfSeatedComponents=[]; // stupid duplication... Just so I can show them on top later
 
-// Interaction
-var dragDelta; 					// how much the pointer needs to move after a click to be considered dragging
+
+
+var arrayOfComponents=[]; 
+var arrayOfSeatedComponents=[]; 
+
+
+var dragDelta; 					
 var topmostComponentOnLocationOfLastPointerDown= null; 
 
-// Graphical constants
-// (to facilitate keeping consistency)
+
+
 var strokeBaseColor = "black";
 var strokeBaseThickness;
 
 }
-if (1) {																	// Define global vars (project-specific)
-// empty for now
+if (1) {																	
 
-// Deck = 1 passenger, or a group
-var currentDeckOfPassengerInfo=[];	// array of passenger info (NOT cards!)
-var currentDeckOfCards=[]; 			// array of cards
-var currentSeatedDeck=[]; 			// array of cards
 
-var seatMapGridActivePos=[0,0]; // [1 to 6 columns, 1 to 5 rows]
+
+var currentDeckOfPassengerInfo=[];	
+var currentDeckOfCards=[]; 			
+var currentSeatedDeck=[]; 			
+
+var seatMapGridActivePos=[0,0]; 
 var seatMapGridPosOnPointerUpOrDown=[0,0];
-var lastObjectWithPassengerClickedOrDragged; // 
+var lastObjectWithPassengerClickedOrDragged; 
 
 var cardWidth; var cardHeight;
 var cardHeightPropWidth=0.4;
@@ -262,27 +262,27 @@ var lineDashSize=5;
 
 var ageAdultMin=21;
 
-var showWarning=""; // Message to show as warning above card
+var showWarning=""; 
 var showWarningDelay= 150;
 var showWarningCutoff=20;
 var showWarningCounter=showWarningDelay;
-var warningSeatList=[]; // Optionally, list of seats to be highlighted alongside warning messae
+var warningSeatList=[]; 
 
 var loneSeats = [];
-var loneSeatsMsg = ""; // can be win, mid or both
+var loneSeatsMsg = ""; 
 											
 
-// ASSETS
+
 loadAsset("logo","png");
 loadAsset("logoAcademy","png");
-// Icons
+
 loadAsset("iconReset","svg");
 loadAsset("iconHelp","svg");
-// Aircraft
+
 loadAsset("seat","svg");
 loadAsset("windowsLeft","svg");
 loadAsset("windowsRight","svg");
-// Avatars
+
 loadAsset("faceWhite","svg","faceBase");
 loadAsset("faceOrange","svg","faceBase");
 loadAsset("faceBrown","svg","faceBase");
@@ -302,7 +302,7 @@ loadAsset("Jon","svg","people");
 loadAsset("Jane","svg","people");
 
 
-var avatarWidth; var avatarHeight; // applies to all avatar related parts 
+var avatarWidth; var avatarHeight; 
 
 var totalPassengersOriginallyInCue=0;
 var totalPassengersSeated=0;
@@ -314,14 +314,14 @@ var timerOn = false;
 var gameTimer = 0;
 }
 
-function mainOnLoad(){									// First thing to be called (in the HTML). Runs these functions: readLocalVars, initializeGeneralStuff and defineInputFunctions
+function mainOnLoad(){									
 
 	if(usingLocalStorage){
 		readLocalVars();
 	}
 	initializeGeneralStuff();
 	initializeProjectSpecificStuff();
-	defineInputFunctions(); 	// call this only once on start, otherwise there's a weird bug
+	defineInputFunctions(); 	
 
 }
 
@@ -329,37 +329,37 @@ function myReload(){
 	location.reload();
 }
 
-function adjustToCanvasSizeAndRes(event){ 									// Function to adjust canvas and other vars based on changes to window size and/or resolution (runs rarely: on init...
-	// This function checks for changes in window width/height and to resolution (canvasRes), then adjusts relevant vars accordingly
+function adjustToCanvasSizeAndRes(event){ 									
+	
 
 	
-	// Grab new window width/height
+	
 	ww = window.innerWidth; 
 	wh =  window.innerHeight;
 	
 	screenPropCurrent=ww/wh;
-	console.log("screenPropCurrent:"+screenPropCurrent); 
 	
-	// Set main canvas size/proportion based on the window size and the canvas resolution (canvasRes)
-	// Note: if canvasRes<1 (i.e. lower resolution), actual canvas will be smaller than window - but the CSS in the html makes it fill the window
+	
+	
+	
 	canvas.width = ww * canvasRes;
 	canvas.height = wh * canvasRes;	
-	// shorthand:
+	
 	cw = canvas.width;
 	ch = canvas.height;
 
-	// Update state variables
-	//if(ww>wh){isPortrait = false;}else{isPortrait=true;}	// now this is tied to proportion rather than size
-	//if(ww<mobileWidth){isMobile=true;}else{isMobile=false;} // now this is tied to proportion rather than size
+	
+	
+	
 
-	// adjust components based on change
-	if(window.layoutSeatmap){ // THIS NEVER RUNS; optimize/tidy
+	
+	if(window.layoutSeatmap){ 
 		updateLayoutElements();
-		console.log("*updateLayoutElements*"); 
+		
 
 	}
 
-	// Repeating this here because updateLayoutElements function above can't run here  yet (messy)
+	
 	if(screenPropCurrent<1){
 		isMobile=true;
 		isPortrait=true;
@@ -369,63 +369,63 @@ function adjustToCanvasSizeAndRes(event){ 									// Function to adjust canvas 
 		
 	}
 
-	// Set various vars based on it:
-	// Font: note that font size is mostly always the same (just one exception if isMobile)
-	fontBaseSizePrimary = 16*canvasRes*0.85; // This actually makes font size stay the same regardless of resolution (since canvas resolution is also smaller)
-	console.log("*adjustToCanvasSizeAndRes*");
+	
+	
+	fontBaseSizePrimary = 16*canvasRes*0.85; 
+	
 	if(isMobile){
 		fontBaseSizePrimary=(fontBaseSizePrimary*0.5)+(fontBaseSizePrimary*0.5*(ww/mobileWidth));
  	}else{
-		fontBaseSizePrimary = 16*canvasRes*0.75; // messy: should be coded properly above
+		fontBaseSizePrimary = 16*canvasRes*0.75; 
 	}
 	fontPrimary = fontBaseSizePrimary + "px "+fontFamilyPrimary;
 	fontHint = fontBaseSizePrimary*1.2 + "px "+fontFamilyPrimary;
-	// Projectspecific fonts
+	
 	fontUISize=fontBaseSizePrimary*1.4;
 	fontUI = 600+" "+fontUISize+ "px "+fontFamilyPrimary;
 	fontBigButtonSize = fontBaseSizePrimary*2;
 	fontBigButton = 400+" "+fontBigButtonSize+ "px "+fontFamilyPrimary;
-	// Other layout constants
+	
 	paddingNormal = fontBaseSizePrimary/1.5;
 	strokeBaseThickness = 4*canvasRes;
-	// Interaction constants
+	
 	dragDelta = 10*canvasRes;
 
 	
-	// set debug and pointer canvas size to it (NOTE: debug and pointer canvas DO NOT LOWER RESOLUTION)
+	
 	canvasd.width = ww;
 	canvasd.height = wh;
 	canvasp.width = ww;
 	canvasp.height = wh;
 	
-	// If using the Fake Pixel canvas, do the same there
+	
 	if(usingFakePixelsCanvas){
-		// Find size of fake Pixel (likely not square)
-		// First, find first guess, assuming fake pixel will be square
+		
+		
 		var fakePixelArea = (ww*wh)/totalPixels;	
 		var fakePixelSide = Math.sqrt(fakePixelArea);
-		// Find width and height in fake pixels assuming square pixels
+		
 		widthInFakePixels = ww/fakePixelSide;
 		heightInFakePixels = wh/fakePixelSide;
-		// Values above likely have decimals. They shouldn't. This can be fixed by considering that when finally defining fake pixel W and H
+		
 		fakePixelW = (widthInFakePixels/Math.floor(widthInFakePixels))*fakePixelSide;
 		fakePixelH = (heightInFakePixels/Math.floor(heightInFakePixels))*fakePixelSide;
-		// Now find proper width and height in fake pixels, assuming non-square pixels (Math.floor is needed because it still gets some tiny decimals)
+		
 		widthInFakePixels = Math.floor(ww/fakePixelW);
 		heightInFakePixels = Math.floor(wh/fakePixelH);
-		// Set canvas to that tiny size (CSS in index.html makes it fill the browser)
+		
 		canvasf.width  = widthInFakePixels;
 		canvasf.height = heightInFakePixels;
-		// Clear the grid
+		
 		clearFakePixelGrid("white");
 	}
 
 }
-window.addEventListener('resize', myReload);				// ... on resize (and whenever canvasRes is changed - via number keys)
+window.addEventListener('resize', myReload);				
 
-function initializeGeneralStuff(){													// Initializing (General)
+function initializeGeneralStuff(){													
 
-	// Init canvas(es)
+	
     canvas = document.getElementById("mainCanvas");
     ctx = canvas.getContext("2d");
     canvasd = document.getElementById("debugCanvas");
@@ -438,32 +438,32 @@ function initializeGeneralStuff(){													// Initializing (General)
 	}
 	introText = document.getElementById("introText");
 
-	// Create the root component
-	// (all components are child to it by default, unless explicitly parented to something else)
+	
+	
 	window.root = new component("root",0.5,0.5);
-	// root.actionOnDrag = "drag";
-	//root.color = "pink";
+	
+	
 	root.fadeMeIn=false;
 
-	// Create a prop warning object (proportion warning)
+	
 	window.propWarning = new component("Please use portrait or landscape",0.5,0.5);
 	propWarning.widthRel = 1;
 	propWarning.heightRel = 1;
 	propWarning.color = colorBadLight;
 	removeComponent(propWarning.id);
 
-	// Create a size warning object
+	
 	window.sizeWarning = new component("Please increase screen size",0.5,0.5);
 	sizeWarning.widthRel = 1;
 	sizeWarning.heightRel = 1;
 	sizeWarning.color = colorBadLight;
 	removeComponent(sizeWarning.id);
 
-	// Init canvas and related vars
+	
 	adjustToCanvasSizeAndRes();	
 
-	// Initiate main loop (once all assets are loaded)
-	// (Main loop loops because it calls itself)
+	
+	
 		if (assetCount==arrayOfAssets.length){
 		allAssetsLoaded=true;
 		requestAnimationFrame(mainLoop);
@@ -473,66 +473,66 @@ function initializeGeneralStuff(){													// Initializing (General)
 		
 	
 	
-	// Store variable states on unload
+	
 	if(usingLocalStorage){
 		window.addEventListener("unload",writeLocalVars,false);
 		window.onunload = function(event) { writeLocalVars() };
 		document.addEventListener("pause", writeLocalVars, false);
 	}
 }
-function initializeProjectSpecificStuff(){											// Initializing (Project-specific)
-	// HELPER: function component(label, posXRel, posYRel, type, alpha, widthRel, heightRel, color, targetx, targety, targetAlpha, disabled)
+function initializeProjectSpecificStuff(){											
+	
 
-	// Initialize project-specific assets
-	// these are automatically added to the arrayOfComponents
+	
+	
 
-	// 
+	
 	
 
  	
 	
-	// Defining layout elements
-	// label NEEDS to start with "layout" (messy)
-	// Actual pos, size and parenting are defined in updateLayoutElements (so it can be updated whenever)
+	
+	
+	
 	window.layoutHeader = new component("layoutHeader");
-	//layoutHeader.color="white";
+	
 	window.layoutBody = new component("layoutBody");
 	window.layoutSeatmap = new component("layoutSeatmap");
-	//layoutSeatmap.color=colorShadow10pct;
+	
 	window.layoutAreaForCards = new component("layoutAreaForCards");
 	window.layoutDeckDropArea = new component("layoutDeckDropArea");
-	//layoutDeckDropArea.color=colorShadow10pct;
+	
 	window.layoutFooter = new component("layoutFooter");
-	//layoutFooter.color=colorShadow10pct;
-	updateLayoutElements(); // eventually this should really update all components (incl ones below)
+	
+	updateLayoutElements(); 
  
-	// Seat Game vars
-	// Required vars: id, name, age  (id: essential to distinguish if same name)
-	// Optional vars: code, pref, group/groupType/groupLeader
-	// Some useful vars (used later for checking too)
+	
+	
+	
+	
 	window.prefWindow = "Prefers window seat.";
 	window.prefAisle = "Prefers aisle seat.";
 	window.prefTogether = "Prefers seating together.";
 	window.elderlyFrail = "Frail elderly person.";
 	window.elderyAble = "Able-bodied elderly person."
-	// Pre-seated passenger
+	
 	window.passengerPreseat = {
 		passport: 0,
 		name: "Pre-Seated",
 		age: 35,
 		pref: ["Already booked a seat."]
 	}
-	// Others
+	
 	var tempPassenger;
-	window.arrayOfPassengers = []; // simple linear array. DOES NOT include pre-seated
-	// Adult
+	window.arrayOfPassengers = []; 
+	
 	tempPassenger = {
 		passport: 0.2,
 		name: "Bob Dangerfield",
 		age: 35
 	}
 	arrayOfPassengers.push(tempPassenger);
-	// Pregnant
+	
 	tempPassenger = {
 		passport: 0.3,
 		name: "Lorraine McFly",
@@ -540,7 +540,7 @@ function initializeProjectSpecificStuff(){											// Initializing (Project-sp
 		code: "PREG"
 	}
 	arrayOfPassengers.push(tempPassenger);
-	// Disabled
+	
 	tempPassenger = {
 		passport: 0.8,
 		name: "Jorge L. Borges",
@@ -548,7 +548,7 @@ function initializeProjectSpecificStuff(){											// Initializing (Project-sp
 		code: "WCHC"
 	}
 	arrayOfPassengers.push(tempPassenger);
-	// Infant on lap
+	
 	tempPassenger = {
 		passport: 0.5,
 		name: "Jess Law",
@@ -557,7 +557,7 @@ function initializeProjectSpecificStuff(){											// Initializing (Project-sp
 		code: "INF"
 	}
 	arrayOfPassengers.push(tempPassenger);
-	// Unaccompanied minor
+	
 	tempPassenger = {
 		passport: 0.32,
 		name: "Frank Abagnale",
@@ -565,7 +565,7 @@ function initializeProjectSpecificStuff(){											// Initializing (Project-sp
 		code: "UMNR"
 	}
 	arrayOfPassengers.push(tempPassenger);
-	// CarinaAndScott 1/2
+	
 	tempPassenger = {
 		passport: 0.78,
 		name: "Carina Nuvem",
@@ -576,7 +576,7 @@ function initializeProjectSpecificStuff(){											// Initializing (Project-sp
 		groupLeader: "true"
 	}
 	arrayOfPassengers.push(tempPassenger);
-	// CarinaAndScott 2/2
+	
 	tempPassenger = {
 		passport: 0.342,
 		name: "Scott Cloud",
@@ -586,7 +586,7 @@ function initializeProjectSpecificStuff(){											// Initializing (Project-sp
 		groupType: "couple"
 	}
 	arrayOfPassengers.push(tempPassenger);	
-	// Prefers aisle
+	
 	tempPassenger = {
 		passport: 0.5221,
 		name: "Heath Longlegs",
@@ -594,7 +594,7 @@ function initializeProjectSpecificStuff(){											// Initializing (Project-sp
 		pref: [prefAisle]
 	}
 	arrayOfPassengers.push(tempPassenger);
-	// CarlaAndCharlie 1/2 (Amanda: Nervous and AIsle preference)
+	
 	tempPassenger = {
 		passport: 0.21166,
 		name: "Carla Horn",
@@ -605,7 +605,7 @@ function initializeProjectSpecificStuff(){											// Initializing (Project-sp
 		code: "NERV"
 	}
 	arrayOfPassengers.push(tempPassenger);	
-	// CarlaAndCharlie 2/2
+	
 	tempPassenger = {
 		passport: 0.6666,
 		name: "Charles Hunt",
@@ -616,7 +616,7 @@ function initializeProjectSpecificStuff(){											// Initializing (Project-sp
 		groupLeader: "true"		
 	}
 	arrayOfPassengers.push(tempPassenger);
-	// Elderly Frail
+	
 	tempPassenger = {
 		passport: 0.1111,
 		name: "Hilda Hilst",
@@ -624,7 +624,7 @@ function initializeProjectSpecificStuff(){											// Initializing (Project-sp
 		pref: [elderlyFrail]
 	}
 	arrayOfPassengers.push(tempPassenger);
-	// Elderly Able
+	
 	tempPassenger = {
 		passport: 0.81142,
 		name: "Howard Happy",
@@ -632,7 +632,7 @@ function initializeProjectSpecificStuff(){											// Initializing (Project-sp
 		pref: [prefWindow,elderyAble]
 	}
 	arrayOfPassengers.push(tempPassenger);
-	// Family 1/4
+	
 	tempPassenger = {
 		passport: 0.39001,
 		name: "Jon Smith",
@@ -643,7 +643,7 @@ function initializeProjectSpecificStuff(){											// Initializing (Project-sp
 		groupLeader: "true"
 	}
 	arrayOfPassengers.push(tempPassenger);	
-	// Family 2/4
+	
 	tempPassenger = {
 		passport: 0.39002,
 		name: "Jane Smith",
@@ -653,7 +653,7 @@ function initializeProjectSpecificStuff(){											// Initializing (Project-sp
 		groupType: "family"
 	}
 	arrayOfPassengers.push(tempPassenger);
-	// Family 3/4
+	
 	tempPassenger = {
 		passport: 0.39003,
 		name: "Billy Smith",
@@ -664,7 +664,7 @@ function initializeProjectSpecificStuff(){											// Initializing (Project-sp
 		groupType: "family",		
 	}
 	arrayOfPassengers.push(tempPassenger);
-	// Family 4/4
+	
 	tempPassenger = {
 		passport: 0.39004,
 		name: "Lilly Smith",
@@ -676,9 +676,9 @@ function initializeProjectSpecificStuff(){											// Initializing (Project-sp
 	}
 	arrayOfPassengers.push(tempPassenger);
 	
-	// Just Hilda
+	
 	if(0){
-				// Elderly Frail
+				
 		var blabla = {
 			passport: 0.1111,
 			name: "Hilda Hilst",
@@ -688,9 +688,9 @@ function initializeProjectSpecificStuff(){											// Initializing (Project-sp
 		arrayOfPassengers=[blabla];
 		
 	}
-	// Just family
+	
 	if(0){
-		// Family 1/4
+		
 		arrayOfPassengers=[];
 		tempPassenger = {
 			passport: 0.39001,
@@ -702,7 +702,7 @@ function initializeProjectSpecificStuff(){											// Initializing (Project-sp
 			groupLeader: "true"
 		}
 		arrayOfPassengers.push(tempPassenger);	
-		// Family 2/4
+		
 		tempPassenger = {
 			passport: 0.39002,
 			name: "Jane Smith",
@@ -712,7 +712,7 @@ function initializeProjectSpecificStuff(){											// Initializing (Project-sp
 			groupType: "family"
 		}
 		arrayOfPassengers.push(tempPassenger);
-		// Family 3/4
+		
 		tempPassenger = {
 			passport: 0.39003,
 			name: "Billy Smith",
@@ -723,7 +723,7 @@ function initializeProjectSpecificStuff(){											// Initializing (Project-sp
 			groupType: "family",		
 		}
 		arrayOfPassengers.push(tempPassenger);
-		// Family 4/4
+		
 		tempPassenger = {
 			passport: 0.39004,
 			name: "Lilly Smith",
@@ -737,11 +737,11 @@ function initializeProjectSpecificStuff(){											// Initializing (Project-sp
 		
 		
 	}
-	// Just Frank and few others
+	
 	if(0){
 				arrayOfPassengers=[];
 
-			// Unaccompanied minor
+			
 	tempPassenger = {
 		passport: 0.32,
 		name: "Frank Abagnale",
@@ -749,7 +749,7 @@ function initializeProjectSpecificStuff(){											// Initializing (Project-sp
 		code: "UMNR"
 	}
 	arrayOfPassengers.push(tempPassenger);
-	// CarinaAndScott 1/2
+	
 	tempPassenger = {
 		passport: 0.78,
 		name: "Carina Nuvem",
@@ -760,7 +760,7 @@ function initializeProjectSpecificStuff(){											// Initializing (Project-sp
 		groupLeader: "true"
 	}
 	arrayOfPassengers.push(tempPassenger);
-	// CarinaAndScott 2/2
+	
 	tempPassenger = {
 		passport: 0.342,
 		name: "Scott Cloud",
@@ -770,7 +770,7 @@ function initializeProjectSpecificStuff(){											// Initializing (Project-sp
 		groupType: "couple"
 	}
 	arrayOfPassengers.push(tempPassenger);	
-	// Prefers aisle
+	
 	tempPassenger = {
 		passport: 0.5221,
 		name: "Heath Longlegs",
@@ -781,7 +781,7 @@ function initializeProjectSpecificStuff(){											// Initializing (Project-sp
 
 	}
 	
-	// TO MAKE DEBUG QUICKER, this makes the array shorter by an amount
+	
 	if(limitNumberOfPassengers>0){
 		arrayOfPassengers.splice(limitNumberOfPassengers,arrayOfPassengers.length-limitNumberOfPassengers);
 	}
@@ -789,23 +789,23 @@ function initializeProjectSpecificStuff(){											// Initializing (Project-sp
 	window.arrayOfPassengersUntouched = arrayOfPassengers.slice();
 	
 	totalPassengersOriginallyInCue=arrayOfPassengers.length;
-	// End of Passengers
+	
 
 
-	// Flow
-	window.gameState = "init"; // states are: init, intro, createNewCardDeck...
+	
+	window.gameState = "init"; 
 
 
-	// Array of Seats (and prepopulate)
+	
 	window.rowCount=5;
 	window.columnCount=6;
-	window.emergencyRows=[3]; // can be multiple
-	window.aisleToRightOfColumn=[3]; // can be multiple
-	window.columnCountWithAisle = columnCount+aisleToRightOfColumn.length; // <<<<
+	window.emergencyRows=[3]; 
+	window.aisleToRightOfColumn=[3]; 
+	window.columnCountWithAisle = columnCount+aisleToRightOfColumn.length; 
 	
-	// This array will keep current seating situation
-	window.arrayOfSeatedPassengers=[]; // ignores aisles!
-	//create it
+	
+	window.arrayOfSeatedPassengers=[]; 
+	
 	var tempColumn=[];
 	for(var i=0;i<columnCount;i++){		
 		for(var j=0;j<rowCount;j++){
@@ -814,40 +814,40 @@ function initializeProjectSpecificStuff(){											// Initializing (Project-sp
 		arrayOfSeatedPassengers.push(tempColumn);
 		tempColumn=[];
 	}
-	// Populate with preseated....
-	// ...randomly: (might not allow solution!)
+	
+	
 	if(0){
 		var  copyOfarrayOfPassengers = arrayOfPassengers.slice();
 		for(var i=0;i<columnCount;i++){		
 			for(var j=0;j<rowCount;j++){
 				if(Math.random()>0.7){
-					// This used to be here for testing: adds other people as well // if(copyOfarrayOfPassengers.length>0){arrayOfSeatedPassengers[i][j]=copyOfarrayOfPassengers.splice(Math.floor(Math.random()*(copyOfarrayOfPassengers.length-1)),1)[0]; /// 
+					
 					arrayOfSeatedPassengers[i][j]= passengerPreseat;
 				}
 			}
 		}
 	}
-	if(1){	//...according to known solution  - THE ONE FOR FINAL GAME
-		//arrayOfSeatedPassengers[0][0]=passengerPreseat;
-		//arrayOfSeatedPassengers[0][2]=passengerPreseat;
+	if(1){	
+		
+		
 		arrayOfSeatedPassengers[0][4]=passengerPreseat;
-		//arrayOfSeatedPassengers[1][0]=passengerPreseat;
-		//arrayOfSeatedPassengers[1][2]=passengerPreseat;
-		//arrayOfSeatedPassengers[2][3]=passengerPreseat;
-		//arrayOfSeatedPassengers[3][4]=passengerPreseat;
-		//arrayOfSeatedPassengers[4][3]=passengerPreseat;
+		
+		
+		
+		
+		
 		arrayOfSeatedPassengers[4][4]=passengerPreseat;
-		//arrayOfSeatedPassengers[5][1]=passengerPreseat; 
-		//arrayOfSeatedPassengers[5][3]=passengerPreseat;
+		
+		
 		arrayOfSeatedPassengers[5][4]=passengerPreseat;
 	}
-	if(0){ // Populate with all passengers (for testing avatars)
+	if(0){ 
 		var copyOfarrayOfPassengers = arrayOfPassengers.slice();
 		for(var i=0;i<columnCount;i++){		
 			for(var j=0;j<rowCount;j++){
 				if(copyOfarrayOfPassengers.length>0){
 					arrayOfSeatedPassengers[i][j]=copyOfarrayOfPassengers.splice(0,1)[0];
-					console.log(arrayOfSeatedPassengers[i][j].name);
+					
 				}
 			}
 		}	
@@ -855,15 +855,15 @@ function initializeProjectSpecificStuff(){											// Initializing (Project-sp
 	
 	var seatsVar = new seats();
 
- 	// the tempComponentPointer... vars are just for assignin properties  here 
-	var tempComponentPointer; // when I want to assign smth specific
-	// HEADER
-	tempComponentPointer=new component(logoAcademy,0.05,0.6); // logo	
+ 	
+	var tempComponentPointer; 
+	
+	tempComponentPointer=new component(logoAcademy,0.05,0.6); 
 	tempComponentPointer.anchorLeft=true;
 	tempComponentPointer.color="none";
 	tempComponentPointer.heightRel=0.85;
-	//tempComponentPointer.graphicScale="fitDadHeight";	
-	//tempComponentPointer.actionOnDrag="drag";
+	
+	
 	parentComponents(tempComponentPointer,layoutHeader);
 	window.componentIconReset =new component(iconReset,0.82,0.5);
 	componentIconReset.color="none";
@@ -871,7 +871,7 @@ function initializeProjectSpecificStuff(){											// Initializing (Project-sp
 	componentIconReset.actionOnClick="reload";
 	componentIconReset.anchorRight=true;
 	componentIconReset.isButton=true;
-	//tempComponentPointer.actionOnDrag="drag";
+	
 	parentComponents(componentIconReset,layoutHeader);
 	tempComponentPointer=new component(iconHelp,0.95,0.5);
 	tempComponentPointer.color="none";
@@ -880,9 +880,9 @@ function initializeProjectSpecificStuff(){											// Initializing (Project-sp
 	tempComponentPointer.anchorRight=true;
 	tempComponentPointer.isButton=true;
 	parentComponents(tempComponentPointer,layoutHeader);
-	// FOOTER
-	// Pecentage
-	statPercentage=new component("0%",0.12,0,"circle"); // logo	
+	
+	
+	statPercentage=new component("0%",0.12,0,"circle"); 
 	statPercentage.heightRel=0.8;
 	statPercentage.color="green";
 	statPercentage.anchorTop=true;
@@ -891,8 +891,8 @@ function initializeProjectSpecificStuff(){											// Initializing (Project-sp
 	statPercentage.widthPropHeight=true;
 	statPercentage.componentType="stat";
 	parentComponents(statPercentage,layoutFooter);
-	// Timer
-	statTimer=new component("0s",0.88,0,"circle"); // logo	
+	
+	statTimer=new component("0s",0.88,0,"circle"); 
 	statTimer.heightRel=0.8;
 	statTimer.color="orange";
 	statTimer.anchorTop=true;
@@ -901,7 +901,7 @@ function initializeProjectSpecificStuff(){											// Initializing (Project-sp
 	parentComponents(statTimer,layoutFooter);
 
 
-	if(0){ // All placed within Main Seat for test - works
+	if(0){ 
 		new component("Not a button",1/4,1/4);
 		var tempComponentPointer2 = new component("Grandpa",0.5,0.5);			
 		tempComponentPointer2.actionOnDrag="drag";
@@ -937,29 +937,29 @@ function initializeProjectSpecificStuff(){											// Initializing (Project-sp
 	}
 }
 
-// Project-specific Functions
+
 function seats(){
 	
-	// Create a layout object for the seats, parent it to layoutSeatmap
-	// Force it to be perfectly square
+	
+	
  	window.layoutSeats = new component("layoutSeats",0.5,0.5);
  	parentComponents(layoutSeats,layoutSeatmap);
  	layoutSeats.widthRel=0.75;	
 	layoutSeats.heightPropWidth=rowCount/columnCountWithAisle;
 	layoutSeats.color="white";
 	
-	// Add seats
+	
 	var tempSeat;
 	for(var i=0;i<columnCountWithAisle;i++){
 		for(var j=0;j<rowCount;j++){
-			// Add seat base
+			
 			tempSeat = new component("",(1/(columnCountWithAisle))*i,(1/(rowCount))*j);
 			tempSeat.anchorLeft=true;
 			tempSeat.anchorTop=true;
 			tempSeat.widthRel=1/columnCountWithAisle;
 			tempSeat.componentType="seat";
 			tempSeat.heightRel=1/rowCount;
-			//tempSeat.actionOnDrag="drag";
+			
 			tempSeat.color="rgb(228,208,200)";
 			tempSeat.strokeWidthRel = 4;
 			tempSeat.strokeColor="white";
@@ -971,7 +971,7 @@ function seats(){
 			parentComponents(tempSeat,layoutSeats);
 			for(var r=0;r<aisleToRightOfColumn.length;r++){
 				if(i!=aisleToRightOfColumn[r]){
-					// Add seat outline
+					
 					tempSeat =new component(seat,(1/(columnCountWithAisle))*(i+0.5),(1/(rowCount))*(j+0.5));
 					tempSeat.color="none";
 					tempSeat.heightRel=0.18;
@@ -979,14 +979,14 @@ function seats(){
 				}
 		}
 	}
-	// border on emergency row
+	
 	for(var r=0;r<emergencyRows.length;r++){
 		for(var i=0;i<columnCountWithAisle;i++){
 			tempSeat = new component("",(1/(columnCountWithAisle))*i,(1/(rowCount))*(emergencyRows[r]-1));
 			tempSeat.anchorLeft=true;
 			tempSeat.anchorTop=true;
 			tempSeat.widthRel=1/columnCountWithAisle;
-			//tempSeat.actionOnDrag="drag";			
+			
 			tempSeat.color="none";			
 			tempSeat.heightRel=1/rowCount;
 			tempSeat.strokeWidthRel = 4;
@@ -1002,8 +1002,8 @@ function seats(){
 	
 		}
 	}
-	// ADD TEXT
-	// Add letters
+	
+	
 	var letterCount=0;
 	for(var i=0;i<columnCountWithAisle;i++){		
 		for(var e=0;e<aisleToRightOfColumn.length;e++){
@@ -1017,8 +1017,8 @@ function seats(){
 			}
 		}
 	}
-	// Add numbers
-	// NTH: make it cycle to account for muliple aisles (right now its just 3)
+	
+	
 	for(var i=0;i<rowCount;i++){		
 		tempSeat = new component(i+1,1/(columnCountWithAisle*2)+(1/(columnCountWithAisle))*3,1/(rowCount*2)+(1/(rowCount))*i);	
 		tempSeat.color="none";
@@ -1027,13 +1027,13 @@ function seats(){
 		parentComponents(tempSeat,layoutSeats);
 	}
 
-	// Add windows
-	// Left
+	
+	
 	tempSeat =new component(windowsLeft,-0.05,0.5);
 	tempSeat.color="none";
 	tempSeat.heightRel=1;
 	parentComponents(tempSeat,layoutSeats);
-	// Right
+	
 	tempSeat =new component(windowsRight,1.05,0.5);
 	tempSeat.color="none";
 	tempSeat.heightRel=1;
@@ -1041,14 +1041,14 @@ function seats(){
 
 
 
-	// Add hint below seatmap
+	
 	window.posHint = new component("",0.5,1.11);	
 	posHint.color="none";
 	posHint.fontColor	= "black";	
 	posHint.fontType	= "UI";	
 	parentComponents(posHint,layoutSeats);	
 
-	// add people
+	
 	var fakeColumnCounter=0;
 	var tempPerson;
 	for(var i=0;i<columnCount;i++){
@@ -1066,7 +1066,7 @@ function seats(){
 				tempPerson.actionOnDrag="drag";
 				parentComponents(tempPerson,layoutSeats);	
 
-				console.log("> "+tempPerson.passenger.name);
+				
 				
 				if(0){
 					tempSeat = new component(arrayOfSeatedPassengers[i][j].name,(1/(columnCountWithAisle))*fakeColumnCounter,(1/(rowCount))*j);
@@ -1089,15 +1089,15 @@ function seats(){
 	
 	
 
-	//window.rowCount=5;
-	//window.columnCount=6;
-	//window.emergencyRows=[3]; // can be multiple
-	//window.aisleToRightOfColumn=[3]; // can be multiple
-	//window.arrayOfSeatedPassengers=[];
+	
+	
+	
+	
+	
 	
 }
 
-function avatarGraphic(passport,x,y,sizePixels){	// size: h=w
+function avatarGraphic(passport,x,y,sizePixels){	
 	if(typeof passport==='undefined'){this.passport=0;}else{this.passport=passport;}
 	if(typeof x==='undefined'){this.x=0;}else{this.x=x;}
 	if(typeof y==='undefined'){this.y=0;}else{this.y=y;}
@@ -1105,11 +1105,11 @@ function avatarGraphic(passport,x,y,sizePixels){	// size: h=w
 
 	this.tagColor = "blue";
 
-	// All of these are relative to sizePixels
+	
 	this.eyeHeight = this.sizePixels/2;
 	this.eyeDist = this.sizePixels/3;	
 	this.lineWeight = strokeBaseThickness/2;
-	this.eyeOpeness = 1; // 0-1	
+	this.eyeOpeness = 1; 
 	this.smileSize = 0.3;
 	this.smileSizeTarget = 0.3;
 	this.headShakeAmountTarget = 0;
@@ -1118,7 +1118,7 @@ function avatarGraphic(passport,x,y,sizePixels){	// size: h=w
 	
 	this.updateAndDraw = function(){
 
-		// If children, or Frank
+		
 		if(this.passport==0.39003 || this.passport==0.39004){this.sizePixels*=0.8;}
 		if(this.passport==0.32){this.sizePixels*=0.9;}
 	
@@ -1130,7 +1130,7 @@ function avatarGraphic(passport,x,y,sizePixels){	// size: h=w
 
 		ctx.globalAlpha=1;	
 		if(this.passport==0){
-			//ctx.globalAlpha=0.5;
+			
 		}
 
 		this.eyeHeight = this.sizePixels/2;
@@ -1143,25 +1143,25 @@ function avatarGraphic(passport,x,y,sizePixels){	// size: h=w
 			this.tagColor= randomColor(this.passport); 
 		}
 
-		// face
-		//console.log(avatarWidth+","+avatarHeight);
-		// drawCircle(this.x,this.y,this.sizePixels,"white",true,"black",this.lineWeight); // Original one
-		this.newAvatarRelSize = 3; // hack to make new avatar parts work with old avatar system
+		
+		
+		
+		this.newAvatarRelSize = 3; 
 		this.newAvatarProp=avatarHeight/avatarWidth;
 		this.newAvatarWidth=this.sizePixels * this.newAvatarRelSize;
 		this.newAvatarHeight=this.newAvatarWidth*this.newAvatarProp;
 		ctx.drawImage(faceWhite,this.x-this.newAvatarWidth/2,this.y-(this.newAvatarHeight*0.55),this.newAvatarWidth,this.newAvatarHeight);
 		ctx.globalAlpha=0.2+this.passport*0.8;
-		if(this.passport>0){ // Some are orange
+		if(this.passport>0){ 
 			ctx.globalAlpha=this.passport*2;
 			ctx.drawImage(faceOrange,this.x-this.newAvatarWidth/2,this.y-(this.newAvatarHeight*0.55),this.newAvatarWidth,this.newAvatarHeight);
 		}
-		if(this.passport>0.5){ // Some are brown
+		if(this.passport>0.5){ 
 			ctx.globalAlpha=0.1+this.passport*0.35	;
 			ctx.drawImage(faceBrown,this.x-this.newAvatarWidth/2,this.y-(this.newAvatarHeight*0.55),this.newAvatarWidth,this.newAvatarHeight);
 		}
 		ctx.globalAlpha=1;
-		// faces
+		
 		if(this.passport==0.2){ctx.drawImage(Bob,this.x-this.newAvatarWidth/2,this.y-(this.newAvatarHeight*0.55),this.newAvatarWidth,this.newAvatarHeight);}
 		if(this.passport==0.3){ctx.drawImage(Lorraine,this.x-this.newAvatarWidth/2,this.y-(this.newAvatarHeight*0.55),this.newAvatarWidth,this.newAvatarHeight);}
 		if(this.passport==0.8){ctx.drawImage(Jorge,this.x-this.newAvatarWidth/2,this.y-(this.newAvatarHeight*0.55),this.newAvatarWidth,this.newAvatarHeight);}
@@ -1181,7 +1181,7 @@ function avatarGraphic(passport,x,y,sizePixels){	// size: h=w
  	
 		
 
-		// mouth
+		
 		ctx.beginPath();
 		ctx.lineCap = "round";
 		if(this.smileSize!=this.smileSizeTarget){
@@ -1191,7 +1191,7 @@ function avatarGraphic(passport,x,y,sizePixels){	// size: h=w
 			this.smileSizeTarget-=(this.smileSizeTarget-0.3)/2;
 		}
 		ctx.lineWidth = this.lineWeight*0.65;
-		if(this.passport==0.5){this.smileSize=0.42;}// if Jess with baby, smaller mouth
+		if(this.passport==0.5){this.smileSize=0.42;}
 		if(!this.isSad){
 			ctx.arc(this.x+this.headShake,this.y-this.sizePixels/4,this.sizePixels/1.5, Math.PI*this.smileSize, Math.PI*(1-this.smileSize));
 		}else{
@@ -1200,10 +1200,10 @@ function avatarGraphic(passport,x,y,sizePixels){	// size: h=w
 		ctx.strokeStyle = strokeBaseColor;
 		ctx.stroke();
 
-		// eyelids
+		
 		if(this.eyeOpeness<1){this.eyeOpeness+=(1-this.eyeOpeness)/5;}
 
-		// eyes
+		
 		ctx.save();
 		ctx.beginPath();
 		ctx.rect(this.headShake+this.x-this.eyeDist*2, this.y-(this.eyeHeight/4)-this.eyeOpeness*(this.eyeHeight/2), this.eyeDist*4, this.eyeDist*1.5);
@@ -1216,21 +1216,21 @@ function avatarGraphic(passport,x,y,sizePixels){	// size: h=w
 			
 		ctx.globalAlpha=1;
 		
-		// tag (to diferentiate, while no faces)
+		
 		if(this.passport!=0){
-			//	drawCircle(this.x-this.sizePixels*0.8,this.y-this.sizePixels*0.8,this.sizePixels/2,this.tagColor);
+			
 		}
 
 		
 	}
 
-//				drawCircle(this.posxPixels, this.posyPixels, this.widthPixels/2,this.color, true, "black");
+
 }
-function pickPersonAndBuildDeck(){ // TBD: create array if group
+function pickPersonAndBuildDeck(){ 
 	var returnArray = [];
 	var tempPerson;
 
-	// Remove a random person from array
+	
 	if(randomizePassengers){
 		tempPerson = arrayOfPassengers.splice(Math.floor(Math.random()*arrayOfPassengers.length),1)[0];
 	}else{
@@ -1240,34 +1240,34 @@ function pickPersonAndBuildDeck(){ // TBD: create array if group
 	var tempGroup="none";
 	
 	if(typeof tempPerson.group==='undefined'){
-		// If person is solo traveller, just return that
+		
 		returnArray[0]= tempPerson;		
 	}else{
 		tempGroup=tempPerson.group;
-		// if part of group, build array (first element in array is the leader)
+		
 		returnArray[0]= tempPerson;
 		for(var i=0; i<arrayOfPassengers.length; i+=1){
 			if(typeof arrayOfPassengers[i].group!=='undefined'){
 				if(arrayOfPassengers[i].group==tempGroup){
-					// if leader, push to front, if not push to back
+					
 					if(typeof arrayOfPassengers[i].groupLeader!=='undefined'){
 						returnArray.unshift(arrayOfPassengers.splice(i,1)[0]);
 					}else{
 						returnArray.push(arrayOfPassengers.splice(i,1)[0]);	
 					}
-					i-=1; // since the original array is now smaller
+					i-=1; 
 				}
 			}
 		}
 	}
 	
-	return returnArray// and returns it
+	return returnArray
 }
-function checkPlacing(){ // returns "accept" or "occupied" (note the placement might still be challenged later if it leaves an empty seat) 
+function checkPlacing(){ 
 	if(arrayOfSeatedPassengers[(seatMapGridPosOnPointerUpOrDown[0]-1)][(seatMapGridPosOnPointerUpOrDown[1]-1)]==null){
 		return "accept";
 	}else{
-		// If seat not empty
+		
 		return "occupied";
 	}
 }
@@ -1281,18 +1281,18 @@ function moveToTop(id){
 	}
 }
 function notSeated(card){
-	console.log("function notSeated concluded:");
+	
 	for(var i=0; i<currentSeatedDeck.length;i++){
 		if(currentSeatedDeck[i].id==card.id){
-			console.log("FALSE");
+			
 			return false;
 		}
 	}
 	
-	console.log("TRUE");	
+	
 	return true;
 }
-function highlightSeats(listOfSeats,hiColor){ // NTH: use this for other instances where you highlight stuff
+function highlightSeats(listOfSeats,hiColor){ 
 	if(typeof hiColor==='undefined'){
 		this.hiColor = colorReviewMode;
 	}else{
@@ -1312,7 +1312,7 @@ function highlightSeats(listOfSeats,hiColor){ // NTH: use this for other instanc
 		sy = layoutSeats.posyPixels-layoutSeats.heightPixels/2 + (listOfSeats[i][1]+0.5)*seatWidth;
 		if(listOfSeats[i][0]>2){sx +=seatWidth;}
 
-		if(0){ // Writes a centered text
+		if(0){ 
 			ctx.fillStyle="black";
 			ctx.textAlign = "center";
 			ctx.font = 100+" "+fontUISize/2	+ "px "+fontFamilyPrimary;			
@@ -1331,50 +1331,50 @@ function checkForLoneSeats(){
 	var listOfLoneSeats = [];
 	var foundLoneWindowSeat=false;
 	var foundLoneMiddleSeat=false;
-	// this will also update this string global var: loneSeatsMsg
+	
 
-	// For all empty window seats, check if any has non-empty seats next to them
-	// Column A
+	
+	
 	for(var j=0;j<rowCount;j++){
 		if(arrayOfSeatedPassengers[0][j]==null){
-			//console.log("In col A, row "+j+" is an empty window seat");
+			
 			if(arrayOfSeatedPassengers[1][j]!=null){		
-				console.log("to its right is a non -empty window seat - so ADD ME TO LONE SEAT ARRAY");
+				
 				listOfLoneSeats.push([0,j]);
 				foundLoneWindowSeat=true;
 			}
 		}
 	}
-	// Column F
+	
 	for(var j=0;j<rowCount;j++){
 		if(arrayOfSeatedPassengers[5][j]==null){
-			//console.log("In col F, row "+j+" is an empty window seat");
+			
 			if(arrayOfSeatedPassengers[4][j]!=null){		
-				//console.log("to its left is a non -empty window seat - so ADD me TO LONE SEAT ARRAY");
+				
 				listOfLoneSeats.push([5,j]);
 				foundLoneWindowSeat=true;
 			}
 		}
 	}
 
-	// For all empty middle seats, check if any is lone
-	// Column B
+	
+	
 	for(var j=0;j<rowCount;j++){
 		if(arrayOfSeatedPassengers[1][j]==null){
-			//console.log("In col B, row "+j+" is an empty window seat");
+			
 			if(arrayOfSeatedPassengers[0][j]!=null && arrayOfSeatedPassengers[2][j]!=null){		
-				//console.log("it is lone - so ADD ME TO LONE SEAT ARRAY");
+				
 				listOfLoneSeats.push([1,j]);
 				foundLoneMiddleSeat=true;
 			}
 		}
 	}
-	// Column E
+	
 	for(var j=0;j<rowCount;j++){
 		if(arrayOfSeatedPassengers[4][j]==null){
-			//console.log("In col E, row "+j+" is an empty window seat");
+			
 			if(arrayOfSeatedPassengers[3][j]!=null && arrayOfSeatedPassengers[5][j]!=null){		
-				//console.log("it is lone - so ADD ME TO LONE SEAT ARRAY");
+				
 				listOfLoneSeats.push([4,j]);
 				foundLoneMiddleSeat=true;
 			}
@@ -1382,12 +1382,12 @@ function checkForLoneSeats(){
 	}
 
 
-	// delme later prbs
+	
 	for(var i=0;i<columnCount;i++){
 		for(var j=0;j<rowCount;j++){
 			if(arrayOfSeatedPassengers[i][j]==null){
 				pointS = arrayOfSeatedPassengers[i][j];
-				//console.log(i+","+j+" is empty");
+				
 			}
 		}
 	}
@@ -1397,35 +1397,35 @@ function checkForLoneSeats(){
 	if(foundLoneMiddleSeat){loneSeatsMsg="Lone middle seat";}
 	if(foundLoneWindowSeat && foundLoneMiddleSeat){loneSeatsMsg="Lone middle/window seats";}
 	
-	return listOfLoneSeats; 	// MUST return empty array if none found
+	return listOfLoneSeats; 	
 }
 
-function defineInputFunctions() { 											// Define pointer events (both mouse and touch use the same mouse function)
+function defineInputFunctions() { 											
  
-	// DOWN (click/touch)
+	
 	canvasp.addEventListener("mousedown", mouseDown, false);
 	canvasp.addEventListener("touchstart", mouseDown, false);
 	function mouseDown(event) {
 		pointerDown = true;		
-		pointerDownGlobalOneOffWarning=true; // true for one main loop (then it becomes false again)
+		pointerDownGlobalOneOffWarning=true; 
 		updatePointerCanvasPos(event);
 	}
 
-	// UP (unclick/untouch)
+	
 	canvasp.addEventListener("mouseup", mouseUp, false);
 	canvasp.addEventListener("touchend", mouseUp, false);
 	function mouseUp(event){
 		
 		event.preventDefault();		
 
-		pointerUpGlobalOneOffWarning=true; // lasts 1 loop
+		pointerUpGlobalOneOffWarning=true; 
 
 		pointerDown = false;
 		pointerDragging = false;			
  	
 	}
 
-	// MOVE
+	
 	canvasp.addEventListener("mousemove", mouseMove, false);
 	canvasp.addEventListener("touchmove", mouseMove, false);	
 	function mouseMove(event){
@@ -1436,7 +1436,7 @@ function defineInputFunctions() { 											// Define pointer events (both mous
 		}
 	}
 
-	// MOUSE OUT (pointer leaves window)
+	
 	canvasp.addEventListener ("mouseout", mouseOut, false);
 	function mouseOut(event){
 		pointerDown = false;
@@ -1449,8 +1449,8 @@ function defineInputFunctions() { 											// Define pointer events (both mous
 function updateLayoutElements(){
 	
 	
-	// ROOT
-	// By default, fill screen
+	
+	
 	root.heightRel = 1;
 	root.widthRel = 1;
 	var intendedWidth=(ch*canvasPropPortrait);
@@ -1459,20 +1459,20 @@ function updateLayoutElements(){
 	introText.style.fontSize="0.9em";
 	introText.style.lineHeight="1.5em";
 	
-	// If screenPropCurrent <1 (i.e. narrower than square)
+	
 	if(screenPropCurrent<1){
 		isMobile=true;
 		isPortrait=true;
 		
-		// If intended width smaller than available cw, then all good: make canvas width be proportional to ch, using canvasPropPortrait
+		
 		if(intendedWidth<cw){
 			root.widthRel = intendedWidth/cw;		
- 		// If bigger, then have height be prop to width instead
+ 		
 		}else{
 			intendedHeight =(cw/canvasPropPortrait);
 			root.heightRel = intendedHeight/ch;
 			
-			// Make sure Introtext is well aligned
+			
 			introText.style.top=(ch-intendedHeight)/2+"px";			
 		}
 		
@@ -1480,19 +1480,19 @@ function updateLayoutElements(){
 		introText.style.lineHeight=root.heightRel*1.75+"em";
 
 
-	// If screenPropCurrent =>1 (i.e. square or wider)
+	
 	}else{
 		isMobile=false;
 		isPortrait=false;
 		
-		// If intended height is smaller than available ch, then all good: make canvas height be proportional to cw, using canvasPropLandscape
+		
 		if(intendedHeight<ch){
 			root.heightRel = intendedHeight/ch;		
 			
-			// Make sure Introtext is well aligned
+			
 			introText.style.top=(ch-intendedHeight)/2+"px";
 			
-		// If bigger, then have width be prop to height instead
+		
 		}else{
 			intendedWidth=(ch*canvasPropLandscape);
 			root.widthRel = intendedWidth/cw;
@@ -1501,7 +1501,7 @@ function updateLayoutElements(){
 	}	
 	
 	
-	// Intro text
+	
 	introText.style.width=root.widthRel*100*0.7+"%";
 	
 	
@@ -1526,96 +1526,96 @@ function updateLayoutElements(){
 	layoutDeckDropArea.anchorBottom=false;
 	layoutDeckDropArea.anchorTop=false;
 	if(isMobile){
-		//Header
+		
 		layoutHeader.posXRel=0.5;
 		layoutHeader.posYRel=0;
 		layoutHeader.anchorTop=true;
 		layoutHeader.widthRel=1;
 		layoutHeader.heightRel=0.075;
-		//layoutHeader.actionOnDrag="drag";
-		// Main
+		
+		
 		layoutBody.posXRel=0.5;
 		layoutBody.posYRel=0.075;
 		layoutBody.widthRel=1;
 		layoutBody.heightRel=0.8;
 		layoutBody.anchorTop=true;
-		//layoutBody.actionOnDrag="drag";
-		// Main.Seats
+		
+		
 		layoutSeatmap.posXRel=0.5;
 		layoutSeatmap.posYRel=0;
 		layoutSeatmap.anchorTop=true;
 		layoutSeatmap.widthRel=1;
 		layoutSeatmap.heightRel=0.6;
-		//layoutSeatmap.actionOnDrag="drag";	
+		
 		parentComponents(layoutSeatmap,layoutBody);
-		// Main.Cards
+		
 		layoutAreaForCards.posXRel=0.5;
 		layoutAreaForCards.posYRel=1;
 		layoutAreaForCards.anchorBottom=true;
 		layoutAreaForCards.widthRel=1;
 		layoutAreaForCards.heightRel=0.4;
-		//layoutAreaForCards.actionOnDrag="drag";	
+		
 		parentComponents(layoutAreaForCards,layoutBody);
-		// Main.Cards
+		
 		layoutDeckDropArea.posXRel=0.5;
 		layoutDeckDropArea.posYRel=0.5;
 		layoutDeckDropArea.widthRel=0.5;
 		layoutDeckDropArea.heightRel=0.5;
-		//layoutAreaForCards.actionOnDrag="drag";	
+		
 		parentComponents(layoutDeckDropArea,layoutAreaForCards);
-		// Footer
+		
 		layoutFooter.posXRel=0.5;
 		layoutFooter.posYRel=1;
 		layoutFooter.anchorBottom=true;
 		layoutFooter.widthRel=1;
 		layoutFooter.heightRel=0.125;
-		//layoutFooter.actionOnDrag="drag";		
+		
 		
 	}else{
-		//Header
+		
 		layoutHeader.posXRel=0.5;
 		layoutHeader.posYRel=0;
 		layoutHeader.anchorTop=true;
 		layoutHeader.widthRel=1;
 		layoutHeader.heightRel=0.1;
-		//layoutHeader.actionOnDrag="drag";
-		// Main
+		
+		
 		layoutBody.posXRel=0.5;
 		layoutBody.posYRel=0.1;
 		layoutBody.anchorTop=true;
 		layoutBody.widthRel=1;
 		layoutBody.heightRel=0.75;
-		//layoutBody.actionOnDrag="drag";
-		// Main.Seats
+		
+		
 		layoutSeatmap.posXRel=0;
 		layoutSeatmap.posYRel=0.5;
 		layoutSeatmap.anchorLeft=true;
 		layoutSeatmap.widthRel=0.5;
 		layoutSeatmap.heightRel=1;
-		//layoutSeatmap.actionOnDrag="drag";	
+		
 		parentComponents(layoutSeatmap,layoutBody);
-		// Main.Cards
+		
 		layoutAreaForCards.posXRel=1;
 		layoutAreaForCards.posYRel=0.5;
 		layoutAreaForCards.anchorRight=true;
 		layoutAreaForCards.widthRel=0.5;
 		layoutAreaForCards.heightRel=1;
-		//layoutAreaForCards.actionOnDrag="drag";	
+		
 		parentComponents(layoutAreaForCards,layoutBody);
-		// Main.Cards
+		
 		layoutDeckDropArea.posXRel=0.5;
 		layoutDeckDropArea.posYRel=0.5;
 		layoutDeckDropArea.widthRel=0.5;
 		layoutDeckDropArea.heightRel=0.5;
-		//layoutAreaForCards.actionOnDrag="drag";	
+		
 		parentComponents(layoutDeckDropArea,layoutAreaForCards);
-		// Footer
+		
 		layoutFooter.posXRel=0.5;
 		layoutFooter.posYRel=1;
 		layoutFooter.anchorBottom=true;
 		layoutFooter.widthRel=1;
 		layoutFooter.heightRel=0.15;
-		//layoutFooter.actionOnDrag="drag";		
+		
 	}
 
 
@@ -1659,34 +1659,34 @@ function updatePointerCanvasPos(theEvent){
 	}
 	
 	
-	// First, get x,y position of mouse or touch
-	if(theEvent.targetTouches="null"){ // IF MOUSE (ie., no touch events)
+	
+	if(theEvent.targetTouches="null"){ 
 			mouseX = theEvent.x;
 			mouseY = theEvent.y;
 	}
-	if(theEvent.targetTouches!="null"&&theEvent.targetTouches.length>0){   // NEEDED to get touch events
+	if(theEvent.targetTouches!="null"&&theEvent.targetTouches.length>0){   
 		mouseX = theEvent.targetTouches[0].pageX;
 		mouseY = theEvent.targetTouches[0].pageY;	
 	}
 
-	// Adjust for canvasRed
+	
 	mouseX *=canvasRes;
 	mouseY *=canvasRes;
 }
 
-function readLocalVars(){													// To read variables from the device...
+function readLocalVars(){													
 	if(localStorage.varToStoreLocally){
 		varToStoreLocally = localStorage.varToStoreLocally;
 	}
 }
-function writeLocalVars(){													// ... and write variables to device.
+function writeLocalVars(){													
 	localStorage.varToStoreLocally = varToStoreLocally;
 }
 
 
-// MAIN LOOP <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-function mainLoop(timestamp) { 												// The main loop (calls itself at end)
-	// Clear debug text 
+
+function mainLoop(timestamp) { 												
+	
 	debugText = [];
 
 	if(lineDashOffset<0){lineDashOffset=lineDashSize*3;}else{lineDashOffset-=1/4;}
@@ -1695,13 +1695,13 @@ function mainLoop(timestamp) { 												// The main loop (calls itself at end
 	cardHeight = cardHeightPropWidth * cardWidth;
 	layoutDeckDropAreaPos=[layoutDeckDropArea.posxPixels,layoutDeckDropArea.posyPixels];
 	
-	// Hacky, to use below
+	
 	if(pointerDownGlobalOneOffWarning){
 		pointerPosWhenDown=[mouseX,mouseY];
 	}
 
-	// If click with no drag
-	// (hacky; lazy to fix this elsewhere)
+	
+	
 	if(pointerUpGlobalOneOffWarning){
 		pointerPosWhenUp=[mouseX,mouseY];
 		if(pointsAreCloserThan(pointerPosWhenDown,pointerPosWhenUp,dragDelta)){
@@ -1712,22 +1712,22 @@ function mainLoop(timestamp) { 												// The main loop (calls itself at end
 	
 
 	timeCounter+= 1;
-	//ctx.scale(2, 2);
+	
 
 	targetStatPercentage=Math.round(100*(totalPassengersSeated/totalPassengersOriginallyInCue)); 
 
 	clearCanvas();
 
-	// Pick one demo to run (set to -1 for none)
+	
 	var demo = 0;
-	if(usingFakePixelsCanvas){ // Haven't been updated for a while. Will prbbly break
+	if(usingFakePixelsCanvas){ 
 		
-	// Draw to canvas on click (demo)
+	
 	if(pointerDown){
 		addFakePixel(mouseXf,mouseYf,"black");
 	}		
 		
-	if(demo==0){	// Weed grows (uwaga: this one requires multiple passes; the way its currently implemented, these passes occur at every new frame (ie, takes a few frames to draw)
+	if(demo==0){	
 	var decayVar = 1/10;
 	if(Math.random()<0.5){decayVar*=1/10;}
 	if(Math.random()<0.5){decayVar*=1/10;}
@@ -1738,27 +1738,27 @@ function mainLoop(timestamp) { 												// The main loop (calls itself at end
 
 			if(fakePixelGrid[rX][rY]=="white"){
 				if(Math.random()<decayVar){
-					//decayVar *= 0.95;
+					
 					addFakePixel(rX,rY,randomColor());
 				}
 			}else{
 				var growDirection = Math.floor(Math.random()*4);
 				
-				if(growDirection==0){ // LEFT
+				if(growDirection==0){ 
 					if(rX>0){
 						if(fakePixelGrid[rX-1][rY]=="white"){
 							addFakePixel(rX-1,rY,fakePixelGrid[rX][rY]);					
 						}
 					}
 				}
-				if(growDirection==1){ // DOWN
+				if(growDirection==1){ 
 					if(rY>0){
 						if(fakePixelGrid[rX][rY-1]=="white"){
 							addFakePixel(rX,rY-1,fakePixelGrid[rX][rY]);											
 						}
 					}	
 				}
-				if(growDirection==2){ // RIGHT
+				if(growDirection==2){ 
 					if(rX<(widthInFakePixels-1)){
 						if(fakePixelGrid[rX+1][rY]=="white"){
 							addFakePixel(rX+1,rY,fakePixelGrid[rX][rY]);											
@@ -1779,14 +1779,14 @@ function mainLoop(timestamp) { 												// The main loop (calls itself at end
 	}
 
 	}
-	if(demo==1){	// Test: noise
+	if(demo==1){	
 	ctx.fillStyle = "blue";
 	var tempX; var tempY;
 	var rgbaColor;
 	ctx.imageSmoothingEnabled = false;
 	for(var i=0; i<widthInFakePixels; i+=1){
 		for(var j=0; j<heightInFakePixels; j+=1){
-			//ctx.fillStyle = "rgba("+(255*Math.abs(Math.sin((Math.cos(timeCounter)+i)/20)))+", "+(255*Math.abs(Math.sin(Math.sin(timeCounter)+i/10)))+", "+(255*Math.abs(Math.sin(timeCounter+i/j*15)))+", 1)"; 
+			
 			rgbaColor = "rgba("+randomFromSeed(timeCounter+i+j*j)*255+", "+randomFromSeed(timeCounter+j+i*i)*255+", "+randomFromSeed(timeCounter+i*j)*255+", 0.1)"; 
 			addFakePixel(i,j,rgbaColor);
 			
@@ -1799,10 +1799,10 @@ function mainLoop(timestamp) { 												// The main loop (calls itself at end
 		}
 	}
 	}
-	if(demo==2){	// Test waves
+	if(demo==2){	
 	var heightDiv = 5;
 	clearFakePixelGrid("white");
-	//Test, wave
+	
 	for(var i=0; i<widthInFakePixels; i+=1){
 		for(var j=0; j<heightInFakePixels; j+=1){
 			
@@ -1812,7 +1812,7 @@ function mainLoop(timestamp) { 												// The main loop (calls itself at end
 		}
 	}
 
-	//Test, wave
+	
 	for(var i=0; i<widthInFakePixels; i+=1){
 		for(var j=0; j<heightInFakePixels; j+=1){
 			if(j>(Math.cos(timeCounter/1.1+i/20)*(Math.sin(timeCounter/1.3+i/70)*heightInFakePixels/heightDiv)+heightInFakePixels*3/4)){
@@ -1821,7 +1821,7 @@ function mainLoop(timestamp) { 												// The main loop (calls itself at end
 		}
 	}
 
-	//Test, wave
+	
 	for(var i=0; i<widthInFakePixels; i+=1){
 		for(var j=0; j<heightInFakePixels; j+=1){
 			var delta=0;
@@ -1836,37 +1836,37 @@ function mainLoop(timestamp) { 												// The main loop (calls itself at end
 	}
 
 	}
-	if(demo==3){	// 3D Test
-		//addFakePixel(100+Math.sin(timeCounter/10)*20,50+Math.cos(timeCounter/11)*20,"pink");
+	if(demo==3){	
 		
-		// Assuming: (locking in many vars for this test)
-		// 1. Unit is cm
-		// 2. Cameraman is standing on 0,0,0 and is 2m tall
-		// 3. Camera is pointing straight along x axis
-		// 4. Camera view (ie, a rectangle/square, where the light impressions will be) has exact same proportions as browser window, is located 1m from camera, on x axis and has 1m width
-			// 
-		// 5. Topography is an infinite cos/siny terrain averaging on z=0, with no bump taller than 1m
 		
-		// For all the below, you assume the screen view matches the cameraView
-		// ie, for every pixel on screen, a ray will be cast from where the camera would be (0,0,200) towards the location of that pixel in the cameraView, then extended , and check if hits terrain
+		
+		
+		
+		
+		
+			
+		
+		
+		
+		
 	 
 		
 		var cameraViewWidth = 100;
 		var cameraViewHeight = (cameraViewWidth*heightInFakePixels)/widthInFakePixels;
-		var cameraHeight = 200; // 200cm tall
+		var cameraHeight = 200; 
 		var cameraPos = [0,0,cameraHeight];
-		//moreDebugText=cameraViewHeight;
+		
 		for(i=0;i<widthInFakePixels;i++){
 			for(j=0;j<heightInFakePixels;j++){
-				// Temp vars containing distance in camera view that matches the distance in the fake pixel grid
+				
 				var viewY = (j/heightInFakePixels)*cameraViewHeight;
 				var viewX = (i/widthInFakePixels)*cameraViewWidth;
 				
-				// This is where the ray touches the camera viewport
-				// Note that viewport WIDTH goes along world Y axis, and viewport HEIGHT goes along Z axis
+				
+				
 				var rayCastPosInView = [100,viewX-(cameraViewWidth/2),viewY-(cameraViewHeight/2)+cameraHeight];
 
-				// Ray going from camera to that point in the camera view			
+				
 				var myRay = [cameraPos,rayCastPosInView];
 				
 				var tempOpacity = distanceBetween(cameraPos,rayCastPosInView)/160;
@@ -1889,33 +1889,33 @@ function mainLoop(timestamp) { 												// The main loop (calls itself at end
 	}
 
 
-	// FLOW
-	root.updateAndDraw(); // always add the root
-	//gameState="bla";
-	if(gameState=="init"){ // Creates components; but the update happens in the next gameState
-		// INTRO SCREEN
+	
+	root.updateAndDraw(); 
+	
+	if(gameState=="init"){ 
+		
 		
 		window.introScreen = new component("",0.5,0.5);
 		introScreen.heightRel=1;
 		introScreen.widthRel=1;
-		//introScreen.actionOnDrag="drag";
+		
 		introScreen.color="white";
 		parentComponents(introScreen,root);
  
-		// Button to Start game
+		
 		window.btnStart = new component("Let's go", 0.5, 0.85);
 		btnStart.fontType="bigButton";
 		btnStart.componentType="button";
-	//	btnStart.hint=ww+"x"+wh;
-		//btnStart.actionOnDrag="drag";
+	
+		
 		btnStart.actionOnClick="startGame";
 		btnStart.color="green";
 		parentComponents(btnStart,introScreen);		
  
 		gameState="intro";
  
-		// All the below is only used later (should have been defined in the start really)
-		// Button to resume game  
+		
+		
 		window.btnResume = new component("Resume", 0.5, 0.85);
 		btnResume.fontType="bigButton";
 		btnResume.componentType="button";
@@ -1923,26 +1923,26 @@ function mainLoop(timestamp) { 												// The main loop (calls itself at end
 		btnResume.color="green";
 		parentComponents(btnResume,introScreen);
 
-		// Transparent white overlay
+		
 		window.transpOverlay = new component("",0.5,0.5);
 		transpOverlay.heightRel=1;
 		transpOverlay.widthRel=1;
 		transpOverlay.color= "rgba(255,255,255,0.922)";
 		parentComponents(transpOverlay,root);
 
-		// Are you sure? message
+		
 		window.areYouSure = new component("Reset game?", 0.5, 0.4);
 		areYouSure.fontType="bigButton";
 		areYouSure.color="none";
 		parentComponents(areYouSure,introScreen);	
-		// YES
+		
 		window.resetYes = new component("Yes", 0.35, 0.5);
 		resetYes.fontType="bigButton";
 		resetYes.componentType="button";
 		resetYes.actionOnClick="resetYes";
 		resetYes.color="green";
 		parentComponents(resetYes,introScreen);
-		// NO
+		
 		window.resetNo = new component(" No ", 0.65, 0.5);
 		resetNo.fontType="bigButton";
 		resetNo.componentType="button";
@@ -1952,7 +1952,7 @@ function mainLoop(timestamp) { 												// The main loop (calls itself at end
 
 		
 		
-		// Remove from main component array (ie, what is looped and shown every frame) all the above items that wont be used yet
+		
 		removeComponent(btnResume.id);
 		removeComponent(transpOverlay.id);
 		removeComponent(areYouSure.id);
@@ -1968,31 +1968,31 @@ function mainLoop(timestamp) { 												// The main loop (calls itself at end
 		
 		
 	
-		// Skip intro (for debugging)
+		
 		if (0){
 			introText.style.opacity="0";
 			gameState="beforeFirstPassenger";
 		}		
 		
   	}
-	if(gameState!="intro"  && gameState!="init"){ 		// Note THIS REPEATS for all screens that show the seat map
-		for(var i=0;i<arrayOfComponents.length;i++){ 	// i=1 because no need to update root again
+	if(gameState!="intro"  && gameState!="init"){ 		
+		for(var i=0;i<arrayOfComponents.length;i++){ 	
 			arrayOfComponents[i].updateAndDraw();
 		}
 	}
 	if(gameState=="beforeFirstPassenger"){
-		// Remove intro screen and button
+		
 		if(typeof introScreen !=='undefined'){
 			removeComponent(introScreen.id);
 			removeComponent(btnStart.id);
 			
 		}
 		
-		// Show a button to Start
+		
 		window.btnCreateDeck = new component("I'm ready", 0.5, 0.5);
 		btnCreateDeck.fontType="bigButton";
 		btnCreateDeck.componentType="button";
-		//btnCreateDeck.actionOnDrag="drag";
+		
 		btnCreateDeck.actionOnClick="createNewCardDeck";
 		btnCreateDeck.color="green";
 		parentComponents(btnCreateDeck,layoutAreaForCards);	
@@ -2000,14 +2000,14 @@ function mainLoop(timestamp) { 												// The main loop (calls itself at end
 		gameState="waitingPlayerToStart";
 	}
 	if(gameState=="waitingPlayerToStart"){
-		//
+		
 	}
 	if(gameState=="createNewCardDeck"){
 		
 		removeComponent(btnCreateDeck.id);
  
-		// Create the cards object based on currentDeckOfPassengerInfo (can be one card, or a group of cards)		
-		currentDeckOfPassengerInfo = pickPersonAndBuildDeck(); // deck = currrent card(s) being shown; usually 1 person, but can be group; Pos 0 in original array is always the group leader 
+		
+		currentDeckOfPassengerInfo = pickPersonAndBuildDeck(); 
 		var approachDelay;
 		for(i=(currentDeckOfPassengerInfo.length-1); i>-1; i--){
 			window["layoutCard_"+i] = new component(window["layoutCard_"+i],0.5,0.5);
@@ -2015,8 +2015,8 @@ function mainLoop(timestamp) { 												// The main loop (calls itself at end
 			window["layoutCard_"+i].actionOnDrag="drag";
 			window["layoutCard_"+i].componentType="card";
 			window["layoutCard_"+i].passenger = currentDeckOfPassengerInfo[i]; 
-			window["layoutCard_"+i].passenger.myPosInDeck=i; // changes as deck is shuffled
-			window["layoutCard_"+i].passenger.myNumInDeck=i; // doesnt change (unless deck is changed)
+			window["layoutCard_"+i].passenger.myPosInDeck=i; 
+			window["layoutCard_"+i].passenger.myNumInDeck=i; 
 			arrayOfSeatedComponents.push(window["layoutCard_"+i]);
 			parentComponents(window["layoutCard_"+i],layoutDeckDropArea);		
 			approachDelay = (currentDeckOfPassengerInfo.length - window["layoutCard_"+i].passenger.myPosInDeck)*2;
@@ -2032,10 +2032,10 @@ function mainLoop(timestamp) { 												// The main loop (calls itself at end
 	}
 
 	if(gameState=="nextCardComesIn"){
-		layoutAreaForCards.updateAndDraw(); // This is needed, otherwise layoutCard doesnt get the proper posxPixels from its dad (layoutAreaForCards)
-		layoutDeckDropArea.updateAndDraw(); // This is needed, otherwise layoutCard doesnt get the proper posxPixels from its dad (layoutAreaForCards)
+		layoutAreaForCards.updateAndDraw(); 
+		layoutDeckDropArea.updateAndDraw(); 
 
-		// The below can probably go eventually, since pos is being defined later?
+		
 		for(i=0; i<currentDeckOfPassengerInfo.length; i++){
 			window["layoutCard_"+i].targetx= window["layoutCard_"+i].pai.pai.posxPixels;
 		}
@@ -2049,11 +2049,11 @@ function mainLoop(timestamp) { 												// The main loop (calls itself at end
 
 	if(gameState=="showNextButton"){
  		
-		// Show a button to SHOW NEXT PASSENGER
+		
 		window.btnCreateDeck = new component("Next, please!", 0.5, 0.5);
 		btnCreateDeck.fontType="bigButton";
 		btnCreateDeck.componentType="button"
-		//btnCreateDeck.actionOnDrag="drag";
+		
 		btnCreateDeck.actionOnClick="createNewCardDeck";
 		btnCreateDeck.color="green";
 		btnCreateDeck.hint = "Unsure? You can still reposition.";
@@ -2062,16 +2062,16 @@ function mainLoop(timestamp) { 												// The main loop (calls itself at end
 		gameState="waitingPlayerToHitNext";
 	}
 	if(gameState=="waitingPlayerToHitNext"){
-		//
+		
 	}
 	if(gameState=="showSubmitButton"){
 		removeComponent(btnCreateDeck.id);
 		
-		// Show a button to SUBMIT
+		
 		window.btnCreateDeck = new component("I'm Done!", 0.5, 0.5);
 		btnCreateDeck.fontType="bigButton";
 		btnCreateDeck.componentType="button"
-		//btnCreateDeck.actionOnDrag="drag";
+		
 		btnCreateDeck.actionOnClick="submit"; 
 		btnCreateDeck.hint = "Unsure? You can still change positions!";
 		btnCreateDeck.color="green";
@@ -2080,7 +2080,7 @@ function mainLoop(timestamp) { 												// The main loop (calls itself at end
 		gameState="waitingPlayerToSubmit";
 	}
 	if(gameState=="waitingPlayerToSubmit"){
-		//
+		
 	}
 
 	if(gameState=="showFeedback"){
@@ -2094,45 +2094,45 @@ function mainLoop(timestamp) { 												// The main loop (calls itself at end
 		
 		window.feedbackAlpha = 0;
 		
-		// Calculate feedback
-		// Errors that lead to fail
-		// If has any CODE (except CHD) and is in emergency row: CODE in emergency row
-		// If is elderly (age>65) and is in emergency row: Elderly in emergency row
-		// If a CHD is not seating next to at least one parent from their group
+		
+		
+		
+		
+		
 
-		// Could be improved
-		// If any pref not fullfilled (prefTogether, prefAisle, prefWindow): just show the correspondent strings (note: across aisle = together)
 		
-		// If under 2min, quick and efficient (if over, dont mention it)
 		
-		// Cycle through arrayOfSeatedPassengers:
-		// ASSUMES ONLY ONE EMERGENCY ROW AND AISLE (if expand for more, adjust below - and elsewhere as well)
-		// Vars below are global
-		window.globalEssentialRequirements = [0,0]; //[total,unmet] // having any CODE, being elderlyFrail, essential requirements specific to a code
-		window.globalPreferences = [0,0]; // [total,unmet] // Note its on an individual basis. If a familu is broken in two, but some memebers are still together, they count
-		window.globalEfficient=false; if(Math.round(gameTimer/60)<120){globalEfficient=true;} // if less than 2 min, its efficient	
-		// Vars below reset for each passenger.
-		var me; // just to make things simpler below
+		
+		
+		
+		
+		
+		
+		window.globalEssentialRequirements = [0,0]; 
+		window.globalPreferences = [0,0]; 
+		window.globalEfficient=false; if(Math.round(gameTimer/60)<120){globalEfficient=true;} 
+		
+		var me; 
 		var childAwayFromParents=true; var isNextToSoloTraveller=false;
 		var UMNRtopRow=true; UMNRnextToSolo=false; UMNRnotInAisle=false;
-		var isEmergencyRow=false; var isElderlyFrail; var isAisle=false; var isWindow=false;  var hasCode=false; var hasPref=false; var siblingOnMy="none"; // can be right or left too
-		// First, mark all people who strayed from groups (useful for UMNR)
+		var isEmergencyRow=false; var isElderlyFrail; var isAisle=false; var isWindow=false;  var hasCode=false; var hasPref=false; var siblingOnMy="none"; 
+		
 		for(var i=0;i<columnCount;i++){
 			for(var j=0;j<rowCount;j++){
 				if(arrayOfSeatedPassengers[i][j]!=null && arrayOfSeatedPassengers[i][j]!=passengerPreseat){
-					// This used to be here; but I actually need to run for all, since I need to know who is solo: if(typeof me.myGroupIsTogether==='undefined'){
-					groupIsTogether(i,j); // runs once per group;  checks entire array, and sets var myGroupIsTogether to all accordingly					
+					
+					groupIsTogether(i,j); 
 				}
 			}
 		}
-		// Below loop will also add vars to some passengers, to be used later for the review
+		
 		for(var i=0;i<columnCount;i++){
 			for(var j=0;j<rowCount;j++){
 				if(arrayOfSeatedPassengers[i][j]!=null && arrayOfSeatedPassengers[i][j]!=passengerPreseat){
 					me = arrayOfSeatedPassengers[i][j];
 					me.feedback="none";
-					console.log(i+","+j+" Checking "+me.name);
-					// Init useful reusable vars
+					
+					
 					isEmergencyRow=false;
 					isAisle=false;
 					isWindow=false;
@@ -2141,112 +2141,112 @@ function mainLoop(timestamp) { 												// The main loop (calls itself at end
 					hasCode=false;
 					hasPref=false;
 					siblingOnMy="false";
-					// Define
+					
 					if(i==aisleToRightOfColumn[0] || i==aisleToRightOfColumn[0]-1){
 						isAisle=true;
-						console.log("Is in aisle seat. ");
+						
 					}
 					if(i==0 || i==columnCount-1){
 						isWindow=true;
-						console.log("Is in window seat. ");
+						
 					}
 					if(j==emergencyRows[0]-1){
 						isEmergencyRow=true;
-						console.log("Is in emergency row. ");
+						
 					}
 					if(typeof me.code !== 'undefined'){
 						hasCode=true;
-						console.log("Has code:"+ me.code);
+						
 						globalEssentialRequirements[0]+=1;
 					}	
 					if(typeof me.pref !== 'undefined'){
-						hasPref=true; // But note it can mean anything; below checks for stuff really count
+						hasPref=true; 
 					}
 					if(hasPref){
 						var prefTemp = me.pref;
-						if(prefTemp.includes(prefAisle)||prefTemp.includes(prefWindow)||prefTemp.includes(prefTogether)){ // since not all items there actually count
+						if(prefTemp.includes(prefAisle)||prefTemp.includes(prefWindow)||prefTemp.includes(prefTogether)){ 
 							globalPreferences[0]+=1;
-							console.log("Has pref:"+ me.pref.length);
+							
 						}
 						if(me.pref.includes(elderlyFrail)){
 							isElderlyFrail=true;
 							globalEssentialRequirements[0]+=1;
 						}
 					}
-					// SPECIFIC
-					// Elderly frail
+					
+					
 					if(isElderlyFrail){
 						if(isEmergencyRow){
 							me.feedback="essential";
-							globalEssentialRequirements[1]+=1; // add to counter of unmet essential requirements
+							globalEssentialRequirements[1]+=1; 
 							me.myReviewFeedbackText="Frail person in emergency row";
-							console.log("Elder frail in emergency row!"); // !!!
+							
 						}
 					}
-					// PREF BASED
+					
 					if(typeof me.pref !== 'undefined'){
-						// prefAisle
+						
 						if(me.pref.includes(prefAisle)){
 							if(isAisle){
-								console.log("Satified:"+me.pref); // !!!										
+								
 							}else{
 								if(me.feedback!="essential"){me.feedback="preference";}
-								globalPreferences[1]+=1; // add to counter of unmet preferences
-								console.log("Not satified:"+me.pref); // !!!
+								globalPreferences[1]+=1; 
+								
 							}
 						}
-						// prefWindow
+						
 						if(me.pref.includes(prefWindow)){
 							if(isWindow){
-								console.log("Satified:"+me.pref); // !!!
+								
 							}else{
 								if(me.feedback!="essential"){me.feedback="preference";}
-								globalPreferences[1]+=1; // add to counter of unmet preferences
-								console.log("Not satified:"+me.pref); // !!!
+								globalPreferences[1]+=1; 
+								
 							}
 						}
-						// prefTogether
+						
 						if(me.pref.includes(prefTogether)){
 							globalPreferences[0]+=1;
-							// All passegers should already have been labeled accordingly earlier 
+							
 							if(!me.myGroupIsTogether){
 								if(me.feedback!="essential"){me.feedback="preference";}
-								globalPreferences[1]+=1; // add to counter of unmet preferences
-								//console.log(me.name+" NOT with full group +++++++++++++++++"); // !!!							
+								globalPreferences[1]+=1; 
+								
 							}else{
-								//console.log(me.name+" YES with full group +++++++++++++++++"); // !!!															
+								
 							}
 						}
 						
 					}					
-					// CODE BASED (PREG, NERV etc)
-					// If has Code
+					
+					
 					if(hasCode){
-						// General
+						
 						if(isEmergencyRow){
 							me.feedback="essential";
-							globalEssentialRequirements[1]+=1; // add to counter of unmet essential requirements
-							console.log(me.code+" in emergency row!"); // !!!
+							globalEssentialRequirements[1]+=1; 
+							
 							me.myReviewFeedbackText="\x22"+me.code+"\x22 in emergency row"
 						}
-						// Specifics
+						
 						if(me.code == "CHD"){
-							// Note this differs from being together w family, as the full family might not be together, but if they're next to at least a parent, its ok
+							
 							var pointerCHD;
 							globalEssentialRequirements[0]+=1;
-							// Look to the left
+							
 							if(i>0){
-								// If there's someone from their group
+								
 								if(arrayOfSeatedPassengers[i-1][j]!=null){
 									if(typeof arrayOfSeatedPassengers[i-1][j].group !== 'undefined'){
 										if(arrayOfSeatedPassengers[i-1][j].group==me.group){
 											if(arrayOfSeatedPassengers[i-1][j].age>ageAdultMin){
-												// if it's an adult, done
-												console.log(me.code+" has a parent on the left"); // !!!
+												
+												
 												childAwayFromParents=false;
 											}else{
-												// if its a sibling, check if evenutally there is a parent
-												console.log(me.code+" has a sibling on the left"); // !!!
+												
+												
 												pointerCHD = i;
 												while(pointerCHD>0){
 													pointerCHD-=1;
@@ -2254,7 +2254,7 @@ function mainLoop(timestamp) { 												// The main loop (calls itself at end
 														if(typeof arrayOfSeatedPassengers[pointerCHD][j].group !== 'undefined'){
 															if(arrayOfSeatedPassengers[pointerCHD][j].group==me.group){
 																if(arrayOfSeatedPassengers[pointerCHD][j].age>ageAdultMin){
-																	console.log(me.code+" eventually has a parent on the left"); // !!!
+																	
 																	childAwayFromParents=false;
 																	break;
 																}
@@ -2268,18 +2268,18 @@ function mainLoop(timestamp) { 												// The main loop (calls itself at end
 									}
 								}
 							}
-							// Look to the right
-							if(childAwayFromParents && i<columnCount-1){ // no point in checking if already has one parent
+							
+							if(childAwayFromParents && i<columnCount-1){ 
 								if(arrayOfSeatedPassengers[i+1][j]!=null){
 									if(typeof arrayOfSeatedPassengers[i+1][j].group !== 'undefined'){
 										if(arrayOfSeatedPassengers[i+1][j].group==me.group){
 											if(arrayOfSeatedPassengers[i+1][j].age>ageAdultMin){
-												// if it's an adult, done
-												console.log(me.code+" has a parent on the right"); // !!!
+												
+												
 												childAwayFromParents=false;
 											}else{
-												// if its a sibling, check if evenutally there is a parent
-												console.log(me.code+" has a sibling on the right"); // !!!
+												
+												
 												pointerCHD = i;
 												while(pointerCHD<columnCount-1){
 													pointerCHD+=1;
@@ -2287,7 +2287,7 @@ function mainLoop(timestamp) { 												// The main loop (calls itself at end
 														if(typeof arrayOfSeatedPassengers[pointerCHD][j].group !== 'undefined'){
 															if(arrayOfSeatedPassengers[pointerCHD][j].group==me.group){
 																if(arrayOfSeatedPassengers[pointerCHD][j].age>ageAdultMin){
-																	console.log(me.code+" eventually has a parent on the right"); // !!!
+																	
 																	childAwayFromParents=false;
 																	break;
 																}
@@ -2300,92 +2300,92 @@ function mainLoop(timestamp) { 												// The main loop (calls itself at end
 									}
 								}
 							}
-							// If child away from family
+							
 							if(childAwayFromParents){
 								me.feedback="essential";
 								if(typeof me.myReviewFeedbackText==='undefined'){
-									// If no other message already exists
+									
 									me.myReviewFeedbackText="\x22"+me.code+"\x22 away from parent";									
 								}else{
-									// If one already does, add to it
+									
 									me.myReviewFeedbackText+=" and alone";
 								}
-								globalEssentialRequirements[1]+=1; // add to counter of unmet essential requirements
-								console.log(me.code+" away from family!"); // !!!							
-								// Note : If next to another CHD, if they're fine, I'm fine too - but this will be checked in the next cycle below REF23894739
+								globalEssentialRequirements[1]+=1; 
+								
+								
 							}
 						}
 						if(me.code == "WCHC"){
-							// WCHC cant be adjacent to emergency row
+							
 							globalEssentialRequirements[0]+=1;
 							if(Math.abs(j-2)<2){
-								globalEssentialRequirements[1]+=1; // add to counter of unmet essential requirements
+								globalEssentialRequirements[1]+=1; 
 								me.feedback="essential";
 								me.myReviewFeedbackText="\x22"+me.code+"\x22 near emergency row";
 							}							
 						}
 						if(me.code == "WCHC"|| me.code == "INF"){						
-							// They can only be in window seat
+							
 							globalEssentialRequirements[0]+=1;
 							if(!isWindow){
-								globalEssentialRequirements[1]+=1; // add to counter of unmet essential requirements
+								globalEssentialRequirements[1]+=1; 
 								me.feedback="essential";
 								me.myReviewFeedbackText="\x22"+me.code+"\x22 not in window seat";
 							}
 						}						
 						if(me.code == "UMNR"){
-							// Essential: needs to be in top row and aisle; can't be next to single traveller (or emergency row - covered above already)
-							// Preference: to be next to another UMNR or family, or on their own (hm, not really a reasonable "preferece" - just covers all cases which are not bad.. so ignore;
 							
-							// ESSENTIALS
+							
+							
+							
 
 							
-							// next to solo traveller
+							
 							globalEssentialRequirements[0]+=1;
 							isNextToSoloTraveller=false;
-							// check left
+							
 							if(i>0){
 								if(arrayOfSeatedPassengers[i-1][j]!=null){
-									if(typeof arrayOfSeatedPassengers[i-1][j].group==='undefined'){ // ie. solo
+									if(typeof arrayOfSeatedPassengers[i-1][j].group==='undefined'){ 
 										if(typeof arrayOfSeatedPassengers[i-1][j].code !== 'undefined'){ 
 											if(arrayOfSeatedPassengers[i-1][j].code!="UMNR"){
-												console.log(me.name+" UMNR has solo traveller on left");
+												
 												isNextToSoloTraveller=true;												
 											}
 										}else{
-												console.log(me.name+" UMNR has solo traveller on left");
+												
 												isNextToSoloTraveller=true;																							
 										}
 									}else{
-										// if person to left is part of group, but is far from entire group
+										
 										if(typeof arrayOfSeatedPassengers[i-1][j].myGroupIsTogether!=='undefined'){
 											if(!arrayOfSeatedPassengers[i-1][j].myGroupIsTogether && !arrayOfSeatedPassengers[i-1][j].isNextToAtLeastOnePersonFromGroup){
-												console.log(me.name+" UMNR has solo traveller on left (debanded from group):"+arrayOfSeatedPassengers[i-1][j].name);
+												
 												isNextToSoloTraveller=true;		
 											}
 										}
 									}
 								}
 							}
-							// check right
-							if(!isNextToSoloTraveller){ // if already next to one, fail already
+							
+							if(!isNextToSoloTraveller){ 
 								if(i<columnCount-1){
 									if(arrayOfSeatedPassengers[i+1][j]!=null){
-										if(typeof arrayOfSeatedPassengers[i+1][j].group==='undefined'){ // ie. solo
+										if(typeof arrayOfSeatedPassengers[i+1][j].group==='undefined'){ 
 											if(typeof arrayOfSeatedPassengers[i+1][j].code !== 'undefined'){
 												if(arrayOfSeatedPassengers[i+1][j].code!="UMNR"){
-													console.log(me.name+" UMNR has solo traveller on right");
+													
 													isNextToSoloTraveller=true;
 												}
 											}else{
-													console.log(me.name+" UMNR has solo traveller on right");
+													
 													isNextToSoloTraveller=true;												
 											}
 										}else{
-											// if person to right is part of group, but is far from group
+											
 											if(typeof arrayOfSeatedPassengers[i+1][j].myGroupIsTogether!=='undefined'){
 												if(!arrayOfSeatedPassengers[i+1][j].myGroupIsTogether && !arrayOfSeatedPassengers[i+1][j].isNextToAtLeastOnePersonFromGroup){
-													console.log(me.name+" UMNR has solo traveller on right (debanded from group):"+arrayOfSeatedPassengers[i+1][j].name);
+													
 													isNextToSoloTraveller=true;		
 												}
 											}
@@ -2396,17 +2396,17 @@ function mainLoop(timestamp) { 												// The main loop (calls itself at end
 							}
 							if(isNextToSoloTraveller){
 								globalEssentialRequirements[1]+=1;
-								console.log(me.name+" UMNR is next to solo traveller indeed.");
+								
 								me.myReviewFeedbackText="\x22"+me.code+"\x22 near solo traveller";
 								me.feedback="essential";
 							}
 
 							
-							// in aisle AND top row (bunching together, otherwise too complex)
+							
 							globalEssentialRequirements[0]+=1;
 							if(!isAisle || j>0){
 								globalEssentialRequirements[1]+=1;
-								console.log(me.name+" UMNR not in top row and aisle");
+								
 								me.myReviewFeedbackText="\x22"+me.code+"\x22 must be in aisle, first row";
 								me.feedback="essential";
 							}
@@ -2419,12 +2419,12 @@ function mainLoop(timestamp) { 												// The main loop (calls itself at end
 			}
 		}	
 		
-		// Right now, there should be 11 essential requirements, and 9 preferences
-		console.log("Unmet "+ globalEssentialRequirements[1] +" out of "+globalEssentialRequirements[0]+" essential requirements");
-		console.log("Unmet "+ globalPreferences[1] +" out of "+globalPreferences[0]+" preferences");
 		
-		// Define title
-		window.feedbackTitle="Completed"; // shouldn't show,  but just in case
+		
+		
+		
+		
+		window.feedbackTitle="Completed"; 
 		window.feedbackItems = [];
 		window.improvementItems = [];
 		window.feedbackEnd = [];
@@ -2463,16 +2463,16 @@ function mainLoop(timestamp) { 												// The main loop (calls itself at end
 		}
 
 		
-		// NEXT: Implement click-to-review; which will also be used in the end to review what went wrong
-		// NEXT: Need to deal with  REF23894739
-		// NEXT: ability to cycle through group on click . Otherwise hard to plan
-		// NTH: card actually remains greyed out in pile while they place avatar, so they arent lookking at someone elses card as they place
+		
+		
+		
+		
 		
 	}
 
 	if(gameState=="showingFeedback"){
 		
-		// Display feedback
+		
 
 		if(!reviewModeGlobal){
 			if(feedbackAlpha<1){
@@ -2482,7 +2482,7 @@ function mainLoop(timestamp) { 												// The main loop (calls itself at end
 			feedbackAlpha-=feedbackAlpha/2;		
 		}
 		
-		// Title
+		
 		ctx.globalAlpha = feedbackAlpha;
 		var feedbackTitleY;
 		if(isPortrait){
@@ -2494,7 +2494,7 @@ function mainLoop(timestamp) { 												// The main loop (calls itself at end
 		ctx.font = 700+" "+fontUISize*1.3	+ "px "+fontFamilyPrimary;			
 		ctx.fillText(feedbackTitle, layoutAreaForCards.posxPixels,feedbackTitleY);
 
-		// Items
+		
 		var normalSize = fontUISize*0.9;
 		ctx.font = 400+" "+normalSize+ "px "+fontFamilyPrimary;			
 		var currentLine = 0;
@@ -2505,7 +2505,7 @@ function mainLoop(timestamp) { 												// The main loop (calls itself at end
 		ctx.textAlign="left";
 		ctx.globalAlpha=feedbackAlpha-currentLine/100;
 		
-		// Main text
+		
 		for(var i=0;i<feedbackItems.length;i++){
 			ctx.fillText(bulletPoint+" "+feedbackItems[i], layoutAreaForCards.posxPixels-textWidth/2,feedbackTextY+currentLine*lineHeight);
 			currentLine+=1;
@@ -2514,7 +2514,7 @@ function mainLoop(timestamp) { 												// The main loop (calls itself at end
 		ctx.globalAlpha=feedbackAlpha-currentLine/100;
 
 
-		// What could be improved
+		
 		if(improvementItems.length>0){
 			currentLine+=0.5;
 			ctx.font = 700+" "+normalSize*1	+ "px "+fontFamilyPrimary;			
@@ -2529,7 +2529,7 @@ function mainLoop(timestamp) { 												// The main loop (calls itself at end
 
 		ctx.globalAlpha=feedbackAlpha-currentLine/100;
 		
-		// Final text
+		
 		currentLine+=0.5;
 		ctx.fillStyle=feedbackAccentColor;
 		ctx.font = 700+" "+normalSize*1	+ "px "+fontFamilyPrimary;			
@@ -2540,9 +2540,9 @@ function mainLoop(timestamp) { 												// The main loop (calls itself at end
 
 
 
-		// Show Highlights
+		
 		ctx.globalAlpha=1;
-		if(feedbackAccentColor!="green"){ // ha, lazy
+		if(feedbackAccentColor!="green"){ 
 			var seatWidth = layoutSeats.widthPixels/columnCountWithAisle;
 			var highlightScale = 0.8;
 			var highlightWidth = seatWidth*highlightScale;
@@ -2557,7 +2557,7 @@ function mainLoop(timestamp) { 												// The main loop (calls itself at end
 						sy = layoutSeats.posyPixels-layoutSeats.heightPixels/2 + (j+0.5)*seatWidth;
 						if(i>2){sx +=seatWidth;}
 
-						if(0){ // Writes a centered text
+						if(0){ 
 							ctx.fillStyle="black";
 							ctx.textAlign = "center";
 							ctx.font = 100+" "+fontUISize/2	+ "px "+fontFamilyPrimary;			
@@ -2565,16 +2565,16 @@ function mainLoop(timestamp) { 												// The main loop (calls itself at end
 							ctx.fillText(arrayOfSeatedPassengers[i][j].name, sx,sy);
 						}
 						
-						// Draw highlight
+						
 						if(arrayOfSeatedPassengers[i][j].reviewMode){
 							ctx.fillStyle=colorReviewMode;
 							ctx.fillRect(sx-highlightShift, sy-highlightShift, highlightWidth, highlightWidth);
 						}
 						
-						// Draw highlight
-						ctx.strokeStyle=colorOrangeStrong; // default color is orange
-						if(arrayOfSeatedPassengers[i][j].feedback=="essential"){ctx.strokeStyle=colorBadStrong;} // if FAIL, red
-						if(arrayOfSeatedPassengers[i][j].reviewMode){ctx.strokeStyle="white";} // if Review Mode, White (since bg will be orange)
+						
+						ctx.strokeStyle=colorOrangeStrong; 
+						if(arrayOfSeatedPassengers[i][j].feedback=="essential"){ctx.strokeStyle=colorBadStrong;} 
+						if(arrayOfSeatedPassengers[i][j].reviewMode){ctx.strokeStyle="white";} 
 						ctx.lineWidth=strokeBaseThickness;
 						ctx.lineDashOffset= lineDashOffset;
 						ctx.setLineDash([lineDashSize,lineDashSize*2]);
@@ -2586,7 +2586,7 @@ function mainLoop(timestamp) { 												// The main loop (calls itself at end
 			}
 			ctx.restore();
 			
-			// Make sure avatars are drawn on top
+			
 			for(var i=0;i<arrayOfSeatedComponents.length;i++){			
 				arrayOfSeatedComponents[i].updateAndDraw();
 			}
@@ -2612,12 +2612,12 @@ function mainLoop(timestamp) { 												// The main loop (calls itself at end
 
 	
 	
-	// Show debug text
+	
 	if(debug){
-	// Needs to be rebuilt every time, to update values
+	
 
-	// Create debug text 
-	//(it was reset at top of Main loop)
+	
+	
 	addToDebugText ("DEBUG MODE");
 	addToDebugText ("-------------------");
 	addToDebugText ("arrayOfComponents.length:"+arrayOfComponents.length);
@@ -2631,12 +2631,12 @@ function mainLoop(timestamp) { 												// The main loop (calls itself at end
 	addToDebugText ("gameState:"+gameState);
 	addToDebugText (moreDebugText);
 
-	// base
+	
 	ctxd.fillStyle = "rgba(255,255,255,0.75)";
 	ctxd.fillRect(0,0,400,400);
 
-	// Show debug text
-	var fb = fontBaseSizePrimary/canvasRes;  // because debug canvas doesnt lower res, so needs to compensate for 
+	
+	var fb = fontBaseSizePrimary/canvasRes;  
 	ctxd.font =  fb + "px "+fontFamilyPrimary;
 	ctxd.fillStyle = "black";
 	ctxd.textAlign = "left";
@@ -2651,21 +2651,21 @@ function mainLoop(timestamp) { 												// The main loop (calls itself at end
 	}		 	
 
  
-	// Example placing image
+	
 	if(0&&debug){
-		//var tw = svgExample1.width*canvasRes;
-		//var th = svgExample1.height*canvasRes; 
-		//var flow = Math.sin(timeCounter/40)*cw/6;
-		//var tx = flow+(cw-tw)/2;
-		//var ty = (ch-th)/2;
-		//myDrawImage(svgExample1,tx,ty,1.5+Math.sin(timeCounter/100),Math.sin(timeCounter/200)*360);
-		//myDrawImage(svgExample2,tx,ty,1.5+Math.sin(timeCounter/50),Math.sin(timeCounter/100)*360);
-	//	myDrawImage(svgExample,cw/2,ch/2);
-	//	myDrawImage(svgExample,cw/3,ch/3);
+		
+		
+		
+		
+		
+		
+		
+	
+	
 	}
 	
-	// Add border
-	//addBorderToCanvasF(1,"orange");
+	
+	
 	if(0){
 		if(isMobile){
 			addBorder(cw/100,"purple");
@@ -2675,7 +2675,7 @@ function mainLoop(timestamp) { 												// The main loop (calls itself at end
 	}
 	
 
-	// Default mouseLock position
+	
 	if(!mouseLockedToGrid){
 		mouseXlock=mouseX;
 		mouseYlock=mouseY;
@@ -2683,29 +2683,29 @@ function mainLoop(timestamp) { 												// The main loop (calls itself at end
 
  
 	
-	// Show location of mouseX,mouseY and locked ones too
+	
 	if(debug){
 		drawCircle(mouseX,mouseY,4,"black");
 		drawCircle(mouseXlock,mouseYlock,8,"none", true);
 	}
 
 
-	// Used in a couple places lower
+	
 	var msgAboveYpos = layoutDeckDropArea.posyPixels-layoutDeckDropArea.heightPixels/2;
 	if(isPortrait){
 		msgAboveYpos = layoutDeckDropArea.posyPixels-layoutDeckDropArea.heightPixels*0.8;
 	}	
 	
-	// Message above and below cards
+	
 	if(gameState=="waitingPlayerPlacePassenger" || reviewModeGlobal){
 		
-		// General setup
+		
 		ctx.font=fontUI;
 		ctx.fillStyle=colorShadow50pct;
 		ctx.textAlign="center";
 		if(pointerDragging){ctx.globalAlpha=0;}else{ctx.globalAlpha=0.8;}
 		
-		// Above
+		
 		var cardType="passenger"; 
 		if(!reviewModeGlobal){
 			if((currentDeckOfCards.length+currentSeatedDeck.length)>1){
@@ -2717,7 +2717,7 @@ function mainLoop(timestamp) { 												// The main loop (calls itself at end
 			ctx.fillText("REVIEW MODE", layoutDeckDropArea.posxPixels, msgAboveYpos);			
 		}
 		
-		// Below
+		
 		var msgBelowYpos = layoutDeckDropArea.posyPixels+layoutDeckDropArea.heightPixels*0.5 + currentDeckOfCards.length*fontBaseSizePrimary/2;
 		if(isPortrait){
 			msgBelowYpos = layoutDeckDropArea.posyPixels+layoutDeckDropArea.heightPixels*0.75 + currentDeckOfCards.length*fontBaseSizePrimary/2;
@@ -2740,7 +2740,7 @@ function mainLoop(timestamp) { 												// The main loop (calls itself at end
 
 	
 	
-	// Add layer (overlay) showing arrayOfSeatedPassengers against the seat map (to make sure the avatars are reflecting it correctly) - for debugging
+	
 	if(0){
 
 		var seatWidth = layoutSeats.widthPixels/columnCountWithAisle;
@@ -2775,7 +2775,7 @@ function mainLoop(timestamp) { 												// The main loop (calls itself at end
 		}
 		ctx.restore();
 	
-		// also show currentDeckOfCards
+		
 		ctx.fillStyle="black";
 		ctx.font = fontUI;
 		ctx.fillText("deck length:"+currentDeckOfCards.length, cw/2,20);
@@ -2808,14 +2808,14 @@ function mainLoop(timestamp) { 												// The main loop (calls itself at end
 		if(showWarningCounter<showWarningCutoff){ctx.globalAlpha=showWarningCounter/showWarningCutoff;}
 		ctx.globalAlpha = 0.5+pulseAlpha;
 				
-		// HIghlight seat (if any)
+		
 		if(warningSeatList.length>0){
 			highlightSeats(warningSeatList,colorBadStrong);
 		}
 			
-		//console.log("SHOWING WARNING:"+layoutDeckDropArea.posxPixels	);
+		
 			
-		// Message
+		
 		ctx.font=fontUI;
 		ctx.fillStyle=colorBadStrong;
 		var warnWidth = layoutAreaForCards.widthPixels*0.8;
@@ -2831,7 +2831,7 @@ function mainLoop(timestamp) { 												// The main loop (calls itself at end
 			showWarningCounter=showWarningDelay;
 		}
 		
-		// Make sure avatars are drawn on top
+		
 		for(var i=0;i<arrayOfSeatedComponents.length;i++){			
 			arrayOfSeatedComponents[i].updateAndDraw();
 		}
@@ -2839,30 +2839,30 @@ function mainLoop(timestamp) { 												// The main loop (calls itself at end
 	}
 	
 
-	// Cover screen if too small
+	
 	if(0){
  		if(ww<minWidth || wh<minHeight){
 			screenSizeAndPropSupported=false;
-			console.log("Unsupported screen size (w or h)");
+			
 			sizeWarning.updateAndDraw();
 			introText.style.opacity="0";
- 			// Show res
+ 			
 			ctx.font=fontUI;
 			ctx.fillStyle="white";
  			ctx.globalAlpha= 1;
  			ctx.fillText(ww+"x"+wh, ww/2, wh*(2/3));
-			//			
+			
 		}else{
 			screenSizeAndPropSupported=true;
 		}
 	}
 	
-	// Cover screen if proportion not ideal
+	
 	if(0){
-		// screenProp: must be bigger than 1.42, smaller than 0.64
+		
 		if(screenPropCurrent>canvasPropPortrait && screenPropCurrent<canvasPropLandscape){
 			screenSizeAndPropSupported=false;
-			console.log("Unsupported proportion");
+			
 			propWarning.updateAndDraw();
 			introText.style.opacity="0";
 		}else{
@@ -2870,16 +2870,16 @@ function mainLoop(timestamp) { 												// The main loop (calls itself at end
 		}
 	}
 	
-	requestAnimationFrame(mainLoop); // Repeat mainLoop
+	requestAnimationFrame(mainLoop); 
 }
 
 
-// Objects
-// (New instances should be created from these, then properties and functions can be accessed easily)
-function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, color, targetx, targety, targetAlpha, disabled) {	// Note: Rel = means its relative to parent's size/pos! (e.g. 0.5 = 50%)
-	/// All code below (until the updateAndDraw function) runs only once, when the instance is created <<<
 
-	// shapes: "rectangle", "circle"
+
+function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, color, targetx, targety, targetAlpha, disabled) {	
+	
+
+	
 
 	arrayOfComponents.push(this);
 
@@ -2893,13 +2893,13 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 
 	this.mySeatPos=[-1,-1];
 
-	this.fadeMeIn=true; // fade in by default
+	this.fadeMeIn=true; 
 
 	this.pointerIsHoveringMe=false;
 
-	this.componentType="text"; // default
+	this.componentType="text"; 
 
-	this.fontType="normal"; // to simplify, this var will determine what type of font (if smalll, or UI)
+	this.fontType="normal"; 
 
 	this.strokeColor="black";
 	this.strokeWidthRel=0;
@@ -2907,45 +2907,45 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 
 	this.paiPosPixels=[0,0]; this.paiSizePixels=[0,0];
 
-	// All component instances are initially either child of root by default (or they are root (label="root"), then your dad is god)
+	
 	if(label=="root"){
 		this.pai = "god";
 	}else{
 		this.pai = root;
 	}
-	// If after creation the instance is parented, then the parent changes accordingly
 	
-	this.stageIsPai = false; // when true, this then acts as the Stage
+	
+	this.stageIsPai = false; 
 
 
-	// NOT JUST BUTTON: this is a general purpose component. Can be just a shape with text,  a button etc.
+	
 
 	this.id = generateUniqueID();
 	this.pointerCameDownOnMe=false;
 	this.pointerIsDownOnMe=false;
 	this.pointerIsDraggingOnMe=false;
 	
-	this.pointerHoverStateOnMe="no"; // no, hovered, hovering
+	this.pointerHoverStateOnMe="no"; 
 	
 	this.graphicScale=1;
 	
-	this.pointerClickOffsetX; this.pointerClickOffsetY; // to tracj when click+drag
+	this.pointerClickOffsetX; this.pointerClickOffsetY; 
 
 	this.deltaX; this.deltaY; this.deltaAlpha;
 
-	//useful
-	this.compX1; this.compY1; this.compX2; this.compY2; // actual canvas positions of start 1 and end 2 of rectangle
+	
+	this.compX1; this.compY1; this.compX2; this.compY2; 
 	 	
-	// Required values fallback (just in case) 
+	
 	if (typeof label === 'undefined') {
 		this.label = "Default value";
 	}else{this.label=label}
 	if (typeof posXRel === 'undefined') {
-		//this.posXRel = cw/2;
+		
 		this.posXRel = Math.random()*cw;
 	}else{this.posXRel=posXRel;}
 	if (typeof posYRel === 'undefined') {
-		//this.posYRel = ch/2;
+		
 		this.posYRel = Math.random()*ch;
 	}else{this.posYRel=posYRel;}
 	if (typeof shape === 'undefined') {
@@ -2955,21 +2955,21 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 		this.alpha = 1;
 	}else{this.alpha=alpha}
 
-	// Define component type as needed
+	
 	if(isGraphic(this.label)){this.componentType="graphic";}
 
 	if(this.componentType!="graphic" && typeof this.label!="number"){
 		this.isLayoutComponent = this.label.startsWith("layout") || this.label=="root";
 	}
 	
-	// Calculate width and height based on label (if none explicitly given) --- DO NOT REMOVE; seemingly doesnt make a diff, but does in some cases
+	
 	ctx.font = fontPrimary;
 	if (typeof widthRel === 'undefined') {
 		if(this.componentType!="graphic"){
 			this.widthPixels = ctx.measureText(this.label).width+paddingNormal*2; 
 		}else{
-			// Means its a graphic
-			this.widthPixels=this.label.width; // OK WORKS
+			
+			this.widthPixels=this.label.width; 
 		}
 		this.widthRel = "undefined";	
 	}else{this.widthRel=widthRel}
@@ -2978,30 +2978,30 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 		this.heightRel = "undefined";	
 	}else{this.heightRel=heightRel}
 	if(this.componentType=="graphic"){
-		this.heightPixels=this.label.height; // OK WORKS
+		this.heightPixels=this.label.height; 
 	}
 
 
-	// Default Color
+	
 	if (typeof color === 'undefined') {
-		// Fallback
+		
 		this.color = randomColor();
 	}else{
 		this.color=color;
 	}
 
-	// Disabled is false by default
+	
 	if (typeof disabled === 'undefined'){
 		this.disabled=false;
 	}else{this.disabled = disabled;}
 	
-	// Update and draw button on screen <<<<<<<<<<<<<<<<<<<<<<<<<<
+	
     this.updateAndDraw = function() {
-		//works: this.posXRel+=0.1;
+		
 
 		
 		if(this.passenger){
-			this.passenger.id=this.id; // hacky, just to be used here REF238048290
+			this.passenger.id=this.id; 
 			
 			
 			if(gameState=="showingFeedback"){
@@ -3011,12 +3011,12 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 			}
 		}
 		
-		//console.log("reviewMode:"+reviewMode);
+		
 		if(!reviewModeGlobal){
 			this.reviewMode=false;
 			this.reviewAvatar=null;
 		}
-		if(this.passenger){ // hacky; repeats property on card as well
+		if(this.passenger){ 
 			if(this.reviewMode){
 				this.passenger.reviewMode=true;
 			}else{
@@ -3024,7 +3024,7 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 			}
 		}
 		if(this.reviewMode){
-			//console.log("REVIEW MODE -"+this.passenger.name);
+			
 			
 			colorReviewMode=colorOrange;
 			if(this.passenger.feedback=="essential"){
@@ -3032,23 +3032,23 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 			}
 			
 			
-			// Draw review card
+			
 			drawCard(this.passenger,layoutDeckDropAreaPos,0,true);
 			
-			// update message to show below the card
+			
 			reviewFeedbackText="";
 			if(this.passenger.feedback=="essential"||this.passenger.feedback=="preference"){
 				if(typeof this.passenger.myReviewFeedbackText === 'undefined'){						
-					reviewFeedbackText="PREFERENCE NOT SATISFIED"; // generic
+					reviewFeedbackText="PREFERENCE NOT SATISFIED"; 
 				}else{
 					reviewFeedbackText=this.passenger.myReviewFeedbackText.toUpperCase()
 				}
 			}
 			
-			// Draw avatar on it (create it if non existent)
+			
 			if(!this.reviewAvatar){
 				moveToTop(this.id);
-				this.reviewAvatar = new avatarGraphic(0,layoutDeckDropAreaPos[0],layoutDeckDropAreaPos[1]); // REF238947329 
+				this.reviewAvatar = new avatarGraphic(0,layoutDeckDropAreaPos[0],layoutDeckDropAreaPos[1]); 
 			}else{
 				this.reviewAvatar.passport=this.passenger.passport;
 				this.reviewAvatar.sizePixels = cardWidth/15;
@@ -3060,7 +3060,7 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 				this.reviewAvatar.updateAndDraw();	
 			}
 			
-			// Draw  highlight
+			
 			if(this.passenger.feedback!="essential" && this.passenger.feedback!="preference"){
 				var seatWidth = layoutSeats.widthPixels/columnCountWithAisle;
 				var highlightScale = 0.85;
@@ -3069,7 +3069,7 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 				var sx=0;
 				var sy=0;
 				ctx.save();
-				//this.mySeatPos
+				
 				sx = layoutSeats.posxPixels-layoutSeats.widthPixels/2 + (this.mySeatPos[0]+0.5)*seatWidth;
 				sy = layoutSeats.posyPixels-layoutSeats.heightPixels/2 + (this.mySeatPos[1]+0.5)*seatWidth;
 
@@ -3080,7 +3080,7 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 				ctx.fillStyle=colorReviewMode;
 				ctx.fillRect(sx-highlightShift, sy-highlightShift, highlightWidth, highlightWidth);
 
-			//	ctx.strokeRect(sx-highlightShift, sy-highlightShift, highlightWidth, highlightWidth);
+			
 
 				ctx.fillStyle="black";
 				ctx.textAlign = "center";
@@ -3094,7 +3094,7 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 			
 
 			
-		// Updates this.pointerHoverStateOnMe
+		
 		if(this.pointerIsHoveringMe){
 			if(this.pointerHoverStateOnMe=="hovered"){this.pointerHoverStateOnMe="hovering";}
 			if(this.pointerHoverStateOnMe=="no"){this.pointerHoverStateOnMe="hovered";}		
@@ -3103,7 +3103,7 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 		}
 
 		
-		// Define component type as needed
+		
 		if(this.passenger && this.componentType!="card"){this.componentType="passenger";}
 
 
@@ -3117,20 +3117,20 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 			this.paiSizePixels=[this.pai.widthPixels,this.pai.heightPixels];
 		}
 		
-		// If changed dads, recalculate relative positions immediatelly based on new dad
+		
 		if(this.justGotaDad){
 			if(this.posxPixels!=undefined && this.posyPixels!=undefined){
 				this.posXRel = (this.posxPixels-(this.paiPosPixels[0]-this.paiSizePixels[0]/2))/this.paiSizePixels[0];
 				this.posYRel = (this.posyPixels-(this.paiPosPixels[1]-this.paiSizePixels[1]/2))/this.paiSizePixels[1];
-				//adjustToCanvasSizeAndRes();
+				
 		}
 			
 			this.justGotaDad=false;
 		}
 
 	
-		// UPDATE FONT
-		// Default
+		
+		
 		this.fontSize = fontBaseSizePrimary;
 		this.font = fontPrimary;
 		if(this.fontType=="UI" || this.componentType=="card"){
@@ -3147,7 +3147,7 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 		ctx.font = this.font;
 	
  
-		// Update pixels vars, from proportional ones // TBD: make this run only once, when it changes (in a scalable way, as every single element will ggo through this)
+		
 		this.posxPixels=this.paiPosPixels[0]-this.paiSizePixels[0]/2+(this.posXRel*this.paiSizePixels[0]);
 		this.posyPixels=this.paiPosPixels[1]-this.paiSizePixels[1]/2+(this.posYRel*this.paiSizePixels[1]);
 		
@@ -3158,28 +3158,28 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 		if(this.anchorRight){this.posxPixels-=this.widthPixels/2;}
 
 		if(this.componentType=="card" && !this.pointerIsDraggingOnMe){
-			// Adjust card Lift animation
+			
 			this.lift+=(this.liftGoal-this.lift)/easeSpeedNormal;
 
 		}
 
 
-		// if has passenger, add avatar to it (if hasnt yet)
+		
 		if(this.passenger && !this.avatar ){
 			
-			this.avatar = new avatarGraphic(0,this.posxPixels,this.posyPixels); // REF238947329 
-			console.log("New avatar for "+ this.passenger.name);
+			this.avatar = new avatarGraphic(0,this.posxPixels,this.posyPixels); 
+			
  				
 			this.avatar.targetx=this.posxPixels;
 			this.avatar.targety=this.posyPixels;
 
 			this.avatar.isSad=false;
 			
-			this.avatar.easeSpeed =1; // always the same; NTH: make it change when transitioning from card to avatar
+			this.avatar.easeSpeed =1; 
 		}
 		
 		
-		// Adjust width and height
+		
 		if(this.componentType!="graphic"){ 
 			if (this.widthRel == "undefined") {
 				this.widthPixels = ctx.measureText(this.label).width+paddingNormal*2; 
@@ -3198,9 +3198,9 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 				}
 			}
 		}else{
-			// If its a graphic
+			
 			if(this.graphicScale=="fitDadHeight"){
-				// If image should fit Dad
+				
 				this.heightRel = 1;
 			}
 			this.heightPixels = this.heightRel*this.paiSizePixels[1];
@@ -3211,43 +3211,43 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 
 		if(this.componentType=="card"){
 			this.color="AliceBlue";
-			this.widthPixels=cardWidth; // hacky (because I later changed its parent to be the Drop area instead
+			this.widthPixels=cardWidth; 
 			this.heightPropWidth=cardHeightPropWidth;
 		}
 
 		
-		// if any of them is square, use the other's measurement
+		
 		if(this.widthPropHeight){this.widthPixels = this.heightPixels*this.widthPropHeight;}
 		if(this.heightPropWidth){this.heightPixels = this.widthPixels*this.heightPropWidth;}
 		
-		// If pointer is dragging on top of me
+		
 		if(this.pointerIsDraggingOnMe){
 			if(debug){
 				ctx.fillStyle = "red";
 				ctx.fillRect(this.compX1-this.fontSize*2, this.compY1-this.fontSize,this.fontSize,this.fontSize);
 			}			
 
-			// If I am draggable (and on top), move me
+			
 			if((this.actionOnDrag=="drag"||keyShift) && topmostComponentOnLocationOfLastPointerDown==this){
 				addToDebugText(this.label+" being dragged. Random:"+Math.random());
 
-				// If this component is just a passenger (i.e. not in a card), lock to grid
+				
 				if(this.componentType=="passenger"){
 					
 					gameState="waitingPlayerPlacePassenger";
 					
 					
-					// lock to grid
-					//console.log("Target = mouse Lock -"+this.passenger.name);
+					
+					
 					this.targetx=mouseXlock;
 					this.targety=mouseYlock;
 
-					// show hint
-					//posHint.label=seatMapGridActivePos; // REF28904820
-					//Useful: tempSeat = new component(String.fromCharCode(65+letterCount),1/(columnCountWithAisle*2)+(1/(columnCountWithAisle))*i,-1/(2*columnCountWithAisle));
+					
+					
+					
 
 				}else{
-					//console.log("Target = mouse+offset -"+this.passenger.name);
+					
 					this.targetx=mouseX+this.pointerClickOffsetX;
 					this.targety=mouseY+this.pointerClickOffsetY;
 				}
@@ -3256,20 +3256,20 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 		}
 		}
 
-		// If is card and not being dragged, goHome
-		// (if works, them the gohome from when STOPPING dragging can be deleted?)
+		
+		
 		if(this.componentType=="card" && !this.pointerIsDraggingOnMe && !this.goHome && !this.isSeated){
-			//console.log("GO HOME (ANOTHER) - "+ this.passenger.name);
+			
 			this.goHome=true;
 		}
 
  
 
-		// Change component type between passenger and card, depending on location/situation
+		
 		if(this.passenger && !this.disabled){
 
-			// Card <> Avatar
-			// PS: the below used to be based on drop area; changed to be simply x/y (portrait/landscape)
+			
+			
 			this.nextToSeatMap =false;
 			if(isPortrait){
 				if(this.pointerIsDraggingOnMe){
@@ -3284,22 +3284,22 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 					if(this.posxPixels<(layoutSeatmap.posxPixels+layoutSeatmap.widthPixels/2)){this.nextToSeatMap =true;}					
 				}
 			}
-			// Card turns into avatar (and parents to layoutSeatmap) if: card dragged out of droparea
+			
 			if(this.pointerIsDraggingOnMe && this.nextToSeatMap && this.componentType!="passenger" && topmostComponentOnLocationOfLastPointerDown==this){
  				this.componentType="passenger";
 				this.anchorLeft=false;
 				parentComponents(this,layoutSeatmap,true);
 			}
-			// Avatar turns into card (and parents to layoutDeckDropArea) if: card dragged into droparea, or reject
+			
 			if((this.pointerIsDraggingOnMe && !this.nextToSeatMap  && this.componentType!="card" && topmostComponentOnLocationOfLastPointerDown==this)||this.goHome){
   
 				if(this.goHome){
-					//console.log("Send home: "+this.passenger.name);
-					var fanAmount = this.widthPixels/70; // NEXT: Make this be just the inner graphics, so its not a factor affecting position instability.
+					
+					var fanAmount = this.widthPixels/70; 
 					this.targety=layoutDeckDropArea.posyPixels+this.passenger.myPosInDeck*fanAmount;
 					this.targetx=layoutDeckDropArea.posxPixels+this.passenger.myPosInDeck*fanAmount;
 				}else{							
-					//console.log("Send home too?: "+this.passenger.name);
+					
 					this.targety=layoutDeckDropArea.posyPixels;
 					this.targetx=layoutDeckDropArea.posxPixels;
 				}
@@ -3309,16 +3309,16 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 
 				if((Math.abs(this.posxPixels-layoutDeckDropArea.posxPixels)<practicallyZero)&&(Math.abs(this.posyPixels-layoutDeckDropArea.posyPixels)<practicallyZero)){
 					parentComponents(this,layoutDeckDropArea,true);	 
-					this.goHome=false; // REF7234732947 This shouldnt be repeating so often
-					// console.log("gohome fALSE"); 
+					this.goHome=false; 
+					
 				}
 			}
 		
 		}
 
 		
-		// Update position (if needed)  
-		if(this.pointerIsDraggingOnMe){this.easeSpeed=easeSpeedFast;} // otherwise moving things feels too floaty; resets only once target is met
+		
+		if(this.pointerIsDraggingOnMe){this.easeSpeed=easeSpeedFast;} 
 		if(typeof this.targetx !== 'undefined') {			
 			this.deltaX = this.targetx-this.posxPixels;
 			if (Math.abs(this.deltaX)<practicallyZero){
@@ -3326,12 +3326,12 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 				this.targetx=undefined;
 			}
 			this.posxPixels += this.deltaX/this.easeSpeed;
- 			//if(this.componentType=="card"){	alert(this.easeSpeed);}
+ 			
 			
-			// Update Rel pos as well, based on the new pixel one
+			
 			this.posXRel = (this.posxPixels-(this.paiPosPixels[0]-this.paiSizePixels[0]/2))/this.paiSizePixels[0];
  			
-			// Adjust if aligned
+			
 			if(this.anchorLeft){this.posXRel -= (this.widthPixels/2)/this.paiSizePixels[0];}
 			if(this.anchorRight){this.posXRel += (this.widthPixels/2)/this.paiSizePixels[0];}					
 			
@@ -3345,50 +3345,50 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 			this.posyPixels += this.deltaY/this.easeSpeed;
 
 
-			// Update Rel pos as well, based on the new pixel one
+			
 			this.posYRel = (this.posyPixels-(this.paiPosPixels[1]-this.paiSizePixels[1]/2))/this.paiSizePixels[1];
 			
-			// Adjust if aligned
+			
 			if(this.anchorTop){this.posYRel -= (this.heightPixels/2)/this.paiSizePixels[1];}
 			if(this.anchorBottom){this.posYRel += (this.heightPixels/2)/this.paiSizePixels[1];}			
 		}
-		// reset easespeed once target is reached
+		
 		if(this.targetx==undefined && this.targety==undefined){
 			this.easeSpeed=easeSpeedNormal;
 		}
  
-		// Update alpha (if needed)
-		// Also takes actionOnFade once fade done (if any)
+		
+		
 		if (typeof this.targetAlpha !== 'undefined') {
 			this.deltaAlpha = this.targetAlpha-this.alpha;
 			if (this.actionOnFade=="remove" && Math.abs(this.deltaAlpha)<practicallyZero){removeComponent(this.id);}
 			this.alpha += this.deltaAlpha/this.easeSpeed;
 		}
 
-		// On hover (very ineficient?)
+		
 		if(pointIsWithinArea([mouseX,mouseY],this.shape,this.posxPixels,this.posyPixels,this.widthPixels,this.heightPixels)){
-			//addToDebugText("hover");
+			
 			
 			this.pointerIsHoveringMe=true;
 
 			if(this.componentType=="button" || this.isButton){this.highlight=true;}
 			
-			// Calculate mouseLock x,y positions
+			
 			if(this.label=="layoutSeats"){
 				mouseLockedToGrid=true;
 
-				// X
+				
 				this.pixelsPerColumn = this.widthPixels/columnCountWithAisle;
 				this.mouseXPosRelToThis = (mouseX+this.pixelsPerColumn/2-(this.posxPixels-this.widthPixels/2));
 				this.mouseXPosInColumns = this.mouseXPosRelToThis/this.pixelsPerColumn;
-				if(Math.round(this.mouseXPosInColumns)!=4){ // Dont allow aisle
+				if(Math.round(this.mouseXPosInColumns)!=4){ 
 					this.mouseXPosInColumnsRound = Math.round(this.mouseXPosInColumns);
 				} else{
 					this.mouseXPosInColumnsRound = 3;
 				}
 				mouseXlock=(this.posxPixels-this.widthPixels/2)+this.mouseXPosInColumnsRound*this.pixelsPerColumn-this.pixelsPerColumn/2;
 
-				// Y
+				
 				this.pixelsPerRow = this.heightPixels/rowCount;
 				this.mouseYPosRelToThis = (mouseY+this.pixelsPerRow/2-(this.posyPixels-this.heightPixels/2));
 				this.mouseYPosInColumns = this.mouseYPosRelToThis/this.pixelsPerRow;
@@ -3397,13 +3397,13 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 				
 				
 				
-				// Update the grid pos var
+				
 				if(this.mouseXPosInColumnsRound>3){this.mouseXPosInColumnsRound-=1;}
-				//console.log("this.mouseXPosInColumns:"+this.mouseXPosInColumns);
-				//console.log("this.mouseXPosInColumnsRound:"+this.mouseXPosInColumnsRound);
+				
+				
 				if(typeof this.mouseXPosInColumnsRound !== 'undefined'){
 					seatMapGridActivePos=[this.mouseXPosInColumnsRound,this.mouseYPosInRowsRound];
-					//seatMapGridActivePos=[this.mouseXPosInColumnsRound,this.mouseYPosInRowsRound]; // Changed from this to one above
+					
 				}
 
 			}
@@ -3428,7 +3428,7 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 			}
 		}
 
-		// Runs once, when pointer goes down (NOT when clicked , which is down+up)
+		
 		if(pointerDownGlobalOneOffWarning){
 			if(showWarning!==""){
 				showWarningCounter=showWarningCutoff;
@@ -3441,8 +3441,8 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 					if(!this.disabled){
 						this.pointerClickOffsetX = this.posxPixels-mouseX;
 						this.pointerClickOffsetY = this.posyPixels-mouseY;
-						// This runs for full stack of components
-						// But also useful to know what is the topmost one:
+						
+						
 						topmostComponentOnLocationOfLastPointerDown=this;
 						
 						this.targetx=undefined;
@@ -3450,7 +3450,7 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 
 						if(this.passenger){
 							lastObjectWithPassengerClickedOrDragged=this;
-							//	console.log("Passenger last clicked/dragged:"+lastObjectWithPassengerClickedOrDragged.passenger.name);
+							
 						}
 					}				
 					if(this.passenger){
@@ -3458,7 +3458,7 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 					}
 					if(this==layoutSeats){
 						seatMapGridPosOnPointerUpOrDown=seatMapGridActivePos;
-						console.log("**seatMapGridPosOnPointerUpOrDown="+seatMapGridActivePos);
+						
 					}
 
 				}			
@@ -3470,30 +3470,30 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 		if(pointerClickedInPlaceGlobalOneOffWarning && this.pointerIsHoveringMe){
 			if(!isShowingResetConfirmation){
 				if(this.componentType=="passenger"){
-					console.log("$$ CLICKED "+this.passenger.name);
+					
 					for(var i=0;i<arrayOfComponents.length;i++){
 						arrayOfComponents[i].reviewMode=false;
 					}
 					this.reviewMode=true;
 					reviewModeGlobal=true;
 				}else{				
-					if(reviewModeGlobal){ // tapping anywhere but a passenger disables review Mode
+					if(reviewModeGlobal){ 
 						this.reviewMode=false;
 						reviewModeGlobal=false;
-						btnCreateDeck.pointerIsDownOnMe=false; // hacky; to avoid clicking the "NEXT, PLEASE" button
+						btnCreateDeck.pointerIsDownOnMe=false; 
 					}
 				}
 			}
 		}
 
 
-		// Inheritances
+		
 		if(this.pai!="root"){
-			// make my pos relative to it, if stageIsPai
-			if(this.inheritPos){ // TBD: this is redundant, as its already having dad as stage
+			
+			if(this.inheritPos){ 
 			}			
 			
-			// draw a line to it (except if pai is root)
+			
 			if(0 && this.pai!=root){
 				ctx.beginPath();
 				ctx.moveTo(this.posxPixels, this.posyPixels);
@@ -3507,47 +3507,47 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 		}
 		
 	
-		// (includes CLICKS) If pointer is down on me (runs every frame; but only for stuff that has been clicked) // TBD: confirm this
+		
 		if(this.pointerIsDownOnMe && (!reviewModeGlobal||this==componentIconReset||this==resetYes||this==resetNo)){
 			if(debug){
 				ctx.fillStyle = "yellow";
 				ctx.fillRect(this.compX1-this.fontSize, this.compY1-this.fontSize,this.fontSize,this.fontSize);
 			}
 
-			// If click and move a bit, it's dragging
+			
 			if(((Math.abs(mouseX-this.posxPixels+this.pointerClickOffsetX)>dragDelta)||(Math.abs(mouseY-this.posyPixels+this.pointerClickOffsetY)>dragDelta))&&!this.pointerIsDraggingOnMe){
-				// RUNS ONCE
-				// If it's a passenger, and it's being dragged out of the seat...
+				
+				
 				if(this.passenger && layoutSeatmap.pointerIsDraggingOnMe){
-					// Log currentDeckOfCards
-					console.log("A currentDeckOfCards:");
+					
+					
 					for(var i=0; i<currentDeckOfCards.length;i++){
-						console.log(i+":"+currentDeckOfCards[i].passenger.name);
+						
 					}
-					//
+					
 					this.isSeated=false;
 					this.mySeatPos=[-1.-1];
-					// ...add it back to current deck (make sure to update myPosInDeck for all others), THEN BRING IT TO END OF MASTER arrayOfComponents[i], so it renders on  top
+					
 					currentDeckOfPassengerInfo.unshift(this.passenger);
 					currentDeckOfCards.unshift(this);
-					// Log currentSeatedDeck
-					console.log("currentSeatedDeck:");
+					
+					
 					for(var i=0; i<currentSeatedDeck.length;i++){
-						console.log(i+":"+currentSeatedDeck[i].passenger.name);
+						
 					}
-					// Remove from currentSeatedDeck
+					
 					for(var i=0; i<currentSeatedDeck.length;i++){
 						if(currentSeatedDeck[i].id==this.id){
 							currentSeatedDeck.splice(i,1);
 						}
 					}
 
-					// Log currentDeckOfCards
-					console.log("B currentDeckOfCards:");
+					
+					
 					for(var i=0; i<currentDeckOfCards.length;i++){
-						console.log(i+":"+currentDeckOfCards[i].passenger.name);
+						
 					}
-					//
+					
 
 
 					moveToTop(this.id);
@@ -3555,66 +3555,66 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 						currentDeckOfPassengerInfo[i].myPosInDeck+=1;
 						currentDeckOfCards[i].myPosInDeck+=1;
 					}					
-					//..., and remove it from array of seated passengers
-					console.log("REMOVED "+this.passenger.name+" FROM SEAT AT "+seatMapGridPosOnPointerUpOrDown);
+					
+					
 
-					// Log currentDeckOfCards
-					console.log("C currentDeckOfCards:");
+					
+					
 					for(var i=0; i<currentDeckOfCards.length;i++){
-						console.log(i+":"+currentDeckOfCards[i].passenger.name);
+						
 					}
-					//
+					
 
 
-					// Log currentSeatedDeck
-					console.log("currentSeatedDeck:");
+					
+					
 					for(var i=0; i<currentSeatedDeck.length;i++){
-						console.log(i+":"+currentSeatedDeck[i].passenger.name);
+						
 					}
 
 					arrayOfSeatedPassengers[(seatMapGridPosOnPointerUpOrDown[0]-1)][(seatMapGridPosOnPointerUpOrDown[1]-1)]=null;					
 					totalPassengersSeated-=1;
 					
-					//lastObjectWithPassengerClickedOrDragged=this.passenger;
+					
 				}
 				this.pointerIsDraggingOnMe=true;
 			}
 			
-			// ie. IF CLICKED ON ME (ie. If pointer is released after being down on me)
+			
 			if(!pointerDown){
 		
  
-				// If the release happens on me, and Im not being dragged, it's a click
+				
 				if(!this.pointerIsDraggingOnMe && pointIsWithinArea([mouseX,mouseY],this.shape,this.posxPixels,this.posyPixels,this.widthPixels,this.heightPixels)){
-					//console.log("IT'S A CLICK. this.componentType="+this.componentType);
+					
 				
 				
-					// If the click is on a card that is on a deck, shuffle it
+					
 					if(this.componentType=="card" && this.passenger.myPosInDeck==0 && currentDeckOfCards.length>1){
 
-						// for(var i=currentDeckOfCards.length-1;i>0;i--){		} // REF839823948903 
+						
 								
 						if(1){ 
 					
-							// Remove all into a temp array
+							
 							var tempCardArray = [];
 							var tempCard;
 							var tempCurrDeckLength = currentDeckOfCards.length;
 							for(var i=0;i<tempCurrDeckLength;i++){
-								tempCard = currentDeckOfCards[0]; // changes , because deck keeps getting smaller
+								tempCard = currentDeckOfCards[0]; 
 								currentDeckOfPassengerInfo.splice(0,1);
 								currentDeckOfCards.splice(0,1);		
-								// 
+								
 								tempCardArray.push(tempCard);
 							}
 
-							// Get top one from tempCardArray, and add it back to (now empty) deck (note: // It wont stay in pos 0!)
+							
 							currentDeckOfPassengerInfo.push(tempCardArray[0].passenger);
 							currentDeckOfCards.push(tempCardArray[0]);
-							currentDeckOfPassengerInfo[0].myPosInDeck=tempCurrDeckLength-1; // because this will become its new pos below
-							currentDeckOfCards[0].myPosInDeck=tempCurrDeckLength-1;  // because this will become its new pos below
+							currentDeckOfPassengerInfo[0].myPosInDeck=tempCurrDeckLength-1; 
+							currentDeckOfCards[0].myPosInDeck=tempCurrDeckLength-1;  
 			
-							// Add back all others, inverted (skip first, as that was added above already)
+							
 							var newMyPos;
 							for(var i=tempCardArray.length-1;i>0;i--){	
 								tempCard=tempCardArray[i];
@@ -3649,23 +3649,23 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 						if(!reviewModeGlobal){
 							loneSeats=checkForLoneSeats();
 							if(loneSeats.length>0){
-								// if there are lone seats, don't allow
+								
 								warningSeatList=loneSeats;
 								showWarning=loneSeatsMsg;
 								showWarningCounter=showWarningDelay;	
 							}else{
-								// otherwise..
+								
 								for(i=0;i<currentSeatedDeck.length;i++){
 									currentSeatedDeck[i].disabled=true;
 								}
 								currentSeatedDeck=[];								
 								if(this.actionOnClick=="createNewCardDeck"){								
-									// next, please							
-									console.log("NEXT DECK!");
+									
+									
 									gameState="createNewCardDeck";
 								}
 								if(this.actionOnClick=="submit"){
-									// Submit									
+									
 									gameState="showFeedback";						
 								}
 							}
@@ -3673,7 +3673,7 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 					}					
 
 					if(this.actionOnClick=="reload"){
-						//myReload();
+						
 						isShowingResetConfirmation=true;
 					}
 					
@@ -3693,18 +3693,18 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 							introText.style.opacity="0";
 							
 						}
- 						console.log("showHelp");
+ 						
 						isShowingHelp=true;
 						
 					}
 					if(this.actionOnClick=="resumeGame"){
 						introText.style.opacity="0";
- 						console.log("resumeGame");
+ 						
 						isShowingHelp=false;						
 					}
 
 					if(this.actionOnClick=="resetNo"){
- 						console.log("resetNo");
+ 						
 						isShowingResetConfirmation=false;
 					}
 
@@ -3715,42 +3715,42 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 	
 				}
 				
-				// If the release is from dragged
-				if(this.pointerIsDraggingOnMe && !this.isSeated){ // note: if already seated, drag+release is ignored
-					// When release after dragging a passenger
+				
+				if(this.pointerIsDraggingOnMe && !this.isSeated){ 
+					
 					if(typeof lastObjectWithPassengerClickedOrDragged !== 'undefined'){
 						if(this.passenger && lastObjectWithPassengerClickedOrDragged==this){
-							// When the release happens on the seatmap 
+							
 							if(layoutSeats.pointerIsHoveringMe){ 
-								//console.log("None of these can ever be zero")
-								//console.log("seatMapGridPosOnPointerUpOrDown[0]:"+seatMapGridPosOnPointerUpOrDown[0])
-								//console.log("seatMapGridPosOnPointerUpOrDown[1]:"+seatMapGridPosOnPointerUpOrDown[1])
+								
+								
+								
 								var tgx = seatMapGridPosOnPointerUpOrDown[0];
 								var tgy = seatMapGridPosOnPointerUpOrDown[1];
 								if(typeof tgx==='undefined' || tgx==0){
 									seatMapGridPosOnPointerUpOrDown[0]=3;
-									console.log("Fake pos to avoid glitch");
+									
 								}
 								if(typeof tgy==='undefined' || tgy==0){seatMapGridPosOnPointerUpOrDown[1]=5;}
 								if(typeof tgx!=='undefined' && tgx!=0 && typeof tgy!=='undefined' && tgy!=0){
 									checkPlacingVar = checkPlacing();
 									if(checkPlacingVar=="accept"){
-										// ACCEPT
-										// (might still be an invalid position, which won't allow continuing once all group is placed - see below)
+										
+										
 										totalPassengersSeated+=1;
 
 										this.isSeated=true;
 										this.componentType="passenger";
 
-										console.log("Accepted: "+this.passenger.name);
-										console.log("seatMapGridActivePos:"+seatMapGridActivePos);
-										console.log("seatMapGridPosOnPointerUpOrDown:"+seatMapGridPosOnPointerUpOrDown);
+										
+										
+										
 	 
-										// Add this passeger to the correct location in the arrayOfSeatedPassengers								
+										
 										arrayOfSeatedPassengers[(seatMapGridPosOnPointerUpOrDown[0]-1)][(seatMapGridPosOnPointerUpOrDown[1]-1)]=lastObjectWithPassengerClickedOrDragged.passenger;
 										this.mySeatPos=[(seatMapGridPosOnPointerUpOrDown[0]-1),(seatMapGridPosOnPointerUpOrDown[1]-1)];
 										
-										// Remove this passenger from the currentDeckOfPassengerInfo (first, update myPosInDeck for the ones after them)
+										
 										if(currentDeckOfPassengerInfo.length>1){						
 											for(i=this.passenger.myPosInDeck+1;i<currentDeckOfPassengerInfo.length;i++){
 												
@@ -3762,47 +3762,47 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 										currentDeckOfCards.splice(this.passenger.myPosInDeck,1);
 										currentSeatedDeck.push(this);
 																				
-										// If current deck is empty, show NEXT/SUBMIT 
+										
 										if(currentDeckOfPassengerInfo.length==0){
-											// I used to have a lone warning here; but was too busy
+											
 
-											// Show buttons
+											
 											if(arrayOfPassengers.length>0){
 												gameState="showNextButton";
 											}else{
 												gameState="showSubmitButton";
 											}
 										}
-										//
+										
 										var seatWidth = layoutSeats.widthPixels/columnCountWithAisle;
 										if(seatMapGridPosOnPointerUpOrDown[0]<4){seatMapGridPosOnPointerUpOrDown[0]=seatMapGridPosOnPointerUpOrDown[0]-1;}
 										this.targetx=layoutSeats.posxPixels-layoutSeats.widthPixels/2 + (seatMapGridPosOnPointerUpOrDown[0]+0.5)*seatWidth;
 										this.targety=layoutSeats.posyPixels-layoutSeats.heightPixels/2 + (seatMapGridPosOnPointerUpOrDown[1]-1+0.5)*seatWidth;
-										console.log("Making sure "+this.passenger.name+" stays where they were seated. PS: this.goHome ="+ this.goHome);
-										console.log("---------------------------------------------------");
+										
+										
 										this.goHome=false;
 										this.pointerIsDraggingOnMe=false;
 									}
-									if(checkPlacingVar=="occupied"){ // Temp removed REF37989: ||checkPlacingVar=="loneWindowSeat"||checkPlacingVar=="loneMiddleSeat"
-										// REJECT
-										console.log("reject:"+this.passenger.name +" timeCounter:"+timeCounter);
+									if(checkPlacingVar=="occupied"){ 
+										
+										
 										this.goHome=true;
-										// Show warning message, highlight relevant seat
+										
 										showWarning="Seat already occupied";
 										showWarningCounter=showWarningDelay;
 										warningSeatList=[[seatMapGridPosOnPointerUpOrDown[0]-1,seatMapGridPosOnPointerUpOrDown[1]-1]];
-										//
+										
 										this.mySeatPos=[-1,-1];
-										// If still found in seat array, remove
-										// (hack to avoid bug where moving avatar quickly from seated into a reject seat wouuld lead them to be sent home but not removed from seat
-										// (Hopefully the below should have no bad side effecs)
-										console.log("Confirm they didnt remain in array of seated");
+										
+										
+										
+										
 										for(var i=0;i<columnCount;i++){
 											for(var j=0;j<rowCount;j++){
 												if(arrayOfSeatedPassengers[i][j]!=null && arrayOfSeatedPassengers[i][j]!=passengerPreseat){
 													if(arrayOfSeatedPassengers[i][j].name==this.passenger.name){													
 														arrayOfSeatedPassengers[i][j]=null;
-														console.log("Found. Removed");
+														
 													}
 												}
 											}
@@ -3810,13 +3810,13 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 									}
 								}else{
 									this.goHome=true;
-									console.log("go home due to glitch:"+this.passenger.name);
+									
 									lastObjectWithPassengerClickedOrDragged=undefined;									
 								}
-								//lastObjectWithPassengerClickedOrDragged=undefined; // not needed, it seems
+								
 							}else{
 									this.goHome=true;
-									console.log("go home");							
+									
 							}
 						}
 					}
@@ -3836,11 +3836,11 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 		if(pointerUpGlobalOneOffWarning && this.pointerIsHoveringMe){
 			if(this.passenger){
 				if(this.disabled){
-					// this.avatar.headShakeAmountTarget=1; // shouldnt shake just by clicking 
+					
 				}
 			}
 			if(this==layoutSeats){
-				console.log("pointer Up at: "+seatMapGridActivePos);
+				
 				seatMapGridPosOnPointerUpOrDown=seatMapGridActivePos;
 			}
 			
@@ -3851,43 +3851,43 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 
 
 
-		// Random blinks
+		
 		if(this.passenger){		
 			if(Math.random()<0.001){
 				this.avatar.eyeOpeness=0;		
 			}	
 		}
 	
-		// head shake
+		
 
 
-		// Useful area vars
-		// Start and End points of rectangle
+		
+		
 		this.compX1 = this.posxPixels-(this.widthPixels/2);
 		this.compY1 = this.posyPixels-(this.heightPixels/2);
 		this.compX2 = this.compX1+this.widthPixels;
 		this.compY2 = this.compY1+ this.heightPixels;
 		
-		// test
-		//this.width += (this.posx/100)*Math.sin(timeCounter/(this.posx/100));
+		
+		
 
 
 
 				
-		// Draw
+		
 		ctx.globalAlpha = this.alpha;
-		// Draw base
+		
 		if(this.color!="none" && this.componentType!="passenger" && this.componentType!="card"){ 
 			ctx.fillStyle = this.color;
 
-			if(this.pointerHoverStateOnMe=="hovered"){ // Runs once
+			if(this.pointerHoverStateOnMe=="hovered"){ 
 
 			}
 						
 			if(this.shape=="rectangle"){
 				ctx.fillRect(this.compX1, this.compY1, this.widthPixels, this.heightPixels);
 				
-				if(this.highlight){ // hacky
+				if(this.highlight){ 
 					ctx.save();
 					ctx.fillStyle = colorHighlight10pct;
 					ctx.fillRect(this.compX1, this.compY1, this.widthPixels, this.heightPixels);
@@ -3912,9 +3912,9 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 			if(this.componentType=="stat"){blimp=0;}
 			drawCircle(this.posxPixels, this.posyPixels, this.widthPixels/2,this.color, true, "black", blimp);				
 		}
-		//function drawCircle(posx,posy,rad,fillColor, strokeAdd, strokeColor, strokeThickness){					// Draw circle
+		
 
-		// Draw text content
+		
 		ctx.font = this.font;
 		if(this.componentType=="text" || this.componentType=="button" || this.componentType=="stat"){
 			ctx.fillStyle = this.fontColor;
@@ -3922,13 +3922,13 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 					ctx.fillStyle="black";
 			}
 			ctx.textAlign = "center";
-			//ctx.globalAlpha=0.5;
+			
 			var yp = this.posyPixels+this.fontSize/4;
 			if(this.shape=="circle"){yp+=this.fontSize/2.5;}
 			ctx.fillText(this.label, this.posxPixels, yp);
 			ctx.globalAlpha=1;
 			if(this.hint){
-				// If btnCreateDeck, add hint
+				
 				ctx.font = fontHint;
 				ctx.globalAlpha=0.5;
 				ctx.fillStyle = colorShadow50pct;
@@ -3938,18 +3938,18 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 		}
 		
 		
-		// Draw card content
+		
 		if(this.componentType=="card"){
 			
 			drawCard(this.passenger,[this.posxPixels,this.posyPixels],this.lift,false	);
 			
 		}
 		
-		// Draw Graphic
+		
 		if(this.componentType=="graphic"){
 			myDrawImage(this.label,this.compX1, this.compY1,this.graphicScale);
 			
-			if(this.highlight){ // hacky
+			if(this.highlight){ 
 				ctx.save();
 				ctx.filter = "contrast(1.2)";
 				myDrawImage(this.label,this.compX1, this.compY1,this.graphicScale);
@@ -3958,7 +3958,7 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 			
 			
 		}
-		if(typeof this.passenger !== 'undefined'){ // i.e. if there's a passenger associated with this component
+		if(typeof this.passenger !== 'undefined'){ 
 
 
 			this.avatar.passport = this.passenger.passport;
@@ -3974,7 +3974,7 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 				this.avatar.sizePixels = this.widthPixels/3;
 			}
 			
-			// move towards target
+			
 			if(this.passenger!=passengerPreseat){
 				this.avatar.x += (this.avatar.targetx-this.avatar.x)/this.avatar.easeSpeed;
 				this.avatar.y += (this.avatar.targety-this.avatar.y)/this.avatar.easeSpeed;		
@@ -3984,7 +3984,7 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 			}
 
 			if(!this.disabled && this.componentType!="card" && !this.pointerIsDraggingOnMe){
-				// bobs head
+				
 				this.avatar.y+=Math.sin((Math.PI)*this.id+timeCounter/6)*2;					
 			}
 			
@@ -3994,17 +3994,17 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 
 		
 		if(0){
-			// Draw id text
+			
 			ctx.fillStyle = "black";
 			ctx.textAlign = "center";
 			ctx.fillText(this.targetx, this.posxPixels, 100+this.posyPixels+this.fontSize*1.5);			
 		}
 		if(0){
-			// Draw id text
+			
 			ctx.fillStyle = "white";
 			ctx.textAlign = "center";
 			ctx.fillText(this.id, this.posxPixels, this.posyPixels+this.fontSize*1.5);			
-			// Draw offset
+			
 			ctx.fillStyle = "black";
 			ctx.textAlign = "center";
 			ctx.fillText("offset:"+this.pointerClickOffsetX+","+this.pointerClickOffsetY, this.posxPixels, this.posyPixels-this.fontSize*1.5);
@@ -4013,9 +4013,9 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 			ctx.fillText("this.color:"+this.color, this.posxPixels, this.posyPixels+this.fontSize*6);
  
 		}
-		// Reset alpha
+		
 		ctx.globalAlpha = 1;
-		//
+		
 		if(debug && this.disabled){
 			ctx.fillStyle = "purple";
 			ctx.fillRect(this.compX1, this.compY1, this.widthPixels/10, this.heightPixels/10);
@@ -4034,14 +4034,14 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
 	this.fadeIn = function(){this.fade(1,0);}
 	this.fadeOut = function(){this.fade(0,1);}
 	
-	// 	Fadein by default (if not layout component)
+	
 	if(!this.isLayoutComponent || this.componentType=="card"){
 		this.fadeIn();
 	}else{
 		this.color = "white";
 	}
 			
-    this.crashWith = function(otherobj) { // NOT BEING USED; probably usable for droping in hotspot
+    this.crashWith = function(otherobj) { 
         var myleft = this.x;
         var myright = this.x + (this.width);
         var mytop = this.y;
@@ -4058,8 +4058,8 @@ function component(label, posXRel, posYRel, shape, alpha, widthRel, heightRel, c
     }
 }
 
-// Functions that act on the fake grid array
-function addFakePixel(fakeX, fakeY, rgba) {									// Adds a "fake" pixel to the stage (ignores out of bounds, applies Math.floor)
+
+function addFakePixel(fakeX, fakeY, rgba) {									
 
 	if(isBetween(fakeX,0,widthInFakePixels)&&isBetween(fakeY,0,heightInFakePixels)){
 		fakePixelGrid[Math.floor(fakeX)][Math.floor(fakeY)]=rgba;
@@ -4084,10 +4084,10 @@ function addBorderToCanvasF(borderWidth, rgba){
 	for(i=0;i<widthInFakePixels;i++){		
 		for(j=0;j<heightInFakePixels;j++){
 			if(i<(borderWidth)||(i>widthInFakePixels-borderWidth-1)){
-				// If far left or far right, draw full vertical line
+				
 				addFakePixel(i, j, rgba);
 			}else{
-				// Otherwise, only draw borders on top and bottom
+				
 				if(j<(borderWidth)||(j>heightInFakePixels-borderWidth-1)){
 					addFakePixel(i, j, rgba);
 				}
@@ -4096,8 +4096,8 @@ function addBorderToCanvasF(borderWidth, rgba){
 	}		
 }
 
-// Functions that affect output
-function clearCanvas(){														// Fill stage white (called at top of each mainLoop
+
+function clearCanvas(){														
 
 
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -4107,7 +4107,7 @@ function clearCanvas(){														// Fill stage white (called at top of each 
 	}
 
 
-	if(0){ // this clear by painting
+	if(0){ 
 		ctx.fillStyle = "purple";
 		ctx.fillRect(0,0,ww,wh);	
 
@@ -4117,8 +4117,8 @@ function clearCanvas(){														// Fill stage white (called at top of each 
 		}
 	}
 
-	// ctx.fillStyle = "white";
-	// ctx.fillRect(0,0,ww,wh);
+	
+	
 }
 function myDrawImage(img,x,y,scale,deg){	
 	if(typeof scale==='undefined'){
@@ -4132,54 +4132,54 @@ function myDrawImage(img,x,y,scale,deg){
 	this.width = img.width*this.scale;
 	this.height = img.height*this.scale;
 	
-	// Store the current context state (i.e. rotation, translation etc..)
+	
     ctx.save()
 
-    //Convert degrees to radian 
+    
     var rad = this.deg * Math.PI / 180;
 
-    //Set the origin to the center of the image
+    
     ctx.translate(x + this.width / 2, y + this.height / 2);
 
-    //Rotate the canvas around the origin
+    
     ctx.rotate(rad);
 
-    //draw the image    
+    
     ctx.drawImage(img,this.width / 2 * (-1),this.height / 2 * (-1),this.width,this.height);
 
-    // Restore canvas state as saved from above
+    
     ctx.restore();
 	
-	// Source: https://stackoverflow.com/questions/2677671/how-do-i-rotate-a-single-object-on-an-html-5-canvas
+	
 }
 
-// When using fake pixel canvas
-function drawFakePixelGrid(){														// Draws to screen whatever is in fakePixelGrid (using the drawFakePixel function below)
+
+function drawFakePixelGrid(){														
 	for(i=0;i<widthInFakePixels;i++){
 		for(j=0;j<heightInFakePixels;j++){
 			drawFakePixel(i,j,fakePixelGrid[i][j]);
 		}
 	}	
 }
-function drawFakePixel(fakeX, fakeY, rgba) {									// Draw a "fake" pixel (which really maps to a rectangle once stage is resized to fit screen)
+function drawFakePixel(fakeX, fakeY, rgba) {									
 	ctxf.fillStyle = rgba;
 	ctxf.fillRect(fakeX,fakeY,1,1);
 	
 }
 
-// Useful functions
+
 function addToDebugText(line){
 	debugText.push(line);
 }
-function randomFromSeed(seed) { 											// Use this for whatever random you want to give same result given seed
+function randomFromSeed(seed) { 											
 
     var tempRandomCalc = Math.sin(seed) * 1000000;
-	//alert(tempRandomCalc);
+	
 
     return tempRandomCalc - Math.floor(tempRandomCalc);
 
 }
-function toggle(targetVar){													// Var name must be within "quotes"! 
+function toggle(targetVar){													
  
  	if(window[targetVar]){
 		newValue = false;
@@ -4212,8 +4212,8 @@ function randomColor(seed,alpha){
 }
 
 
-// Checker functions
-function isBetween(numberToTest,numA,numB){									// Test if numberToTest is between numA and numB (including). Returns true or false
+
+function isBetween(numberToTest,numA,numB){									
 	
 	var smallerNum = numA;
 	var biggerNum = numB;
@@ -4229,9 +4229,9 @@ function isBetween(numberToTest,numA,numB){									// Test if numberToTest is b
 		return false;
 	}
 	
-	// Later you might add inlA and inclB, to allow choosing include or not
+	
 }
-function pointIsWithinArea(point,shape,posx,posy,width,height){								// Test if point (x,y) is within a rectangular area (x1,y1,x2,y2), or circle (x,y,radius)
+function pointIsWithinArea(point,shape,posx,posy,width,height){								
 	if (typeof shape === 'undefined') {
 		this.shape = "rectangle";
 	}else{this.shape=shape}
@@ -4245,10 +4245,10 @@ function pointIsWithinArea(point,shape,posx,posy,width,height){								// Test i
 		if((Math.pow((point[0]-posx), 2)+Math.pow((point[1]-posy), 2))<Math.pow((width/2),2)){return true;}
 	}	
 
-	// Fallback (shouldnt ever happen)
+	
 	return false;
 }
-function pointsAreCloserThan(point1,point2,distance){	// lazy, doesn't calculate sincos dist
+function pointsAreCloserThan(point1,point2,distance){	
 	if((Math.abs(point1[0]-point2[0])<distance) && (Math.abs(point1[1]-point2[1])<distance)){
 		return true;
 	}
@@ -4270,15 +4270,15 @@ function drawCard(pass,pos,lift,reviewModeTemp){
 	
  
 		
-	// lift
+	
 	var actualX = pos[0]-lift;
 	var actualY = pos[1]-lift;
-	//console.log("lift:"+lift);
 	
-	// BASE
 	
-	// Useful area vars
-	// Start and End points of rectangle
+	
+	
+	
+	
 	var compX1 = actualX-(cardWidth/2);
 	var compY1 = actualY-(cardHeight/2);
 	var compX2 = compX1+cardWidth;
@@ -4302,38 +4302,38 @@ function drawCard(pass,pos,lift,reviewModeTemp){
 
  
 	
-	// TEXT
+	
 	ctx.fillStyle = "black";			
 	ctx.textAlign = "left";
 	var fontSize = fontUISize;
 	ctx.font = fontUI;				
 	var lineHeightRel = 1.5;		
-	// Name
+	
 	ctx.fillText(pass.name, actualX-cardWidth/8, actualY-cardHeight/2+fontSize*2);
 	ctx.globalAlpha=0.8;
-	// Age
+	
 	ctx.font = 400+" "+fontSize*0.9	+ "px "+fontFamilyPrimary;
 	ctx.fillText(pass.age+"yo", actualX-cardWidth/8, actualY-cardHeight/2+fontSize*(2+lineHeightRel*1));
-	// Preference
+	
 	if(typeof pass.pref !== 'undefined'){
 		for(var i=0; i<pass.pref.length; i+=1){
 			ctx.fillText(bulletPoint+" "+pass.pref[i], actualX-cardWidth/8, actualY-cardHeight/2+fontSize*(2+lineHeightRel*(2+i)));
 		}
 	}
-	// Code
+	
 	if(typeof pass.code !== 'undefined'){
 		ctx.font = 600+" "+fontSize*0.7 + "px "+fontFamilyPrimary;
-		// Black base
+		
 		var codeTextBoxWidth = ctx.measureText(pass.code).width+paddingNormal*2;
 		ctx.fillRect(actualX+(cardWidth/2)-(cardWidth/7)-codeTextBoxWidth+paddingNormal, actualY-cardHeight/2+fontSize*(2+lineHeightRel/2), codeTextBoxWidth,fontSize);
-		// Code
+		
 		ctx.textAlign = "right";
 		ctx.fillStyle="white";
 		ctx.fillText(pass.code, actualX+(cardWidth/2)-cardWidth/7, actualY-cardHeight/2+fontSize*(2+lineHeightRel*1));
 	}			
 	ctx.globalAlpha=1;	
 
-	// If Group, pagination
+	
 	if(typeof pass.group !== 'undefined'){
 		ctx.globalAlpha=0.6;
 		ctx.font = 400+" "+fontSize*0.8	+ "px "+fontFamilyPrimary;
@@ -4344,7 +4344,7 @@ function drawCard(pass,pos,lift,reviewModeTemp){
 		
 	}
 	
-	// If review mode, show an X
+	
 	if(this.reviewModeTemp){
 		var glowAmount=0.5;
 		ctx.globalAlpha=(1-glowAmount)+glowAmount*Math.sin(timeCounter/8);
@@ -4359,7 +4359,7 @@ function drawCard(pass,pos,lift,reviewModeTemp){
 
 						
 function groupIsTogether(i,j){
-	// pos in arrayOfSeatedPassengers[i][j] of someone with a group
+	
 	var isTogLeft=false;
 	var isTogRight=false;
 	var groupCounter = 1;
@@ -4369,55 +4369,55 @@ function groupIsTogether(i,j){
 	
 	var pointer = i;
 	
-	console.log("Checking if group is Together for "+tempPerson.name);
 	
-	// Check left
-	console.log("Check to left");
+	
+	
+	
 	while(pointer>0){
 		pointer-=1;
 		if(arrayOfSeatedPassengers[pointer][j]!=null){
 			if(typeof arrayOfSeatedPassengers[pointer][j].group !== 'undefined'){
 				if(arrayOfSeatedPassengers[pointer][j].group==tempPerson.group){
 					groupCounter+=1;
-					console.log("Person to left is of my group:"+arrayOfSeatedPassengers[pointer][j].name);
+					
 				}else{					
-					console.log("BREAK: Person to left is not of my group:"+arrayOfSeatedPassengers[pointer][j].name);
+					
 					break;
 				}
 			}else{
-				console.log("BREAK: Person to left is not my group, as has no group:"+arrayOfSeatedPassengers[pointer][j].name);
+				
 				break; 
 			}
 		}else{
-			console.log("BREAK: Nobody further left.");
+			
 			break;
 		}
 	}
 	pointer = i;
-	// Check right
-	console.log("Check to right");
+	
+	
 	while(pointer<columnCount-1){
 		pointer+=1;
 		if(arrayOfSeatedPassengers[pointer][j]!=null){
 			if(typeof arrayOfSeatedPassengers[pointer][j].group !== 'undefined'){
 				if(arrayOfSeatedPassengers[pointer][j].group==tempPerson.group){
-					console.log("Person to right is of my group:"+arrayOfSeatedPassengers[pointer][j].name);
+					
 					groupCounter+=1;
 				}else{
-					console.log("BREAK: Person to right is not of my group:"+arrayOfSeatedPassengers[pointer][j].name);
+					
 					break;
 				}
 			}else{
-				console.log("BREAK: Person to right is not my group, as has no group:"+arrayOfSeatedPassengers[pointer][j].name);
+				
 				break; 
 			}
 		}else{
-			console.log("BREAK: Nobody further right.");
+			
 			break;
 		}
 	}
 	
-	// Count how many there actually is for this group
+	
 	var actualGroupCount=0;
 	for(var a=0;a<arrayOfPassengersUntouched.length;a++){
 		if(arrayOfPassengersUntouched[a].group==tempPerson.group){
@@ -4425,38 +4425,38 @@ function groupIsTogether(i,j){
 		}
 	}
 	
-	console.log(groupCounter+": groupCounter x actualGroupCount :"+actualGroupCount);
 	
-	// Add a var indicating if at least their not fully alone (REF73893)
+	
+	
 	if(groupCounter>1){
 		tempPerson.isNextToAtLeastOnePersonFromGroup=true;
 	}else{
 		tempPerson.isNextToAtLeastOnePersonFromGroup=false;		
 	}
 	
-	// Decide if group together or not, attribute variables accordingly
+	
 	var result = groupCounter==actualGroupCount;
 
-	// Count how many there actually is for this group // NTH: no need to redo the below for every person from group (the above , yes REF73893)
+	
 	for(var i=0;i<columnCount;i++){		
 		for(var j=0;j<rowCount;j++){
 			if(arrayOfSeatedPassengers[i][j]!=null){
 				if(typeof arrayOfSeatedPassengers[i][j].group !== 'undefined'){
 					if(arrayOfSeatedPassengers[i][j].group==tempPerson.group){
 						arrayOfSeatedPassengers[i][j].myGroupIsTogether=result;
-						console.log(arrayOfSeatedPassengers[i][j].name+" got var myGroupIsTogether as:"+result);
+						
 					}
 				}
 			}
 		}
 	}
 	
-	//
+	
 	return result;
 	
 }
 
-function loadAsset(name,ext,subFolder){												// loads asset (adds it to an array, that can later be checked to make sure its all loaded)
+function loadAsset(name,ext,subFolder){												
 	if(typeof subFolder==='undefined'){
 		this.subFolder="";
 	}else{
@@ -4474,8 +4474,8 @@ function loadAsset(name,ext,subFolder){												// loads asset (adds it to an
 
 }
 
-// Basic draw functions
-function drawCircle(posx,posy,rad,fillColor, strokeAdd, strokeColor, strokeThickness){					// Draw circle
+
+function drawCircle(posx,posy,rad,fillColor, strokeAdd, strokeColor, strokeThickness){					
 	if (typeof fillColor === 'undefined'){
 		fillColor="none";
 	}else{this.fillColor=fillColor;}
@@ -4501,11 +4501,11 @@ function drawCircle(posx,posy,rad,fillColor, strokeAdd, strokeColor, strokeThick
 	}
 }
 
-function generateUniqueID() {			// numbers from 0 to 1
+function generateUniqueID() {			
   return Date.now().toString()+Math.random();
 }
 
-function removeComponent(id){													// TBD: have a single function for this, that knows which array to look for?
+function removeComponent(id){													
 	for(i=0;i<arrayOfComponents.length;i++){
 		if(arrayOfComponents[i].id==id){
 			arrayOfComponents.splice(i,1);
@@ -4514,11 +4514,11 @@ function removeComponent(id){													// TBD: have a single function for thi
 	}
 }
 
-// Project specific functions (examples)
 
 
-// 3d functions
-function distanceBetween(pointA,pointB){													// distance between two 3d points
+
+
+function distanceBetween(pointA,pointB){													
     var x1 = pointA[0];
     var x2 = pointB[0];
     var y1 = pointA[1];
@@ -4531,71 +4531,71 @@ function distanceBetween(pointA,pointB){													// distance between two 3d 
 
 function onKeyUp(e) {
 
-	if(e.keyCode == 16) { 		// SHIFT
+	if(e.keyCode == 16) { 		
 		keyShift=false;
 	}
 	
 	
-	if(e.keyCode == 49){ // 1
+	if(e.keyCode == 49){ 
 		canvasRes=1;
 		adjustToCanvasSizeAndRes();
 	}
-	if(e.keyCode == 50){ // 2
+	if(e.keyCode == 50){ 
 		canvasRes=0.5;
 		adjustToCanvasSizeAndRes();
 	}
-	if(e.keyCode == 51){ // 3
+	if(e.keyCode == 51){ 
 		canvasRes=0.25;
 		adjustToCanvasSizeAndRes();
 	}
-	if(e.keyCode == 32) { //Space-bar		
+	if(e.keyCode == 32) { 
 		keySpace=false;
 		
 	}	
 }
 
-function onKeyDown(e) {														// This function is called by the HTML whenever there is a keydown event;
-//Responds to a key press event
+function onKeyDown(e) {														
 
-	if(e.keyCode == 16) { 		// SHIFT
+
+	if(e.keyCode == 16) { 		
 		keyShift=true;
 	}
 	
-	if(e.keyCode == 82) { 		//r = reset (limpa vars da urk)
-			//var tempURL = window.location.href;
-			//var tempURL2 = tempURL.split('index.html');
-			//window.location.href = tempURL2[0]+'index.html';
+	if(e.keyCode == 82) { 		
+			
+			
+			
 		}
-    if(e.keyCode == 37) { 		//Left arrow
+    if(e.keyCode == 37) { 		
     }
-    else if(e.keyCode == 38) { //Up arrow
+    else if(e.keyCode == 38) { 
 
     }
-    else if(e.keyCode == 39) { //Right arrow
+    else if(e.keyCode == 39) { 
     }
-    else if(e.keyCode == 40) { //Down arrow
+    else if(e.keyCode == 40) { 
 
     }
-	else if(e.keyCode == 32) { //Space-bar		
+	else if(e.keyCode == 32) { 
 		keySpace=true;
 	}
     	
-	if(e.keyCode == 85) { //u = undo
+	if(e.keyCode == 85) { 
 		}
 
-	if(e.keyCode == 68) { //d = debug toggle
+	if(e.keyCode == 68) { 
 		toggle("debug");
 	}
 
 	
-	// IGNORE BELOW (remove?)
-	// Editor keys
-	if(e.keyCode == 67) { //c = clear grid
+	
+	
+	if(e.keyCode == 67) { 
 		if(editor){
-	//	initGrid(0);
+	
 		}
 	}
-    if(e.keyCode > 47 && e.keyCode < 58) { //Numbers 0:48, 1:49, 2:50 .. 9:57;
+    if(e.keyCode > 47 && e.keyCode < 58) { 
 
 		if(e.keyCode==48){
 			paintColor=100;
@@ -4607,4 +4607,3 @@ function onKeyDown(e) {														// This function is called by the HTML when
 	} 
 }
 
-// End
